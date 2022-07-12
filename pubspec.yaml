@@ -1,0 +1,85 @@
+name: bike_cafe
+description: A new Flutter E-commerce project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.5 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  firebase_core: ^1.19.1
+  flutter_image_compress: ^1.1.0
+  image_picker: ^0.8.4+10
+  flutter_svg: ^1.0.3
+  fluttertoast: ^8.0.8
+  get: ^4.6.1
+  google_fonts: ^2.2.0
+
+  hive: ^2.0.5
+  hive_flutter: ^1.1.0
+  http: ^0.13.4
+  geocoding: ^2.0.2
+  geolocator:
+
+  percent_indicator: ^4.2.2
+
+  sign_button: ^2.0.2
+  razorpay_flutter: ^1.2.9
+  uuid: ^3.0.3
+  dropdown_search: ^2.0.1
+  searchfield: ^0.5.6
+  dio: 4.0.4
+  open_file: 3.2.1
+  rxdart: ^0.27.4
+
+  flutter_staggered_grid_view: ^0.6.0
+  carousel_nullsafety: ^0.1.1
+  custom_searchable_dropdown: ^2.1.1
+  flutter_spinkit: ^5.1.0
+  photo_view: ^0.13.0
+  permission_handler: ^9.2.0
+  readmore: ^2.1.0
+  device_info_plus: ^3.2.2
+  double_back_to_close_app: ^2.1.0
+  firebase_auth: ^3.3.16
+  google_sign_in: ^5.3.0
+  flutter_facebook_auth: ^4.0.0
+  firebase_messaging: ^11.2.13
+  flutter_local_notifications: ^9.5.0
+  app_links: ^3.2.0
+  timeago: ^3.2.2
+  url_launcher: ^6.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+  #app launcher icon
+  flutter_launcher_icons: "^0.9.2"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/img/bike_cafe_logo.png"
+
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/img/
+    - assets/img/svg/
+    - assets/bike_cafe/
