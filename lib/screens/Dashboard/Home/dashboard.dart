@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:carousel_nullsafety/carousel_nullsafety.dart';
+
 import 'package:flutter/material.dart';
+import 'package:bike_cafe/widget/locale/ShimmerWidget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,9 +16,11 @@ import 'package:bike_cafe/screens/Dashboard/Cart/cart.dart';
 import 'package:bike_cafe/screens/Dashboard/Home/category/category.dart';
 import 'package:bike_cafe/screens/Dashboard/Home/offers/moreoffer.dart';
 import 'package:bike_cafe/screens/Dashboard/Home/offers/offerpage.dart';
+
 import 'package:bike_cafe/screens/Dashboard/NavBar/bottomNavBar.dart';
 import 'package:bike_cafe/screens/Dashboard/NavBar/menuBar.dart';
 import 'package:bike_cafe/screens/Dashboard/Notification/notification.dart';
+
 import 'package:bike_cafe/screens/chatbotScreen/chatbot.dart';
 import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/config.dart';
@@ -53,11 +57,8 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
+    bottomcontroller.tabIndex.value = 0;
     service.cartCheckoutApi(token: token, userId: userId).then((value) {
-      // if (value!.products == []) {
-      //   cartController.cartItemsCount.value = value!.products!.length;
-      //   debugPrint("cart length: "+value!.products!.length.toString());
-      // }
       cartController.cartItemsCount.value = value!.products!.length;
       debugPrint("cart Updated +${value.products!.length}");
       // setState(() {});
@@ -126,7 +127,11 @@ class _DashboardState extends State<Dashboard> {
         snackBar: const SnackBar(
           content: Text("Tap back again to close app"),
         ),
-        child: DashboardList(boxData: box1),
+        child: DashboardList(
+          boxData: box1,
+          token: token,
+          userId: userId,
+        ),
       ),
     );
   }
@@ -158,6 +163,7 @@ class DashboardList extends StatefulWidget {
 
 class _DashboardListState extends State<DashboardList> {
   TextWidgetStyle style = TextWidgetStyle();
+  // bool isLoading = true;
 
   LocationController locationController = Get.put(LocationController());
 
@@ -171,17 +177,15 @@ class _DashboardListState extends State<DashboardList> {
   // final _notificationcontroller = Get.find<NotificationController>();
   String androidId = '';
 
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
     address();
 
     createBox();
-    // intial();
-    // Notificationapi.inint();
-    // noti();
 
-    //fetching user device id
     DeviceInfoApi.getDeviceAndroidId().then((String value) async {
       setState(() {
         androidId = value;
@@ -192,34 +196,14 @@ class _DashboardListState extends State<DashboardList> {
           deviceToken: box1?.get("device_token"),
           androidId: androidId.toString());
     });
-  }
 
-  // void noti() => Notificationapi.onNotification.stream.listen((event) {
-  //       Map valueMap = event.isEmpty ? {} : json.decode(event as String);
-  //
-  //       if(box1?.get("data4") != null) {
-  //         if (valueMap['screen'] == '1') {
-  //           Get.to(() => const MyOffersPage());
-  //         } else if (valueMap['screen'] == '2') {
-  //           Get.to(() => const OrdersListPage());
-  //         } else {
-  //           Get.to(() => Dashboard());
-  //         }
-  //       }else{
-  //         Get.to(() => const SignIn());
-  //       }
-  //     });
-  //
-  // void intial() async{
-  //   FirebaseMessaging.onMessage.listen((event) {
-  //     log(event.data.toString());
-  //     Notificationapi.shownotification(
-  //         event.notification!.title.toString(),
-  //         event.notification!.body,
-  //         jsonEncode(event.data),
-  //         event.data['img_url'].toString());
-  //   });
-  // }
+    // Future.delayed(const Duration(milliseconds: 3000), () {
+    //   setState(() {
+    //     isLoading = false;
+    //     debugPrint(isLoading.toString());
+    //   });
+    // });
+  }
 
   void createBox() async {
     box1 = await Hive.openBox('logindata');
@@ -236,14 +220,7 @@ class _DashboardListState extends State<DashboardList> {
 
     locationController.locality.value = place.locality.toString();
     locationController.zipcode.value = place.postalCode.toString();
-    // UserAddress.isEmpty
-    //     ? const CircularProgressIndicator()
-    //     : Get.to(GoogleMapScreen(
-    //         Address: UserAddress,
-    //         latitude: position.latitude,
-    //         longitude: position.longitude,
-    //       ));
-    // isAddressadded = true;
+
     print(position.latitude);
     print(position.longitude);
     setState(() {});
@@ -252,7 +229,7 @@ class _DashboardListState extends State<DashboardList> {
   void address() async {
     GetAddressFromLatLong;
     Position position = await _controller.getGeoLocationPosition();
-    // location = 'Lat: ${position.latitude} , Long: ${position.longitude}';
+
     GetAddressFromLatLong(position);
 
     print(UserAddress);
@@ -262,91 +239,39 @@ class _DashboardListState extends State<DashboardList> {
 
   @override
   Widget build(BuildContext context) {
-    return box1?.get("data4") == null
-        ? const Center(child: CircularProgressIndicator(color: Colors.red))
-        : RefreshIndicator(
-            onRefresh: () async {
-              var reload;
-              setState(() {
-                reload = service.getProductsApi(token: box1?.get("data4"));
-              });
-              return reload;
-            },
-            color: Colors.red,
-            child: ListView(
-              children: [
-                const SizedBox(height: 3),
-                Category(
-                  token: box1?.get("data4"),
-                  userId: box1?.get("data3"),
-                ),
-                FutureBuilder<GetBanners?>(
-                  future: service.getMainPageBanners(token: box1?.get("data4")),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return bannerCarousel(snapshot);
-                    } else {
-                      return const Center();
-                    }
-                  },
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    OfferPage(
-                        token: box1!.get("data4"), userId: box1!.get("data3")),
-                    // InkWell(
-                    //   onTap: () {},
-                    //   child: Align(
-                    //     alignment: Alignment.bottomRight,
-                    //     child: style.Roboto(text: "See All Details>>"),
-                    //   ),
-                    // )
-                  ],
-                ),
-
-                MoreOffers(
-                    token: box1!.get("data4"), userId: box1!.get("data3")),
-
-                SizedBox(
-                  height: 40,
-                )
-                // Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: style.Roboto(
-                //       text: "Upcoming Offers",
-                //       color: Colors.black,
-                //       size: 16,
-                //       fontwight: FontWeight.w500),
-                // ),
-                // Container(
-                //   margin: EdgeInsets.only(left: 6),
-                //   height: 100,
-                //   child: ListView(
-                //     scrollDirection: Axis.horizontal,
-                //     children: [
-                //       OffersCard('assets/img/oof3.png'),
-                //       OffersCard('assets/img/off1.png'),
-                //       OffersCard('assets/img/oof3.png'),
-                //     ],
-                //   ),
-                // ),
-              ],
-            ),
-          );
+    return ListView(
+      children: [
+        const SizedBox(height: 3),
+        Category(
+          token: widget.token.toString(),
+          userId: widget.userId.toString(),
+        ),
+        FutureBuilder<GetBanners?>(
+          future: service.getMainPageBanners(token: widget.token.toString()),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return bannerShimmer();
+            }
+            if (snapshot.hasData) {
+              return bannerCarousel(snapshot);
+            } else {
+              return const Center();
+            }
+          },
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            OfferPage(),
+          ],
+        ),
+        MoreOffers(
+            token: widget.token.toString(), userId: widget.userId.toString()),
+        const SizedBox(height: 40),
+      ],
+    );
   }
-
-  // Widget OffersCard(String img) {
-  //   return InkWell(
-  //     onTap: () {
-  //       Get.to(VerifyUser());
-  //     },
-  //     child: Card(
-  //       child: Image.asset(img),
-  //     ),
-  //   );
-  // }
 
   Widget bannerCarousel(AsyncSnapshot<GetBanners?> snapshot) {
     return SizedBox(
@@ -397,6 +322,15 @@ class _DashboardListState extends State<DashboardList> {
   }
 }
 
+Widget bannerShimmer() {
+  return Container(
+    height: Get.height * 0.25,
+    margin: const EdgeInsets.symmetric(horizontal: 6),
+    child: ShimmerWidget.rectangular(
+        width: Get.width - 50, height: Get.height * 0.25),
+  );
+}
+
 class LocationController extends GetxController {
   var locality = ''.obs;
   var zipcode = ''.obs;
@@ -406,9 +340,12 @@ class Utlis {
   static Future<String> notificationimg(String url, String filename) async {
     final dir = await getApplicationDocumentsDirectory();
     final path = '${dir.path}/${filename}';
-    final response = await http.get(Uri.parse(url));
-    final file = File(path);
-    await file.writeAsBytes(response.bodyBytes);
+    if (url != 'null') {
+      final response = await http.get(Uri.parse(url));
+      final file = File(path);
+      await file.writeAsBytes(response.bodyBytes);
+      return path;
+    }
     return path;
   }
 }
@@ -439,14 +376,27 @@ class Notificationapi {
 
   static Future _notificationdetails(String url) async {
     final large = await Utlis.notificationimg(url.toString(), 'Offers');
+
+    if (url == null) {
+      return const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channelId',
+          'channelName',
+          icon: "@mipmap/ic_launcher",
+          priority: Priority.max,
+          importance: Importance.max,
+          enableVibration: true,
+        ),
+      );
+    }
     return NotificationDetails(
       android: AndroidNotificationDetails('channelId', 'channelName',
           icon: "@mipmap/ic_launcher",
           priority: Priority.max,
           importance: Importance.max,
           enableVibration: true,
-          styleInformation:
-              BigPictureStyleInformation(FilePathAndroidBitmap(large))),
+          styleInformation: BigPictureStyleInformation(
+              FilePathAndroidBitmap(url == null ? '' : large))),
     );
   }
 

@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:bike_cafe/widget/config.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
 
 class Constants {
+  var screenHeight = Get.height;
   //background color
   //light white
   static const bgcolor = Color.fromRGBO(236, 243, 249, 1);
@@ -102,7 +106,9 @@ class Constants {
         child: Text.rich(
           TextSpan(children: [
             WidgetSpan(
-              child: Icon(icontext, size: 20, color: isWishlist == null ? Colors.white : Colors.red),
+              child: Icon(icontext,
+                  size: 20,
+                  color: isWishlist == null ? Colors.white : Colors.red),
             ),
             TextSpan(text: " $text"),
           ], style: TextStyle(color: Colors.white)),
@@ -111,7 +117,7 @@ class Constants {
     );
   }
 
-  static appBarOnlyTitle(String name){
+  static appBarOnlyTitle(String name) {
     return AppBar(
       backgroundColor: Color.fromRGBO(255, 251, 254, 1),
       iconTheme: IconThemeData(color: Colors.black),
@@ -130,7 +136,7 @@ class Constants {
     if (avgRating >= 1 && avgRating < 2) {
       color = const Color.fromRGBO(255, 165, 0, 1);
     }
-    if (avgRating >= 2 && avgRating < 5){
+    if (avgRating >= 2 && avgRating < 5) {
       color = const Color.fromRGBO(0, 128, 0, 1);
     }
     return Card(
@@ -153,4 +159,46 @@ class Constants {
       ),
     );
   }
+
+  static linkText(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+          color: kPrimaryColor,
+          fontWeight: FontWeight.w400,
+          fontSize: 18,
+          fontFamily: GoogleFonts.roboto().fontFamily,
+          decoration: TextDecoration.underline),
+    );
+  }
+
+  static cartIcon() {
+    return const Card(
+      color: Color.fromRGBO(230, 10, 9, 3),
+      child: Padding(
+        padding: EdgeInsets.all(4.0),
+        child:
+            Icon(Icons.add_shopping_cart_sharp, size: 18, color: Colors.white),
+      ),
+    );
+  }
+
+  static circularWidget() {
+    return SizedBox(
+      height: Get.height - 150,
+      child: const Center(
+        child: CircularProgressIndicator(color: kPrimaryColor),
+      ),
+    );
+  }
+
+  static linearColor() => const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    stops: [0.0, 1.0],
+    colors: [
+      Color.fromRGBO(255, 154, 158, 1),
+      Color.fromRGBO(250, 208, 196, 1),
+    ],
+  );
 }

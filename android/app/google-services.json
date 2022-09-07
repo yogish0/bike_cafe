@@ -1,63 +1,49 @@
 {
   "project_info": {
-    "project_number": "700931703908",
-    "project_id": "bikecafe-4693d",
-    "storage_bucket": "bikecafe-4693d.appspot.com"
+    "project_number": "503894826774",
+    "project_id": "bikecafe-86a11",
+    "storage_bucket": "bikecafe-86a11.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:700931703908:android:e3f0837fec6bd14b240b71",
+        "mobilesdk_app_id": "1:503894826774:android:33ea3401aa9f8441d23a37",
         "android_client_info": {
           "package_name": "com.gologix.bikecafe"
         }
       },
       "oauth_client": [
         {
-          "client_id": "700931703908-rhkt3ibktq9c9q4gmqcvm0qc4li389o0.apps.googleusercontent.com",
+          "client_id": "503894826774-v7a3k4qsf2e0grs3ld4bmr7qu5h1073t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gologix.bikecafe",
+            "certificate_hash": "2cf72cd2eff53637384c13e0cbbf8ca665f7b9da"
+          }
+        },
+        {
+          "client_id": "503894826774-shn65o8h5fne6pl4v5fec4b56ddih3ut.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCnsYBjh-SYTxPKTEGGKA_EnfUOJSHyA_w"
+          "current_key": "AIzaSyBbY3NmIzWtEdTnuhYQ5s1aOpAz6WTEIjg"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "700931703908-rhkt3ibktq9c9q4gmqcvm0qc4li389o0.apps.googleusercontent.com",
+              "client_id": "503894826774-shn65o8h5fne6pl4v5fec4b56ddih3ut.apps.googleusercontent.com",
               "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:700931703908:android:8b24a071743e34d5240b71",
-        "android_client_info": {
-          "package_name": "com.gologix.bikecafe"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "700931703908-rhkt3ibktq9c9q4gmqcvm0qc4li389o0.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCnsYBjh-SYTxPKTEGGKA_EnfUOJSHyA_w"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
+            },
             {
-              "client_id": "700931703908-rhkt3ibktq9c9q4gmqcvm0qc4li389o0.apps.googleusercontent.com",
-              "client_type": 3
+              "client_id": "503894826774-ks6r8c5ko0o0ghj5vi21kdip7s880q0m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gologix.bikecafe"
+              }
             }
           ]
         }

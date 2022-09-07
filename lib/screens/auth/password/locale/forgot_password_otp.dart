@@ -9,7 +9,8 @@ import 'package:bike_cafe/widget/auth/txt_formfield.dart';
 import 'package:bike_cafe/widget/config.dart';
 
 class ForgotPasswordOtp extends StatefulWidget {
-  ForgotPasswordOtp({Key? key, this.userId, this.phoneNumber}) : super(key: key);
+  ForgotPasswordOtp({Key? key, this.userId, this.phoneNumber})
+      : super(key: key);
 
   String? userId;
   String? phoneNumber;
@@ -26,22 +27,24 @@ class _ForgotPasswordOtpState extends State<ForgotPasswordOtp> {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      try{
-        var verify = apiService.verifyUserByOtpApi(userId: widget.userId, userOtp: _otpController.text.toString());
-        verify.then((value){
-          if(value!.success == 1){
-            Get.off(()=> PasswordReset(userId: widget.userId.toString()));
-          }else{
+      try {
+        var verify = apiService.verifyUserByOtpApi(
+            userId: widget.userId, userOtp: _otpController.text.toString());
+        verify.then((value) {
+          if (value!.success == 1) {
+            Get.off(() => PasswordReset(userId: widget.userId.toString()));
+          } else {
             Fluttertoast.showToast(msg: value.message.toString());
           }
         });
-      }catch(e){
+      } catch (e) {
         print(e.toString());
       }
       return true;
     }
     return false;
   }
+
   @override
   Widget build(BuildContext context) {
     TextWidgetStyle style = TextWidgetStyle();
@@ -68,8 +71,9 @@ class _ForgotPasswordOtpState extends State<ForgotPasswordOtp> {
                       SizedBox(height: Config.Height * 0.15),
                       const Text('Enter OTP sent your mobile number'),
                       const SizedBox(height: 10),
-                      Text('+91 '+ widget.phoneNumber.toString(),
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                      Text('+91 ' + widget.phoneNumber.toString(),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 15),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -79,10 +83,11 @@ class _ForgotPasswordOtpState extends State<ForgotPasswordOtp> {
                           type: TextInputType.number,
                           textAlign: TextAlign.center,
                           validator: (input) {
-                            bool _isNumberValid = RegExp(r"^[0-9]{6}").hasMatch(input!);
-                            if(input == ''){
+                            bool _isNumberValid =
+                                RegExp(r"^[0-9]{6}").hasMatch(input!);
+                            if (input == '') {
                               return 'Enter OTP';
-                            }else if (!_isNumberValid) {
+                            } else if (!_isNumberValid) {
                               return 'Invalid OTP';
                             }
                             return null;

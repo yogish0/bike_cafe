@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:bike_cafe/controllers/paymentstatuscontroller.dart';
+import 'package:bike_cafe/main.dart';
 import 'package:bike_cafe/models/Order_Model/payment_failed_model.dart';
+import 'package:bike_cafe/services/api.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentController extends GetxController {
-
   late Razorpay razorpay;
   var payment_id = ''.obs;
 
@@ -17,11 +18,6 @@ class PaymentController extends GetxController {
 
   var failedPaymentId = ''.obs;
   var paymentStatus = 0.obs;
-
-
- 
-  //if paymentStatus = 1, payment success
-  //if paymentStatus = 2, payment failed
 
   @override
   void onInit() {
@@ -40,7 +36,7 @@ class PaymentController extends GetxController {
     razorpay.clear();
   }
 
-  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async{
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     // Get.snackbar(
     //     'Payment Successful!',
     //     response.orderId.toString() +
@@ -49,27 +45,35 @@ class PaymentController extends GetxController {
     //         "\n" +
     //         response.signature.toString());
 
-PaymentStatusController paymentStatusController=Get.put(PaymentStatusController());
+    PaymentStatusController paymentStatusController =
+        Get.put(PaymentStatusController());
+    APIService service = APIService();
 
-paymentStatusController.paymentcontrollerstatus.value=1;
+    service.onlinePaymentInitiateApi(
+        token: box1.get("data4"),
+        userId: box1.get("data3"),
+        payment_trans_id: response.paymentId.toString());
 
     Get.snackbar(
-      'Payment Successful!', "Payment id : " + response.paymentId.toString(),
+        'Payment Successful!', "Payment id : " + response.paymentId.toString(),
         snackPosition: SnackPosition.TOP,
         duration: const Duration(seconds: 5),
         backgroundColor: const Color.fromRGBO(0, 0, 0, 0.8),
-        colorText: Colors.white
-    );
-
-    
+        colorText: Colors.white);
+    paymentStatusController.coninuelodaing.value = false;
 
     payment_id.value = response.paymentId.toString();
-    debugPrint('payment id : '+payment_id.value);
+    debugPrint('payment id : ' + payment_id.value);
   }
 
-  Future<void> _handlePaymentError(PaymentFailureResponse response) async{
-    var failedResponse = PaymentCancelledResponseModel.fromMap(jsonDecode(response.message.toString()));
+  Future<void> _handlePaymentError(PaymentFailureResponse response) async {
+    var failedResponse = PaymentCancelledResponseModel.fromMap(
+        jsonDecode(response.message.toString()));
     // Get.snackbar('Payment Error Occurred', response.message.toString());
+    PaymentStatusController paymentStatusController =
+        Get.put(PaymentStatusController());
+
+    paymentStatusController.coninuelodaing.value = false;
 
     failedPaymentId.value = failedResponse.error.metadata.paymentId.toString();
     debugPrint(failedResponse.error.metadata.paymentId.toString());
@@ -82,9 +86,9 @@ paymentStatusController.paymentcontrollerstatus.value=1;
   }
 
   Future<void> dispatchPayment(int amount, String name, String contact,
-      String description, String email, String wallet) async{
+      String description, String email, String wallet) async {
     var options = {
-      'key': 'rzp_test_0CUClQS9ymJpN7',
+      'key': 'rzp_live_LzYKcpWINbsfuB',
       'amount': amount, //in the smallest currency sub-unit.
       'name': name,
       'description': description,

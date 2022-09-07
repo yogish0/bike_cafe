@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bike_cafe/controllers/paymentcontroller.dart';
 import 'package:bike_cafe/models/Order_Model/online_payment_verify.dart';
+import 'package:bike_cafe/models/Order_Model/order_details_model.dart';
 import 'package:bike_cafe/models/Order_Model/order_response_model.dart';
+import 'package:bike_cafe/models/Order_Model/orderdetailsmodeltwo.dart';
 import 'package:bike_cafe/models/Storage/address/getaddressmodel.dart';
 import 'package:bike_cafe/screens/Dashboard/Cart/cart.dart';
 import 'package:bike_cafe/services/api.dart';
@@ -36,7 +38,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     setState(() {});
   }
 
-  ProductOrderController productController = Get.put(ProductOrderController());
+  // ProductOrderController productController = Get.put(ProductOrderController());
   CartController cartController = Get.put(CartController());
 
   final PaymentController paymentController = Get.put(PaymentController());
@@ -53,112 +55,46 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (productController.paymentType.value != 0)
-                  Obx(
-                    () => Container(
-                      child: productController.paymentType.value == 2
-                          ? FutureBuilder<OrderResponseModel?>(
-                              future: service.codPaymentOrderApi(
-                                  token: box1?.get("data4"),
-                                  userId: box1?.get("data3")),
-                              builder: (context, snapshot) {
-                                if(snapshot.connectionState==ConnectionState.waiting){
-                                  return Center(child: CircularProgressIndicator(color: Colors.red),);
-                                }
-                                else 
-                                if (snapshot.data!=null) {
-                                  if (snapshot.data!.orders.success.toString() == '1') {
-                                    return Column(
-                                      children: [
-                                        orderSuccessWidget(snapshot),
-                                        const SizedBox(height: 25),
-                                        addressWidget(),
-                                        const SizedBox(height: 25),
-                                        priceDetailsWidget(),
-                                        const Divider(),
-                                        const SizedBox(height: 10),
-                                      ],
-                                    );
-                                  } else {
-                                    return Center(
-                                      child: Text(snapshot.data!.orders.message.toString()),
-                                    );
-                                  }
-                                } return Container();
-                              },
-                            )
-                          : paymentController.paymentStatus.value != 0
-                              ? paymentController.paymentStatus.value == 1
-                                  ? FutureBuilder<VerifyOnlinePaymentModel?>(
-                                      future: service.onlinePaymentVerifyApi(
-                                          token: box1?.get("data4"),
-                                          userId: box1?.get("data3"),
-                                          goTransactionId: paymentController
-                                              .goTransactionId.value.toString(),
-                                          orderId: paymentController
-                                              .orderId.value.toString(),
-                                          paymentTransactionId:
-                                              paymentController.payment_id.toString(),
-                                          paymentStatus: "1"),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          if(snapshot.data!.success == "1"){
-                                            return Column(
-                                              children: [
-                                                orderPaymentSuccessWidget(snapshot),
-                                                const SizedBox(height: 25),
-                                                addressWidget(),
-                                                // const SizedBox(height: 25),
-                                                // priceDetailsWidget(),
-                                                const Divider(),
-                                                const SizedBox(height: 10)
-                                              ],
-                                            );
-                                          }else{
-                                            return const Center();
-                                          }
-                                        } else {
-                                          return const Center();
-                                        }
-                                      },
-                                    )
-                                  : FutureBuilder<VerifyOnlinePaymentModel?>(
-                                      future: service.onlinePaymentVerifyApi(
-                                          token: box1?.get("data4"),
-                                          userId: box1?.get("data3"),
-                                          goTransactionId: paymentController
-                                              .goTransactionId.value.toString(),
-                                          orderId: paymentController
-                                              .orderId.value.toString(),
-                                          paymentTransactionId:
-                                              paymentController.failedPaymentId.toString(),
-                                          paymentStatus: "0"),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          if(snapshot.data!.success == "1"){
-                                            return Column(
-                                              children: [
-                                                orderFailureWidget(snapshot),
-                                              ],
-                                            );
-                                          }else{
-                                            return const Center();
-                                          }
-                                        } else {
-                                          return const Center();
-                                        }
-                                      },
-                                    )
-                              : const Center(),
+                // if (productController.paymentType.value != 0)
+                Container(
+                  child:
+                      //  productController.paymentType.value == 2
+                      // ?
+                      FutureBuilder<GetPaymentOrder?>(
+                    future: service.getUserOrdersDetailsinorderlist(
+                      orderId: box1!.get('orderId').toString(),
+                      token: box1?.get("data4"),
                     ),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: Colors.red),
+                        );
+                      }
+
+                      return Column(
+                        children: [
+                          orderSuccessWidget(snapshot),
+                          const SizedBox(height: 25),
+                          addressWidget(),
+                          const SizedBox(height: 25),
+                          priceDetailsWidget(snapshot: snapshot),
+                          const Divider(),
+                          const SizedBox(height: 10),
+                        ],
+                      );
+                    },
                   ),
+                  // :
+                ),
               ],
             ),
           );
   }
 
   //int index, AsyncSnapshot<CartCheckoutModel?> snapshot, int totalItems
-  Widget priceDetailsWidget() {
+  Widget priceDetailsWidget(
+      {required AsyncSnapshot<GetPaymentOrder?> snapshot}) {
     return Container(
       padding: const EdgeInsets.all(4),
       child: Column(
@@ -170,38 +106,38 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  style.OpenSans(
-                      text: "Price (" +
-                          productController.productCount.value.toString() +
-                          " items)",
-                      size: 12,
-                      fontwight: FontWeight.w400),
-                  style.OpenSans(
-                      text: "₹ " + productController.mrpPrice.value.toString(),
-                      size: 12,
-                      fontwight: FontWeight.w400,
-                      color: Colors.red),
-                ],
-              ),
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     // style.OpenSans(
+              //     //     text: "Price (" +
+              //     //         snapshot.data.order[0].+
+              //     //         " items)",
+              //     //     size: 12,
+              //     //     fontwight: FontWeight.w400),
+              //     // style.OpenSans(
+              //     //     text: "₹ " +  snapshot.data!.order[0].,
+              //     //     size: 12,
+              //     //     fontwight: FontWeight.w400,
+              //     //     color: Colors.red),
+              //   ],
+              // ),
               const SizedBox(height: 4),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  style.OpenSans(
-                      text: "Discount", size: 12, fontwight: FontWeight.w400),
-                  style.OpenSans(
-                      text: "- ₹ " +
-                          productController.savingAmount.value.toString(),
-                      size: 12,
-                      fontwight: FontWeight.w400,
-                      color: const Color.fromRGBO(0, 129, 0, 1)),
-                ],
-              ),
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     style.OpenSans(
+              //         text: "Discount", size: 12, fontwight: FontWeight.w400),
+              //     style.OpenSans(
+              //         text: "- ₹ " +
+              //            snapshot.data!.productorder[0].proordPrice.toString(),
+              //         size: 12,
+              //         fontwight: FontWeight.w400,
+              //         color: const Color.fromRGBO(0, 129, 0, 1)),
+              //   ],
+              // ),
               // Row(
               //   crossAxisAlignment: CrossAxisAlignment.start,
               //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -223,18 +159,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 children: [
                   style.OpenSans(
                       text: "Tax(18%) ", size: 12, fontwight: FontWeight.w400),
-                  Tooltip(
-                    message: "CGST: ₹ " +
-                        productController.cgstPrice.value.toString() +
-                        "and SGST: ₹ " +
-                        productController.sgstPrice.value.toString(),
-                    preferBelow: false,
-                    showDuration: const Duration(seconds: 5),
-                    child: const Icon(Icons.help, size: 14, color: Colors.grey),
-                  ),
+                  // Tooltip(
+                  //   message: "CGST: ₹ " +
+                  //        snapshot.data!.order![0].tax.toString() +
+                  //      ,
+                  //   preferBelow: false,
+                  //   showDuration: const Duration(seconds: 5),
+                  //   child: const Icon(Icons.help, size: 14, color: Colors.grey),
+                  // ),
                   const Spacer(),
                   style.OpenSans(
-                      text: "₹ " + productController.gstPrice.value.toString(),
+                      text: "₹ " + snapshot.data!.order![0].tax.toString(),
                       size: 12,
                       fontwight: FontWeight.w400,
                       color: const Color.fromRGBO(0, 129, 0, 1)),
@@ -250,7 +185,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                       size: 12,
                       fontwight: FontWeight.w400),
                   style.OpenSans(
-                      text: "₹ "+productController.deliveryFee.value.toString(),
+                      text: "₹ " +
+                          snapshot.data!.order![0].deliveryfee.toString(),
                       size: 12,
                       fontwight: FontWeight.w400,
                       color: const Color.fromRGBO(0, 129, 0, 1)),
@@ -267,7 +203,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               style.OpenSans(
                   text: "Total Amount", size: 12, fontwight: FontWeight.w400),
               style.OpenSans(
-                  text: "₹ " + productController.totalPrice.value.toString(),
+                  text: "₹ " + snapshot.data!.order![0].total.toString(),
                   size: 12,
                   fontwight: FontWeight.w400),
             ],
@@ -279,9 +215,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               style.OpenSans(
                   text: "Payment Mode", size: 12, fontwight: FontWeight.w400),
               style.OpenSans(
-                  text: productController.paymentType.value == 1
-                      ? "Online Payment"
-                      : "Cash on Delivery",
+                  text: snapshot.data!.order![0].paymentMethod.toString(),
                   size: 12,
                   fontwight: FontWeight.w400),
             ],
@@ -328,46 +262,45 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     return address.addIsDefault == 0
         ? const Center()
         : Column(
-          children: [
-            SizedBox(
-              width: Config.Width * 0.85,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: style.OpenSans(
-                        text: address.name.toString(),
-                        size: 14), //Full Name
-                  ),
-                  style.OpenSans(
-                      text: address.addAddress.toString(), size: 12),
+            children: [
+              SizedBox(
+                width: Config.Width * 0.85,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: style.OpenSans(
+                          text: address.name.toString(), size: 14), //Full Name
+                    ),
+                    style.OpenSans(
+                        text: address.addAddress.toString(), size: 12),
 
-                  style.OpenSans(
-                      text: address.addDescription.toString() +
-                          ', ' +
-                          address.cityName.toString(),
-                      size: 12),
+                    style.OpenSans(
+                        text: address.addDescription.toString() +
+                            ', ' +
+                            address.cityName.toString(),
+                        size: 12),
 
-                  style.OpenSans(
-                      text: address.stateName.toString() +
-                          ' - ' +
-                          address.addPincode.toString(),
-                      size: 12),
+                    style.OpenSans(
+                        text: address.stateName.toString() +
+                            ' - ' +
+                            address.addPincode.toString(),
+                        size: 12),
 
-                  const SizedBox(height: 10),
-                  // State and pincode
-                  style.OpenSans(
-                      text: address.phonenumber.toString(), size: 12),
-                ],
+                    const SizedBox(height: 10),
+                    // State and pincode
+                    style.OpenSans(
+                        text: address.phonenumber.toString(), size: 12),
+                  ],
+                ),
               ),
-            ),
-          ],
-        );
+            ],
+          );
   }
 
   //order success widget for cash on delivery
-  Widget orderSuccessWidget(AsyncSnapshot<OrderResponseModel?> snapshot) {
+  Widget orderSuccessWidget(AsyncSnapshot<GetPaymentOrder?> snapshot) {
     return Container(
       padding: const EdgeInsets.all(4),
       alignment: Alignment.center,
@@ -402,7 +335,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               text: "your order number ", size: 16, fontwight: FontWeight.w700),
           const SizedBox(height: 8),
           style.Roboto(
-              text: snapshot.data!.orders.orderrefid.toString(),
+              text: snapshot.data!.order![0].orderRefId.toString(),
               size: 24,
               fontwight: FontWeight.w700,
               color: kPrimaryColor),
@@ -514,15 +447,19 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
-  Future<void> pushOrderMethod(String orderId) async{
-    service.pushOrderApi(token: box1?.get("data4"),
-        orderId: orderId).then((value) {
+  Future<void> pushOrderMethod(String orderId) async {
+    service
+        .pushOrderApi(token: box1?.get("data4"), orderId: orderId)
+        .then((value) {
       debugPrint("push order api...");
       debugPrint(value?.shipmentId.toString());
-      if(value?.shipmentId != null){
-        service.storeShipmentIdApi(token: box1?.get("data4"),
-            orderId: orderId,
-            shipmentId: value?.shipmentId.toString()).then((value) {
+      if (value?.shipmentId != null) {
+        service
+            .storeShipmentIdApi(
+                token: box1?.get("data4"),
+                orderId: orderId,
+                shipmentId: value?.shipmentId.toString())
+            .then((value) {
           debugPrint("store shipment id api...");
           debugPrint(value?.message.toString());
         });

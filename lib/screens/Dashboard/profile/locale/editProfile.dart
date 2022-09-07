@@ -1,9 +1,17 @@
+// ignore: file_names
+// ignore_for_file: unused_import, must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:bike_cafe/models/UserProfile/usermodel.dart';
 import 'package:bike_cafe/models/UserProfile/userprofile.dart';
+import 'package:bike_cafe/models/editprofile/editprofilemodel.dart';
+import 'package:bike_cafe/screens/Dashboard/Address/locale/editadress.dart';
 import 'package:bike_cafe/services/api.dart';
+import 'package:bike_cafe/themes/CirucularIndication/progressHud.dart';
+import 'package:bike_cafe/widget/auth/textformfield.dart';
+import 'package:bike_cafe/widget/auth/txt_formfield.dart';
 import 'package:bike_cafe/widget/config.dart';
 import 'package:bike_cafe/widget/constrants.dart';
 import 'package:bike_cafe/widget/locale/scaffold.dart';
@@ -11,6 +19,8 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../profile.dart';
 import 'gallery_widget.dart';
 import 'dart:io';
 
@@ -27,7 +37,7 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   Box? box1;
   APIService service = APIService();
-  String previousName ='';
+  String previousName = '';
   String previousEmail = '';
   String previousNumber = '';
 
@@ -42,9 +52,12 @@ class _EditProfileState extends State<EditProfile> {
         previousName = value!.user[0].name.toString();
         previousEmail = value.user[0].email.toString();
         previousNumber = value.user[0].phonenumber.toString();
-        _nameController.value = TextEditingValue(text: value.user[0].name.toString());
-        _emailController.value = TextEditingValue(text: value.user[0].email.toString());
-        _numberController.value = TextEditingValue(text: value.user[0].phonenumber.toString());
+        _nameController.value =
+            TextEditingValue(text: value.user[0].name.toString());
+        _emailController.value =
+            TextEditingValue(text: value.user[0].email.toString());
+        _numberController.value =
+            TextEditingValue(text: value.user[0].phonenumber.toString());
       });
     });
   }
@@ -54,11 +67,11 @@ class _EditProfileState extends State<EditProfile> {
     setState(() {});
   }
 
-  bool validateNameAndUpdate(){
+  bool validateNameAndUpdate() {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      if(previousName != _nameController.text){
+      if (previousName != _nameController.text) {
         try {
           final String name = _nameController.text.toString();
           final String email = previousEmail.toString();
@@ -70,7 +83,7 @@ class _EditProfileState extends State<EditProfile> {
               email: email,
               number: number);
           model.then((value) {
-            if(value?.success == 1) {
+            if (value?.success == 1) {
               Fluttertoast.showToast(msg: "Profile name updated");
             }
             previousName = _nameController.text.toString();
@@ -84,11 +97,11 @@ class _EditProfileState extends State<EditProfile> {
     return false;
   }
 
-  bool validateEmailAndUpdate(){
+  bool validateEmailAndUpdate() {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      if(previousEmail != _emailController.text){
+      if (previousEmail != _emailController.text) {
         try {
           final String name = previousName.toString();
           final String email = _emailController.text.toString();
@@ -100,7 +113,7 @@ class _EditProfileState extends State<EditProfile> {
               email: email,
               number: number);
           model.then((value) {
-            if(value?.success == 1) {
+            if (value?.success == 1) {
               Fluttertoast.showToast(msg: "Email address updated");
             }
             previousEmail = _emailController.text;
@@ -114,63 +127,69 @@ class _EditProfileState extends State<EditProfile> {
     return false;
   }
 
-  bool validateNumberAndUpdate(){
+  bool validateNumberAndUpdate() {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      if(previousNumber != _numberController.text){
+      if (previousNumber != _numberController.text) {
         try {
           final String name = previousName.toString();
           final String email = previousEmail.toString();
           final String number = _numberController.text.toString();
 
-          var sendOtp = service.OtpToMobileNumberVerify(phoneNumber: number.toString());
+          var sendOtp =
+              service.OtpToMobileNumberVerify(phoneNumber: number.toString());
           sendOtp.then((value) {
             var smsIdResponse = value?.smsid.toString();
-            if(value!.success == 1){
+            if (value!.success == 1) {
               Get.defaultDialog(
                 title: 'OTP Verification',
                 content: otpPopup2(),
-                onCancel: (){
-                  _otpController2.text ='';
+                onCancel: () {
+                  _otpController2.text = '';
                 },
-                onConfirm: (){
+                onConfirm: () {
                   if (form.validate()) {
                     final form = _formKey4.currentState;
                     form?.save();
                     try {
-                      var verify = service.verifyUserByOtpToRegisterApi(otpId: smsIdResponse.toString(), userOtp: _otpController2.text.toString());
-                      verify.then((value){
-                        if(value?.success == 1){
-                          _otpController2.text ='';
+                      var verify = service.verifyUserByOtpToRegisterApi(
+                          otpId: smsIdResponse.toString(),
+                          userOtp: _otpController2.text.toString());
+                      verify.then((value) {
+                        if (value?.success == 1) {
+                          _otpController2.text = '';
                           var editNumber = service.edituser(
                               id: box1?.get("data3"),
                               token: box1?.get("data4"),
                               name: name,
                               email: email,
                               number: number);
-                          editNumber.then((value){
-                            if(value?.success == 1){
-                              Fluttertoast.showToast(msg: "Phone number updated");
+                          editNumber.then((value) {
+                            if (value?.success == 1) {
+                              Fluttertoast.showToast(
+                                  msg: "Phone number updated");
                               Get.back();
-                            }else{
+                            } else {
                               Fluttertoast.showToast(msg: "failed to update");
                               setState(() {
-                                _numberController.value = TextEditingValue(text: previousNumber.toString());
+                                _numberController.value = TextEditingValue(
+                                    text: previousNumber.toString());
                               });
                               Get.back();
                             }
                           });
-                        }else{
-                          _otpController2.text ='';
+                        } else {
+                          _otpController2.text = '';
                           Fluttertoast.showToast(msg: "Verification failed");
                           setState(() {
-                            _numberController.value = TextEditingValue(text: previousNumber.toString());
+                            _numberController.value = TextEditingValue(
+                                text: previousNumber.toString());
                           });
                           Get.back();
                         }
                       });
-                    }catch(e){
+                    } catch (e) {
                       debugPrint(e.toString());
                     }
                   }
@@ -180,7 +199,7 @@ class _EditProfileState extends State<EditProfile> {
                 cancelTextColor: kPrimaryColor,
                 confirmTextColor: Colors.white,
               );
-            }else{
+            } else {
               Fluttertoast.showToast(msg: value.message.toString());
             }
           });
@@ -231,60 +250,54 @@ class _EditProfileState extends State<EditProfile> {
 
   formDecor(String hint, Function()? onPressed) {
     return InputDecoration(
-      // border: InputBorder.none,
-      hintText: hint,
-      enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: containerColor),
-          borderRadius: BorderRadius.all(Radius.circular(10))
-      ),
-      focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: containerColor),
-          borderRadius: BorderRadius.all(Radius.circular(10))
-      ),
-      errorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red),
-          borderRadius: BorderRadius.all(Radius.circular(10))
-      ),
-      focusedErrorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red),
-          borderRadius: BorderRadius.all(Radius.circular(10))
-      ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 6),
-      fillColor: Colors.white,
-      filled: true,
-      suffixIcon: TextButton(
-        onPressed: (){
-          onPressed!();
-          FocusScope.of(context).unfocus();
-        },
-        child: const Text("Update", style: TextStyle(color: Colors.black),),
-      )
-    );
+        // border: InputBorder.none,
+        hintText: hint,
+        enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: containerColor),
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: containerColor),
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        errorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        focusedErrorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        contentPadding: const EdgeInsets.symmetric(vertical: 6),
+        fillColor: Colors.white,
+        filled: true,
+        suffixIcon: TextButton(
+          onPressed: () {
+            onPressed!();
+            FocusScope.of(context).unfocus();
+          },
+          child: const Text(
+            "Update",
+            style: TextStyle(color: Colors.black),
+          ),
+        ));
   }
 
   formDecor2(String hint) {
     return InputDecoration(
       // border: InputBorder.none,
-        hintText: hint,
-        enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: containerColor),
-            borderRadius: BorderRadius.all(Radius.circular(10))
-        ),
-        focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: containerColor),
-            borderRadius: BorderRadius.all(Radius.circular(10))
-        ),
-        errorBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red),
-            borderRadius: BorderRadius.all(Radius.circular(10))
-        ),
-        focusedErrorBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red),
-            borderRadius: BorderRadius.all(Radius.circular(10))
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 6),
-        fillColor: Colors.white,
-        filled: true,
+      hintText: hint,
+      enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: containerColor),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: containerColor),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      focusedErrorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      contentPadding: const EdgeInsets.symmetric(vertical: 6),
+      fillColor: Colors.white,
+      filled: true,
     );
   }
 
@@ -293,11 +306,14 @@ class _EditProfileState extends State<EditProfile> {
 
   //pick image from gallery/camera
   Future pickImage(ImageSource imgSource, String token, String userId) async {
-    final pickedFile = await picker.pickImage(source: imgSource, imageQuality: 50);
+    final pickedFile =
+        await picker.pickImage(source: imgSource, imageQuality: 50);
     if (pickedFile != null) {
       image = File(pickedFile.path);
       if (image != null) {
-        service.uploadProfilePhotoApi(token: token, userId: userId, img: image!).then((value) {
+        service
+            .uploadProfilePhotoApi(token: token, userId: userId, img: image!)
+            .then((value) {
           setState(() {});
         });
       }
@@ -312,6 +328,7 @@ class _EditProfileState extends State<EditProfile> {
     return box1?.get("data4") == null
         ? const Center(child: CircularProgressIndicator())
         : GetScaffold(
+            index: 6,
             title: 'My Profile',
             body: Scaffold(
               backgroundColor: Constants.bgcolor,
@@ -329,7 +346,9 @@ class _EditProfileState extends State<EditProfile> {
                               if (snapshot.hasData) {
                                 return Column(
                                   children: [
-                                    for (var i = 0;i < snapshot.data!.user.length;i++)
+                                    for (var i = 0;
+                                        i < snapshot.data!.user.length;
+                                        i++)
                                       profileCover(i, snapshot),
                                   ],
                                 );
@@ -342,7 +361,8 @@ class _EditProfileState extends State<EditProfile> {
                           Form(
                             key: _formKey,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
                               child: Column(
                                 children: [
                                   const SizedBox(height: 15),
@@ -360,7 +380,8 @@ class _EditProfileState extends State<EditProfile> {
                                           }
                                           return null;
                                         },
-                                        decoration: formDecor('Full Name',validateNameAndUpdate)),
+                                        decoration: formDecor('Full Name',
+                                            validateNameAndUpdate)),
                                   ),
                                   const SizedBox(height: 15),
                                   Container(
@@ -380,8 +401,8 @@ class _EditProfileState extends State<EditProfile> {
                                           }
                                           return null;
                                         },
-                                        decoration: formDecor('Email address',validateEmailAndUpdate)
-                                      ),
+                                        decoration: formDecor('Email address',
+                                            validateEmailAndUpdate)),
                                   ),
                                   const SizedBox(height: 15),
                                   Container(
@@ -401,70 +422,110 @@ class _EditProfileState extends State<EditProfile> {
                                           }
                                           return null;
                                         },
-                                        decoration: formDecor('Phone number', validateNumberAndUpdate)
-                                    ),
+                                        decoration: formDecor('Phone number',
+                                            validateNumberAndUpdate)),
                                   ),
                                   const SizedBox(height: 10),
                                   const Divider(),
-
                                   ListTile(
                                     title: const Text("Change password"),
-                                    onTap: (){
-                                      try{
-                                        service.forgotPasswordOtpApi(phoneNumber: _numberController.text.toString()).then((value){
-                                          if(value?.userid != null){
+                                    onTap: () {
+                                      try {
+                                        service
+                                            .forgotPasswordOtpApi(
+                                                phoneNumber: _numberController
+                                                    .text
+                                                    .toString())
+                                            .then((value) {
+                                          if (value?.userid != null) {
                                             Get.defaultDialog(
                                               title: "OTP Verification",
                                               content: otpPopup(),
-                                              onCancel: (){
-                                                _otpController.text ='';
+                                              onCancel: () {
+                                                _otpController.text = '';
                                               },
-                                              onConfirm: (){
-                                                final form = _formKey2.currentState;
+                                              onConfirm: () {
+                                                final form =
+                                                    _formKey2.currentState;
                                                 if (form!.validate()) {
                                                   form.save();
-                                                  try{
-                                                    var verify = service.verifyUserByOtpApi(userId: widget.userId, userOtp: _otpController.text.toString());
-                                                    verify.then((value){
-                                                      if(value!.success == 1){
+                                                  try {
+                                                    var verify = service
+                                                        .verifyUserByOtpApi(
+                                                            userId:
+                                                                widget.userId,
+                                                            userOtp:
+                                                                _otpController
+                                                                    .text
+                                                                    .toString());
+                                                    verify.then((value) {
+                                                      if (value!.success == 1) {
                                                         Get.defaultDialog(
-                                                          title: "Change password",
-                                                          content: changePasswordPopup(),
-                                                          onCancel: (){
-                                                            _otpController.text ='';
-                                                            _passwordController.text = '';
-                                                            _confirmController.text = '';
+                                                          title:
+                                                              "Change password",
+                                                          content:
+                                                              changePasswordPopup(),
+                                                          onCancel: () {
+                                                            _otpController
+                                                                .text = '';
+                                                            _passwordController
+                                                                .text = '';
+                                                            _confirmController
+                                                                .text = '';
                                                             Get.back();
                                                           },
-                                                          onConfirm: (){
-                                                            final form = _formKey3.currentState;
-                                                            if (form!.validate()) {
+                                                          onConfirm: () {
+                                                            final form = _formKey3
+                                                                .currentState;
+                                                            if (form!
+                                                                .validate()) {
                                                               form.save();
-                                                              try{
-                                                                var resetResponse = service.resetPasswordApi(userId: widget.userId.toString(), password: _passwordController.text.toString());
-                                                                resetResponse.then((value) {
-                                                                  if(value?.success == 1){
-                                                                    _otpController.text ='';
-                                                                    _passwordController.text = '';
-                                                                    _confirmController.text = '';
+                                                              try {
+                                                                var resetResponse = service.resetPasswordApi(
+                                                                    userId: widget
+                                                                        .userId
+                                                                        .toString(),
+                                                                    password:
+                                                                        _passwordController
+                                                                            .text
+                                                                            .toString());
+                                                                resetResponse
+                                                                    .then(
+                                                                        (value) {
+                                                                  if (value
+                                                                          ?.success ==
+                                                                      1) {
+                                                                    _otpController
+                                                                        .text = '';
+                                                                    _passwordController
+                                                                        .text = '';
+                                                                    _confirmController
+                                                                        .text = '';
                                                                     Get.back();
                                                                     Get.back();
-                                                                    Fluttertoast.showToast(msg: "Password updated");
+                                                                    Fluttertoast
+                                                                        .showToast(
+                                                                            msg:
+                                                                                "Password updated");
                                                                   }
                                                                 });
-                                                              }catch(e){
-                                                                debugPrint(e.toString());
+                                                              } catch (e) {
+                                                                debugPrint(e
+                                                                    .toString());
                                                               }
                                                             }
                                                           },
                                                           textConfirm: 'Update',
-                                                          buttonColor: kPrimaryColor,
-                                                          cancelTextColor: kPrimaryColor,
-                                                          confirmTextColor: Colors.white,
+                                                          buttonColor:
+                                                              kPrimaryColor,
+                                                          cancelTextColor:
+                                                              kPrimaryColor,
+                                                          confirmTextColor:
+                                                              Colors.white,
                                                         );
                                                       }
                                                     });
-                                                  }catch(e){
+                                                  } catch (e) {
                                                     debugPrint(e.toString());
                                                   }
                                                 }
@@ -476,7 +537,7 @@ class _EditProfileState extends State<EditProfile> {
                                             );
                                           }
                                         });
-                                      }catch(e){
+                                      } catch (e) {
                                         debugPrint(e.toString());
                                       }
                                     },
@@ -494,7 +555,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   //change password popup
-  Widget changePasswordPopup(){
+  Widget changePasswordPopup() {
     return Column(
       children: [
         // const Text('Change password'),
@@ -511,30 +572,29 @@ class _EditProfileState extends State<EditProfile> {
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.text,
                     validator: (input) {
-                      if(input == ''){
+                      if (input == '') {
                         return 'Enter password';
-                      }else if (input.toString().length < 8) {
+                      } else if (input.toString().length < 8) {
                         return 'Password should be longer or equal to 8 characters.';
                       }
                       return null;
                     },
-                    decoration: formDecor2('New password')
-                ),
+                    decoration: formDecor2('New password')),
                 const SizedBox(height: 15),
                 TextFormField(
                     controller: _confirmController,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.text,
                     validator: (input) {
-                      if(input == ''){
+                      if (input == '') {
                         return 'Enter password';
-                      }else if (input?.trim() != _passwordController.text.trim()) {
+                      } else if (input?.trim() !=
+                          _passwordController.text.trim()) {
                         return 'Passwords does not match!';
                       }
                       return null;
                     },
-                    decoration: formDecor2('Confirm password')
-                ),
+                    decoration: formDecor2('Confirm password')),
               ],
             ),
           ),
@@ -544,12 +604,12 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   //otp popup
-  Widget otpPopup(){
+  Widget otpPopup() {
     return Column(
       children: [
         const Text('Enter OTP sent your mobile number'),
         const SizedBox(height: 10),
-        Text('+91 '+ previousNumber.toString(),
+        Text('+91 ' + previousNumber.toString(),
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         const SizedBox(height: 15),
         Container(
@@ -563,15 +623,14 @@ class _EditProfileState extends State<EditProfile> {
                 keyboardType: TextInputType.text,
                 validator: (input) {
                   bool _isNumberValid = RegExp(r"^[0-9]{6}").hasMatch(input!);
-                  if(input == ''){
+                  if (input == '') {
                     return 'Enter OTP';
-                  }else if (!_isNumberValid) {
+                  } else if (!_isNumberValid) {
                     return 'Invalid OTP';
                   }
                   return null;
                 },
-                decoration: formDecor2('Enter OTP')
-            ),
+                decoration: formDecor2('Enter OTP')),
           ),
         ),
       ],
@@ -579,12 +638,12 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   //otp popup
-  Widget otpPopup2(){
+  Widget otpPopup2() {
     return Column(
       children: [
         const Text('Enter OTP sent your mobile number'),
         const SizedBox(height: 10),
-        Text('+91 '+ _numberController.text.toString(),
+        Text('+91 ' + _numberController.text.toString(),
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         const SizedBox(height: 15),
         Container(
@@ -598,15 +657,14 @@ class _EditProfileState extends State<EditProfile> {
                 keyboardType: TextInputType.text,
                 validator: (input) {
                   bool _isNumberValid = RegExp(r"^[0-9]{6}").hasMatch(input!);
-                  if(input == ''){
+                  if (input == '') {
                     return 'Enter OTP';
-                  }else if (!_isNumberValid) {
+                  } else if (!_isNumberValid) {
                     return 'Invalid OTP';
                   }
                   return null;
                 },
-                decoration: formDecor2('Enter OTP')
-            ),
+                decoration: formDecor2('Enter OTP')),
           ),
         ),
       ],
@@ -616,13 +674,12 @@ class _EditProfileState extends State<EditProfile> {
   Widget profileCover(int index, AsyncSnapshot<GetUserProfileData?> snapshot) {
     var user = snapshot.data!.user[index];
     var imageList = [
-      // "https://msilonline.in" + user.profilePhotoPath.toString(),
-      "http://3.109.69.39" + user.profilePhotoPath.toString(),
+      "https://" + user.profilePhotoPath.toString(),
     ];
     return Card(
       margin: EdgeInsets.zero,
       child: Container(
-        padding: const EdgeInsets.only(top: 12, left: 24,bottom: 24),
+        padding: const EdgeInsets.only(top: 12, left: 24, bottom: 24),
         color: Colors.white,
         child: Row(
           children: [
@@ -634,22 +691,25 @@ class _EditProfileState extends State<EditProfile> {
                     height: 120,
                     width: 120,
                     child: user.profilePhotoPath == null
-                        ? const Icon(Icons.account_circle_sharp, size: 130, color: Colors.black54)
+                        ? const Icon(Icons.account_circle_sharp,
+                            size: 130, color: Colors.black54)
                         : InkWell(
                             onTap: () {
                               Get.to(() => GalleryWidget(urlImages: imageList));
                             },
                             child: Image.network(
-                                // "https://msilonline.in" + user.profilePhotoPath.toString(),
-                              "http://3.109.69.39" + user.profilePhotoPath.toString(),
-                                fit: BoxFit.cover,
-                                width: 120,
-                                height: 120,
-                                errorBuilder: (context, img, image){
-                                  return Image.asset("assets/img/no_image_available.jpg",
-                                      fit: BoxFit.cover,
-                                      height: 100, width: 100);
-                            },),
+                              "https://" + user.profilePhotoPath.toString(),
+                              fit: BoxFit.cover,
+                              width: 120,
+                              height: 120,
+                              errorBuilder: (context, img, image) {
+                                return Image.asset(
+                                    "assets/img/no_image_available.jpg",
+                                    fit: BoxFit.cover,
+                                    height: 100,
+                                    width: 100);
+                              },
+                            ),
                           ),
                   ),
                 ),
@@ -657,15 +717,16 @@ class _EditProfileState extends State<EditProfile> {
                   right: -6,
                   bottom: -4,
                   child: IconButton(
-                      icon: const Icon(Icons.camera_alt_outlined, color: kPrimaryColor),
+                      icon: const Icon(Icons.camera_alt_outlined,
+                          color: kPrimaryColor),
                       onPressed: () {
                         showModalBottomSheet(
                           context: context,
                           builder: (context) => uploadOptions(user),
                           isScrollControlled: true,
                           shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(15)),
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(15)),
                           ),
                         );
                       }),
@@ -673,7 +734,8 @@ class _EditProfileState extends State<EditProfile> {
               ],
             ),
             Expanded(
-              child: Image.asset("assets/img/love_bikecafe.png", fit: BoxFit.cover),
+              child: Image.asset("assets/img/love_bikecafe.png",
+                  fit: BoxFit.cover),
             )
           ],
         ),
@@ -685,7 +747,7 @@ class _EditProfileState extends State<EditProfile> {
   bool storagePermission = false;
 
   //ask permission for camera
-  void checkCameraPermission() async{
+  void checkCameraPermission() async {
     if (await Permission.camera.request().isGranted) {
       setState(() {
         cameraPermission = true;
@@ -704,7 +766,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   //ask permission for storage
-  void checkStoragePermission() async{
+  void checkStoragePermission() async {
     if (await Permission.storage.request().isGranted) {
       setState(() {
         storagePermission = true;

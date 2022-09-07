@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
-// import 'package:getx_loginpage/screens/root.dart';
-// import 'package:getx_loginpage/widget/config.dart';
+import 'package:bike_cafe/screens/root.dart';
+import 'package:bike_cafe/widget/config.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthController extends GetxController {

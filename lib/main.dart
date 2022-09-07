@@ -1,13 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:bike_cafe/routes/routes.dart';
-import 'package:bike_cafe/screens/Dashboard/Home/dashboard.dart';
-import 'package:bike_cafe/screens/Dashboard/MyOrder/orders_list.dart';
-import 'package:bike_cafe/screens/Dashboard/myoffres/myoffers.dart';
-import 'package:bike_cafe/screens/SplashScreen/splashScreen.dart';
-import 'package:bike_cafe/screens/auth/login/signin.dart';
-import 'package:bike_cafe/widget/binding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -15,22 +8,25 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:bike_cafe/routes/routes.dart';
+import 'package:bike_cafe/screens/Dashboard/Home/dashboard.dart';
+import 'package:bike_cafe/screens/Dashboard/MyOrder/orders_list.dart';
+import 'package:bike_cafe/screens/Dashboard/myoffres/myoffers.dart';
+
+import 'package:bike_cafe/screens/SplashScreen/splashScreen.dart';
+import 'package:bike_cafe/screens/auth/login/signin.dart';
+import 'package:bike_cafe/widget/binding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'firebase_options.dart';
-
 late Box box1;
 
 Future<void> main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
@@ -39,13 +35,12 @@ Future<void> main() async {
 
   Notificationapi.inint();
 
-
-  await FirebaseMessaging.onMessageOpenedApp.listen((event){
-    debugPrint('on message details is '+event.data.toString());
-    Map valueMap =  event.data;
+  await FirebaseMessaging.onMessageOpenedApp.listen((event) {
+    debugPrint('on message details is ' + event.data.toString());
+    Map valueMap = event.data;
     debugPrint(valueMap['screen']);
     //
-    if(box1.get("data4") != null) {
+    if (box1.get("data4") != null) {
       if (valueMap['screen'] == '1') {
         Get.to(() => const MyOffersPage());
       } else if (valueMap['screen'] == '2') {
@@ -53,7 +48,7 @@ Future<void> main() async {
       } else {
         Get.to(() => Dashboard());
       }
-    }else{
+    } else {
       Get.to(() => const SignIn());
     }
   });
@@ -61,7 +56,7 @@ Future<void> main() async {
   await Notificationapi.onNotification.stream.listen((event) {
     Map valueMap = event.isEmpty ? {} : json.decode(event as String);
 
-    if(box1.get("data4") != null) {
+    if (box1.get("data4") != null) {
       if (valueMap['screen'] == '1') {
         Get.to(() => const MyOffersPage());
       } else if (valueMap['screen'] == '2') {
@@ -69,34 +64,23 @@ Future<void> main() async {
       } else {
         Get.to(() => Dashboard());
       }
-    }else{
+    } else {
       Get.to(() => const SignIn());
     }
   });
 
+  await FirebaseMessaging.onMessage.listen((event) {
+    log(event.data.toString());
+    Notificationapi.shownotification(
+        event.notification!.title.toString(),
+        event.notification!.body,
+        jsonEncode(event.data),
+        event.data['img_url'].toString());
+  });
 
-    await FirebaseMessaging.onMessage.listen((event) {
-      log(event.data.toString());
-      Notificationapi.shownotification(
-          event.notification!.title.toString(),
-          event.notification!.body,
-          jsonEncode(event.data),
-          event.data['img_url'].toString());
-    });
-
-
- 
   await Hive.initFlutter();
   box1 = await Hive.openBox('logindata');
   runApp(MyApp());
-}
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-
-  print("Handling a background message: ${message.messageId}");
 }
 
 class MyApp extends StatelessWidget {
@@ -114,8 +98,6 @@ class MyApp extends StatelessWidget {
         });
 
         FirebaseMessaging.instance.subscribeToTopic("All_message");
-
-
       },
 
       debugShowCheckedModeBanner: false,
@@ -129,13 +111,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class Notificationapi {
   static final _notificationplugin = FlutterLocalNotificationsPlugin();
   static final onNotification = BehaviorSubject<String>();
 
   static final AndroidInitializationSettings android =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
+      const AndroidInitializationSettings('@mipmap/ic_launcher');
 
   static final InitializationSettings settings = InitializationSettings(
     android: android,
@@ -150,20 +131,34 @@ class Notificationapi {
 
     await _notificationplugin.initialize(settings,
         onSelectNotification: (payload) {
-          onNotification.add(payload.toString());
-        });
+      onNotification.add(payload.toString());
+    });
   }
 
-  static Future _notificationdetails(String url) async {
+  static Future _notificationdetails(String? url) async {
+    log(url.toString());
+
     final large = await Utlis.notificationimg(url.toString(), 'Offers');
+    if (url == null) {
+      return const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channelId',
+          'channelName',
+          icon: "@mipmap/ic_launcher",
+          priority: Priority.max,
+          importance: Importance.max,
+          enableVibration: true,
+        ),
+      );
+    }
     return NotificationDetails(
       android: AndroidNotificationDetails('channelId', 'channelName',
           icon: "@mipmap/ic_launcher",
           priority: Priority.max,
           importance: Importance.max,
           enableVibration: true,
-          styleInformation:
-          BigPictureStyleInformation(FilePathAndroidBitmap(large))),
+          styleInformation: BigPictureStyleInformation(
+              FilePathAndroidBitmap(url == null ? '' : large))),
     );
   }
 

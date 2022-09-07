@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bike_cafe/screens/Dashboard/Home/offers/moreoffer.dart';
 import 'package:bike_cafe/widget/config.dart';
 
 class Description extends StatelessWidget {

@@ -17,7 +17,8 @@ import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 
 class EditVeichle extends StatefulWidget {
-  const EditVeichle({Key? key, this.token, this.userId, this.vehicleId}) : super(key: key);
+  const EditVeichle({Key? key, this.token, this.userId, this.vehicleId})
+      : super(key: key);
 
   final String? token;
   final String? userId;
@@ -38,12 +39,15 @@ class _EditVeichleState extends State<EditVeichle> {
   //pick image from gallery/camera
   Future pickImage(ImageSource imgSource, String? token, String? userId,
       String vehicleId) async {
-    final PickedFile = await picker.pickImage(source: imgSource, imageQuality: 50);
+    final PickedFile =
+        await picker.pickImage(source: imgSource, imageQuality: 50);
     if (PickedFile != null) {
       image = File(PickedFile.path);
       if (image != null) {
-        service.vehicleImageUploadApi(
-            token: token, userId: userId, vehicleId: vehicleId, img: image!).then((value) {
+        service
+            .vehicleImageUploadApi(
+                token: token, userId: userId, vehicleId: vehicleId, img: image!)
+            .then((value) {
           setState(() {});
           Fluttertoast.showToast(msg: "Vehicle image updated");
         });
@@ -64,27 +68,38 @@ class _EditVeichleState extends State<EditVeichle> {
   TextEditingController vehicleYear = TextEditingController();
   TextEditingController vehicleCC = TextEditingController();
 
-  VehicleEditController vehicleEditController = Get.put(VehicleEditController());
+  VehicleEditController vehicleEditController =
+      Get.put(VehicleEditController());
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    service.getVehicleDetailsByUseridVehicleId(token: widget.token.toString(),
-        userId: widget.userId.toString(), vehicleId: widget.vehicleId.toString())?.then((value) {
-          var vehicle = value?.body[0];
+    service
+        .getVehicleDetailsByUseridVehicleId(
+            token: widget.token.toString(),
+            userId: widget.userId.toString(),
+            vehicleId: widget.vehicleId.toString())
+        ?.then((value) {
+      var vehicle = value?.body[0];
       setState(() {
         vehicleNumber.value = vehicle!.usevehVehicleNumber == null
             ? const TextEditingValue(text: '')
             : TextEditingValue(text: vehicle.usevehVehicleNumber.toString());
-        vehicleType.value = TextEditingValue(text: vehicle.vehicleTypeName.toString());
-        vehicleBrand.value = TextEditingValue(text: vehicle.brandname.toString());
-        vehicleModel.value = TextEditingValue(text: vehicle.modelName.toString());
-        vehicleVariant.value = TextEditingValue(text: vehicle.variantName.toString());
-        vehicleEditController.vehicleTypeId.value = vehicle.vehicleTypeId.toString();
+        vehicleType.value =
+            TextEditingValue(text: vehicle.vehicleTypeName.toString());
+        vehicleBrand.value =
+            TextEditingValue(text: vehicle.brandname.toString());
+        vehicleModel.value =
+            TextEditingValue(text: vehicle.modelName.toString());
+        vehicleVariant.value =
+            TextEditingValue(text: vehicle.variantName.toString());
+        vehicleEditController.vehicleTypeId.value =
+            vehicle.vehicleTypeId.toString();
         vehicleEditController.vehicleBrandId.value = vehicle.brandid.toString();
         vehicleEditController.vehicleModelId.value = vehicle.modelId.toString();
-        vehicleEditController.vehicleVariantId.value = vehicle.variantId.toString();
+        vehicleEditController.vehicleVariantId.value =
+            vehicle.variantId.toString();
         vehicleEditController.vehicleYear.value = vehicle.launchYear.toString();
         vehicleEditController.vehicleEndYear.value = vehicle.endYear.toString();
         vehicleEditController.vehicleCC.value = vehicle.cc.toString();
@@ -101,7 +116,6 @@ class _EditVeichleState extends State<EditVeichle> {
   //vehicle variant list
   List<String> _vehicleVariant = [];
 
-
   @override
   Widget build(BuildContext context) {
     vehicleYear.value = TextEditingValue(
@@ -112,7 +126,7 @@ class _EditVeichleState extends State<EditVeichle> {
     return Scaffold(
       backgroundColor: kBackgroundColor,
       body: GestureDetector(
-        onTap: (){
+        onTap: () {
           FocusScope.of(context).unfocus();
           validate();
         },
@@ -148,12 +162,15 @@ class _EditVeichleState extends State<EditVeichle> {
                 children: [
                   // imgContainer(vehicleEditController.vehicleImgUrl.value),
                   FutureBuilder<GetVechiclebyuserid?>(
-                    future: service.getVehicleDetailsByUseridVehicleId(token: widget.token.toString(),
-                        userId: widget.userId.toString(), vehicleId: widget.vehicleId.toString()),
-                    builder: (context, snapshot){
-                      if(snapshot.hasData){
-                        return imgContainer(snapshot.data?.body[0].vehicleImage.toString());
-                      }else{
+                    future: service.getVehicleDetailsByUseridVehicleId(
+                        token: widget.token.toString(),
+                        userId: widget.userId.toString(),
+                        vehicleId: widget.vehicleId.toString()),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return imgContainer(
+                            snapshot.data?.body[0].vehicleImage.toString());
+                      } else {
                         return const Center(child: CircularProgressIndicator());
                       }
                     },
@@ -173,17 +190,17 @@ class _EditVeichleState extends State<EditVeichle> {
                   // const SizedBox(height: 5),
                   //vehicle type search field
                   FutureBuilder<Vechicletypemodel?>(
-                    future: service.getuservechiletype(
-                        token: widget.token),
+                    future: service.getuservechiletype(token: widget.token),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         _vehicleType = [];
-                        for (var i = 0;i < snapshot.data!.body.length;i++) {
-                          _vehicleType.add(snapshot.data!.body[i].vehcatVehicleType.toString());
+                        for (var i = 0; i < snapshot.data!.body.length; i++) {
+                          _vehicleType.add(snapshot
+                              .data!.body[i].vehcatVehicleType
+                              .toString());
                         }
                         return Padding(
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 30),
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: MySearchField(
@@ -193,11 +210,16 @@ class _EditVeichleState extends State<EditVeichle> {
                               hint: 'Vehicle Type',
                               searchInputDecoration: validationDecor(''),
                               onTap: (value) {
-                                var index = _vehicleType.indexOf(value.toString());
-                                vehicleEditController.vehicleTypeId.value = snapshot.data!.body[index].id.toString();
-                                vehicleEditController.vehicleBrandId.value = '0';
-                                vehicleEditController.vehicleModelId.value = '0';
-                                vehicleEditController.vehicleVariantId.value = '0';
+                                var index =
+                                    _vehicleType.indexOf(value.toString());
+                                vehicleEditController.vehicleTypeId.value =
+                                    snapshot.data!.body[index].id.toString();
+                                vehicleEditController.vehicleBrandId.value =
+                                    '0';
+                                vehicleEditController.vehicleModelId.value =
+                                    '0';
+                                vehicleEditController.vehicleVariantId.value =
+                                    '0';
                                 vehicleEditController.vehicleYear.value = '';
                                 vehicleEditController.vehicleEndYear.value = '';
                                 vehicleEditController.vehicleCC.value = '';
@@ -205,7 +227,9 @@ class _EditVeichleState extends State<EditVeichle> {
                                 vehicleModel.clear();
                                 vehicleVariant.clear();
                                 setState(() {});
-                                debugPrint("vehicle type: "+vehicleEditController.vehicleTypeId.value.toString());
+                                debugPrint("vehicle type: " +
+                                    vehicleEditController.vehicleTypeId.value
+                                        .toString());
                               },
                               validator: (input) {
                                 if (input.toString().isEmpty) {
@@ -226,16 +250,17 @@ class _EditVeichleState extends State<EditVeichle> {
                   FutureBuilder<VechiletypeBrand?>(
                     future: service.getuserbrandbyvechicletype(
                         token: widget.token,
-                        vtypeid: vehicleEditController.vehicleTypeId.value.toString()),
+                        vtypeid: vehicleEditController.vehicleTypeId.value
+                            .toString()),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         _vehicleBrand = [];
-                        for (var i = 0;i < snapshot.data!.body.length; i++) {
-                          _vehicleBrand.add(snapshot.data!.body[i].brandName.toString());
+                        for (var i = 0; i < snapshot.data!.body.length; i++) {
+                          _vehicleBrand
+                              .add(snapshot.data!.body[i].brandName.toString());
                         }
                         return Padding(
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 30),
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: MySearchField(
@@ -245,11 +270,16 @@ class _EditVeichleState extends State<EditVeichle> {
                               hint: 'Vehicle Brand',
                               searchInputDecoration: validationDecor(''),
                               onTap: (value) {
-                                var index = _vehicleBrand.indexOf(value.toString());
-                                vehicleEditController.vehicleBrandId.value = snapshot.data!.body[index].brandid.toString();
+                                var index =
+                                    _vehicleBrand.indexOf(value.toString());
+                                vehicleEditController.vehicleBrandId.value =
+                                    snapshot.data!.body[index].brandid
+                                        .toString();
 
-                                vehicleEditController.vehicleModelId.value = '0';
-                                vehicleEditController.vehicleVariantId.value = '0';
+                                vehicleEditController.vehicleModelId.value =
+                                    '0';
+                                vehicleEditController.vehicleVariantId.value =
+                                    '0';
                                 vehicleEditController.vehicleYear.value = '';
                                 vehicleEditController.vehicleEndYear.value = '';
                                 vehicleEditController.vehicleCC.value = '';
@@ -257,7 +287,9 @@ class _EditVeichleState extends State<EditVeichle> {
                                 vehicleVariant.clear();
 
                                 setState(() {});
-                                debugPrint("brand: "+vehicleEditController.vehicleBrandId.value.toString());
+                                debugPrint("brand: " +
+                                    vehicleEditController.vehicleBrandId.value
+                                        .toString());
                               },
                               validator: (input) {
                                 if (input.toString().isEmpty) {
@@ -278,18 +310,17 @@ class _EditVeichleState extends State<EditVeichle> {
                   FutureBuilder<VechileModelByBrandId?>(
                     future: service.getusermodelbybrandtype(
                         token: widget.token,
-                        brandid: vehicleEditController
-                            .vehicleBrandId.value
+                        brandid: vehicleEditController.vehicleBrandId.value
                             .toString()),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         _vehicleModel = [];
-                        for (var i = 0;i < snapshot.data!.body.length;i++) {
-                          _vehicleModel.add(snapshot.data!.body[i].vehmodName.toString());
+                        for (var i = 0; i < snapshot.data!.body.length; i++) {
+                          _vehicleModel.add(
+                              snapshot.data!.body[i].vehmodName.toString());
                         }
                         return Padding(
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 30),
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: MySearchField(
@@ -300,16 +331,20 @@ class _EditVeichleState extends State<EditVeichle> {
                               searchInputDecoration: validationDecor(''),
                               onTap: (value) {
                                 var index =
-                                _vehicleModel.indexOf(value.toString());
-                                vehicleEditController.vehicleModelId.value = snapshot.data!.body[index].id.toString();
+                                    _vehicleModel.indexOf(value.toString());
+                                vehicleEditController.vehicleModelId.value =
+                                    snapshot.data!.body[index].id.toString();
 
-                                vehicleEditController.vehicleVariantId.value = '0';
+                                vehicleEditController.vehicleVariantId.value =
+                                    '0';
                                 vehicleEditController.vehicleYear.value = '';
                                 vehicleEditController.vehicleEndYear.value = '';
                                 vehicleEditController.vehicleCC.value = '';
                                 vehicleVariant.clear();
                                 setState(() {});
-                                debugPrint("model: "+vehicleEditController.vehicleModelId.value.toString());
+                                debugPrint("model: " +
+                                    vehicleEditController.vehicleModelId.value
+                                        .toString());
                               },
                               validator: (input) {
                                 if (input.toString().isEmpty) {
@@ -330,16 +365,17 @@ class _EditVeichleState extends State<EditVeichle> {
                   FutureBuilder<VechilevariantType?>(
                     future: service.getuservariantmodeltype(
                         token: widget.token,
-                        modelid: vehicleEditController.vehicleModelId.value.toString()),
+                        modelid: vehicleEditController.vehicleModelId.value
+                            .toString()),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         _vehicleVariant = [];
-                        for (var i = 0;i < snapshot.data!.body.length;i++) {
-                          _vehicleVariant.add(snapshot.data!.body[i].vehvarName.toString());
+                        for (var i = 0; i < snapshot.data!.body.length; i++) {
+                          _vehicleVariant.add(
+                              snapshot.data!.body[i].vehvarName.toString());
                         }
                         return Padding(
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 30),
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: MySearchField(
@@ -349,13 +385,23 @@ class _EditVeichleState extends State<EditVeichle> {
                               controller: vehicleVariant,
                               searchInputDecoration: validationDecor(''),
                               onTap: (value) {
-                                var index = _vehicleVariant.indexOf(value.toString());
-                                vehicleEditController.vehicleVariantId.value = snapshot.data!.body[index].id.toString();
-                                vehicleEditController.vehicleYear.value = snapshot.data!.body[index].vehvarLaunchYear.toString();
-                                vehicleEditController.vehicleEndYear.value = snapshot.data!.body[index].vehvarLaunchYear.toString();
-                                vehicleEditController.vehicleCC.value = snapshot.data!.body[index].vehvarCc.toString();
+                                var index =
+                                    _vehicleVariant.indexOf(value.toString());
+                                vehicleEditController.vehicleVariantId.value =
+                                    snapshot.data!.body[index].id.toString();
+                                vehicleEditController.vehicleYear.value =
+                                    snapshot.data!.body[index].vehvarLaunchYear
+                                        .toString();
+                                vehicleEditController.vehicleEndYear.value =
+                                    snapshot.data!.body[index].vehvarLaunchYear
+                                        .toString();
+                                vehicleEditController.vehicleCC.value = snapshot
+                                    .data!.body[index].vehvarCc
+                                    .toString();
                                 setState(() {});
-                                debugPrint("variant: "+vehicleEditController.vehicleVariantId.value.toString());
+                                debugPrint("variant: " +
+                                    vehicleEditController.vehicleVariantId.value
+                                        .toString());
                               },
                               validator: (input) {
                                 if (input.toString().isEmpty) {
@@ -380,19 +426,34 @@ class _EditVeichleState extends State<EditVeichle> {
                           color: containerColor,
                           border: Border.all(color: containerColor),
                           borderRadius:
-                          const BorderRadius.all(Radius.circular(15))),
+                              const BorderRadius.all(Radius.circular(15))),
                       child: Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             vehicleEditController.vehicleYear.value == ''
-                                ? const Text("Year", style: TextStyle(color: Color.fromRGBO(0,0,0,0.5),fontSize: 17),)
-                                : Text(vehicleEditController.vehicleYear.value.toString() + ' - ' , style: const TextStyle(fontSize: 17)),
+                                ? const Text(
+                                    "Year",
+                                    style: TextStyle(
+                                        color: Color.fromRGBO(0, 0, 0, 0.5),
+                                        fontSize: 17),
+                                  )
+                                : Text(
+                                    vehicleEditController.vehicleYear.value
+                                            .toString() +
+                                        ' - ',
+                                    style: const TextStyle(fontSize: 17)),
                             vehicleEditController.vehicleEndYear.value == ''
                                 ? const Text("")
-                                : vehicleEditController.vehicleEndYear.value == 'null'
-                                ? const Text("" ,style: TextStyle(fontSize: 17))
-                                : Text(vehicleEditController.vehicleEndYear.value.toString(), style: const TextStyle(fontSize: 17)),
+                                : vehicleEditController.vehicleEndYear.value ==
+                                        'null'
+                                    ? const Text("",
+                                        style: TextStyle(fontSize: 17))
+                                    : Text(
+                                        vehicleEditController
+                                            .vehicleEndYear.value
+                                            .toString(),
+                                        style: const TextStyle(fontSize: 17)),
                           ],
                         ),
                       ),
@@ -402,23 +463,29 @@ class _EditVeichleState extends State<EditVeichle> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                          color: containerColor,
-                          border: Border.all(color: containerColor),
-                          borderRadius:
-                          const BorderRadius.all(Radius.circular(15))),
-                      child: Center(
-                        child: vehicleEditController.vehicleCC.value == ''
-                            ? const Text("CC", style: TextStyle(color: Color.fromRGBO(0,0,0,0.5),fontSize: 17),)
-                            : Text(vehicleEditController.vehicleCC.value.toString(), style: const TextStyle(fontSize: 17)),
-                      )
-                    ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                            color: containerColor,
+                            border: Border.all(color: containerColor),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(15))),
+                        child: Center(
+                          child: vehicleEditController.vehicleCC.value == ''
+                              ? const Text(
+                                  "CC",
+                                  style: TextStyle(
+                                      color: Color.fromRGBO(0, 0, 0, 0.5),
+                                      fontSize: 17),
+                                )
+                              : Text(
+                                  vehicleEditController.vehicleCC.value
+                                      .toString(),
+                                  style: const TextStyle(fontSize: 17)),
+                        )),
                   ),
                 ],
               ),
             ),
-
             SizedBox(height: Config.Height * 0.03),
             FloatingActionButton(
               backgroundColor: kPrimaryColor,
@@ -430,7 +497,6 @@ class _EditVeichleState extends State<EditVeichle> {
                 validateAndSave();
               },
             ),
-
             const SizedBox(height: 50)
           ],
         ),
@@ -441,7 +507,7 @@ class _EditVeichleState extends State<EditVeichle> {
   Widget imgContainer(String? vechileImg) {
     var imageList = [
       // "https://msilonline.in" + vechileImg.toString(),
-      "http://3.109.69.39" + vechileImg.toString(),
+      "https://bikecafe.co.in" + vechileImg.toString(),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -453,17 +519,19 @@ class _EditVeichleState extends State<EditVeichle> {
             vechileImg == "null"
                 ? Image.asset("assets/img/no_image_available.jpg")
                 : Center(
-                child: InkWell(
-                  onTap: (){
-                    Get.to(() => GalleryWidget(urlImages: imageList));
-                  },
-                  child: Image.network(
+                    child: InkWell(
+                    onTap: () {
+                      Get.to(() => GalleryWidget(urlImages: imageList));
+                    },
+                    child: Image.network(
                       // "https://msilonline.in" + vechileImg.toString(),
-                    "http://3.109.69.39" + vechileImg.toString(),
-                      width: 130,errorBuilder: (context, img, image){
-                    return Image.asset("assets/img/no_image_available.jpg");
-                  },),
-                )),
+                      "https://bikecafe.co.in" + vechileImg.toString(),
+                      width: 130,
+                      errorBuilder: (context, img, image) {
+                        return Image.asset("assets/img/no_image_available.jpg");
+                      },
+                    ),
+                  )),
             Padding(
               padding: const EdgeInsets.only(left: 4),
               child: Align(
@@ -478,7 +546,7 @@ class _EditVeichleState extends State<EditVeichle> {
                       isScrollControlled: true,
                       shape: const RoundedRectangleBorder(
                         borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(15)),
+                            BorderRadius.vertical(top: Radius.circular(15)),
                       ),
                     );
                   },
@@ -490,6 +558,7 @@ class _EditVeichleState extends State<EditVeichle> {
       ),
     );
   }
+
   bool validate() {
     final form = _formKey.currentState;
     if (form!.validate()) {
@@ -498,22 +567,26 @@ class _EditVeichleState extends State<EditVeichle> {
     }
     return false;
   }
+
   bool validateAndSave() {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      service.editVehicleByUserVehicleIdApi(
-          token: widget.token.toString(),
-          userId: widget.userId.toString(),
-          vehicleId: widget.vehicleId.toString(),
-          vehicleTypeId: vehicleEditController.vehicleTypeId.value.toString(),
-          brandId: vehicleEditController.vehicleBrandId.value.toString(),
-          modelId: vehicleEditController.vehicleModelId.value.toString(),
-          variantId: vehicleEditController.vehicleVariantId.value.toString(),
-          vehicleNumber: vehicleNumber.text.toString()
-      ).then((value) {
-        if(value?.success == "1"){
-          Get.off(()=> ListedVehicle());
+      service
+          .editVehicleByUserVehicleIdApi(
+              token: widget.token.toString(),
+              userId: widget.userId.toString(),
+              vehicleId: widget.vehicleId.toString(),
+              vehicleTypeId:
+                  vehicleEditController.vehicleTypeId.value.toString(),
+              brandId: vehicleEditController.vehicleBrandId.value.toString(),
+              modelId: vehicleEditController.vehicleModelId.value.toString(),
+              variantId:
+                  vehicleEditController.vehicleVariantId.value.toString(),
+              vehicleNumber: vehicleNumber.text.toString())
+          .then((value) {
+        if (value?.success == "1") {
+          Get.off(() => ListedVehicle());
         }
       });
       return true;
@@ -524,43 +597,36 @@ class _EditVeichleState extends State<EditVeichle> {
   validationDecor(String? hintText) => InputDecoration(
       enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: containerColor),
-          borderRadius: BorderRadius.all(Radius.circular(15))
-      ),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
       focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: containerColor),
-          borderRadius: BorderRadius.all(Radius.circular(15))
-      ),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
       errorBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.red),
-          borderRadius: BorderRadius.all(Radius.circular(15))
-      ),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
       focusedErrorBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.red),
-          borderRadius: BorderRadius.all(Radius.circular(15))
-      ),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
       contentPadding: const EdgeInsets.symmetric(vertical: 12),
       fillColor: containerColor,
       filled: true,
       hoverColor: Colors.black,
       border: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black26),
-          borderRadius: BorderRadius.all(Radius.circular(15))
-      ),
-      hintText: hintText.toString()
-  );
-
+          borderRadius: BorderRadius.all(Radius.circular(15))),
+      hintText: hintText.toString());
 
   bool cameraPermission = false;
   bool storagePermission = false;
 
   //ask permission for camera
-  void checkCameraPermission(String vehicleId) async{
+  void checkCameraPermission(String vehicleId) async {
     if (await Permission.camera.request().isGranted) {
       setState(() {
         cameraPermission = true;
       });
-      pickImage(ImageSource.camera, widget.token,
-          widget.userId, vehicleId.toString());
+      pickImage(ImageSource.camera, widget.token, widget.userId,
+          vehicleId.toString());
     } else if (await Permission.camera.request().isPermanentlyDenied) {
       await openAppSettings();
       debugPrint('object3');
@@ -574,13 +640,13 @@ class _EditVeichleState extends State<EditVeichle> {
   }
 
   //ask permission for storage
-  void checkStoragePermission(String vehicleId) async{
+  void checkStoragePermission(String vehicleId) async {
     if (await Permission.storage.request().isGranted) {
       setState(() {
         storagePermission = true;
       });
-      pickImage(ImageSource.gallery, widget.token,
-          widget.userId, vehicleId.toString());
+      pickImage(ImageSource.gallery, widget.token, widget.userId,
+          vehicleId.toString());
     } else if (await Permission.storage.request().isPermanentlyDenied) {
       await openAppSettings();
       debugPrint('object3');

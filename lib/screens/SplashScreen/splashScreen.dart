@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bike_cafe/screens/root.dart';
 import 'package:bike_cafe/widget/config.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SplashPage extends StatefulWidget {
+//repository injection
+//final MyRepository repository = MyRepository(apiClient: MyApiClient(httpClient: http.Client()));
+
   @override
   _SplashPageState createState() => _SplashPageState();
 }
@@ -23,12 +25,14 @@ class _SplashPageState extends State<SplashPage>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3000),
+      duration: const Duration(milliseconds: 1000),
     );
     _animation = CurvedAnimation(
         parent: _animationController!.view, curve: Curves.easeInCubic);
 
-    _animationController!.forward().whenComplete(() => Get.off(() => Root()));
+    _animationController!
+        .forward()
+        .whenComplete(() => Get.offAll(() => Root()));
   }
 
   @override
@@ -54,15 +58,18 @@ class _SplashPageState extends State<SplashPage>
                 Container(
                   child: Image.asset(
                     "assets/img/bike_cafe_logo.png",
-                    width: 250,
-                    height: 250,
+                    width: 200,
+                    height: 200,
                   ),
                 ),
                 // SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("Your's Vehicle Partner",style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold)),
-                ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: style.Roboto(
+                        text: "Your's Vehicle Partner",
+                        fontwight: FontWeight.bold,
+                        size: 22,
+                        color: Colors.black)),
 
                 const SpinKitThreeBounce(size: 20, color: Colors.red),
 

@@ -82,7 +82,7 @@ class Order {
   int? productid;
   String? proName;
   String? proDescription;
-  int? proCapacity;
+  dynamic proCapacity;
   String? proCode;
   String? proSku;
   int? packageItemsCount;

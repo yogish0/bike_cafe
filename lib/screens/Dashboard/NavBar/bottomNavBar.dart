@@ -16,12 +16,10 @@ CartController cartController = Get.put(CartController());
 
 BottomNavigationController bottomcontroller = BottomNavigationController();
 
-//  _currentIndex = ;
-
 class BottomNavBarPresisitant {
   Widget buildBottomBar(context, bottomcontroller) {
     return Container(
-      color: const Color.fromRGBO(103,80,164,0.08),
+      color: const Color.fromRGBO(103, 80, 164, 0.08),
       child: Row(
         children: [
           NavBarItem(
@@ -68,17 +66,10 @@ class BottomNavBarPresisitant {
             } else if (bottomcontroller.tabIndex.value == 2) {
               Get.to(() => EchargePage());
             } else if (bottomcontroller.tabIndex.value == 3) {
-              Get.to(() => SearchPage());
+              Get.to(() => const SearchPage());
             } else if (bottomcontroller.tabIndex.value == 4) {
-              Get.to(() => ProfilePage());
+              Get.to(() => const ProfilePage());
             }
-            // Get.to(() => pages);
-
-            // print(bottomcontroller.changeTabIndex);
-            // print(bottomcontroller.tabIndex.value = index);
-
-            // print("hii");
-            // _currentIndex = index;
           },
           child: Container(
             height: 60,
@@ -170,12 +161,12 @@ class BottomNavBarPresisitant {
                         color: index == bottomcontroller.tabIndex.value
                             ? kPrimaryColor
                             : Colors.grey.shade800),
-                    if(cartController.cartItemsCount.value != 0)
+                    if (cartController.cartItemsCount.value != 0)
                       Positioned(
                         top: 0,
                         right: 0,
                         child: Card(
-                          shape: RoundedRectangleBorder(
+                          shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           margin: EdgeInsets.zero,
@@ -185,12 +176,14 @@ class BottomNavBarPresisitant {
                           child: Row(
                             children: [
                               const SizedBox(width: 4),
-                              Text(cartController.cartItemsCount.value.toString(),
+                              Text(
+                                  cartController.cartItemsCount.value
+                                      .toString(),
                                   style: TextStyle(
-                                      fontSize:
-                                          index == bottomcontroller.tabIndex.value
-                                              ? 10
-                                              : 8,
+                                      fontSize: index ==
+                                              bottomcontroller.tabIndex.value
+                                          ? 10
+                                          : 8,
                                       color: index == bottomcontroller.tabIndex
                                           ? Colors.black
                                           : Colors.white)),

@@ -11,15 +11,18 @@ import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/auth/ClipWidget.dart';
 import 'package:bike_cafe/widget/auth/txt_formfield.dart';
 import 'package:bike_cafe/widget/config.dart';
-import 'package:sign_button/create_button.dart';
-import 'package:sign_button/sign_button.dart';
+import 'package:bike_cafe/widget/constrants.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
+import 'package:sign_button/constants.dart';
+import 'package:sign_button/create_button.dart';
 import '../../Dashboard/Home/dashboard.dart';
 import '../../SlidingScreen/RegisterVehicle.dart';
 import 'google_authentication.dart';
 import 'locale/facebook_authentication.dart';
-import 'locale/social_auth_mobile_verification.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'locale/social_auth_mobile_verification.dart';
 
 class SignUp extends StatefulWidget {
   SignUp({Key? key}) : super(key: key);
@@ -38,6 +41,7 @@ class _SignUpState extends State<SignUp> {
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   SignInRequestModel? requestModel1;
+
   // final users = FirebaseAuth.instance.currentUser;
   TextWidgetStyle style = TextWidgetStyle();
 
@@ -62,6 +66,10 @@ class _SignUpState extends State<SignUp> {
       });
       debugPrint("android id : " + androidId);
     });
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      googleAuthentication.logOut();
+    }
   }
 
   void createBox() async {
@@ -98,109 +106,150 @@ class _SignUpState extends State<SignUp> {
               ),
               SizedBox(height: Config.Height * 0.02),
               Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 40),
-                      child: style.Monterserrat(
-                          text: "Sign Up",
-                          fontwight: FontWeight.w600,
-                          size: 30,
-                          color: Colors.black),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40),
+                    child: style.Monterserrat(
+                        text: "Sign Up",
+                        fontwight: FontWeight.w600,
+                        size: 30,
+                        color: Colors.black),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 40),
+                    child: FloatingActionButton(
+                      backgroundColor: kPrimaryColor,
+                      onPressed: () {
+                        validateAndSave();
+                      },
+                      child: const Icon(Icons.arrow_right_alt_outlined),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 40),
-                      child: FloatingActionButton(
-                        backgroundColor: kPrimaryColor,
-                        onPressed: () {
-                          validateAndSave();
-                        },
-                        child: const Icon(Icons.arrow_right_alt_outlined),
-                      ),
-                    ),
-                  ],),
+                  ),
+                ],
+              ),
               SizedBox(height: Config.Height * 0.02),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(width: 10),
-                  SignInButton.mini(
-                    buttonType: ButtonType.google,
-                    onPressed: (){
-                      try {
-                        googleAuthentication.googleSignIn().then((value){
-                          var googleUserData = FirebaseAuth.instance.currentUser;
-                          print(googleUserData?.email!.toString());
-                          print("-------");
-                          print(googleUserData?.uid.toString());
-                          print(googleUserData?.displayName.toString());
-                          apiService.checkSocialAuthUserApi(email: googleUserData?.email!.toString()).then((value){
-                            if(value!.isavailable == "1"){
-                              apiService.socialAuthUserApi(email: googleUserData?.email!,
-                                  userName: googleUserData?.displayName!,
-                                  deviceToken: androidId,
-                                  mailIdToken: googleUserData?.uid,
-                                  authType: "email",
-                                  phoneNumber: null
-                              ).then((value) {
-                                if (value!.apiToken != "null") {
-                                  box1!.put('data0', value.user!.name.toString());
-                                  box1!.put('data1', value.user!.phonenumber.toString());
-                                  box1!.put('data2', value.user!.email.toString());
-                                  box1!.put('data3', value.user!.id.toString());
-                                  box1!.put('data4', value.apiToken.toString());
-                                  box1!.put('isLogged', true);
-                                  box1!.put("welcomeNotification", false);
-                                  box1!.put("isGoogleAuth", true);
-                                  var checkVehicleList =
-                                  apiService.getvechiledetailsbyuserid(
-                                      token: value.apiToken.toString(),
-                                      id: value.user!.id.toString());
-                                  checkVehicleList?.then((value) {
-                                    value!.body.isEmpty
-                                        ? Get.off(() => const RegisterVehicle())
-                                        : Get.off(() => Dashboard());
-                                  });
-                                }else{
-                                  Fluttertoast.showToast(msg: "Sign up failed");
-                                }
-                              });
-                            }else{
-                              Get.to(()=> SocialAuthMobileVerification(email: googleUserData?.email!,
-                                  userName: googleUserData?.displayName!,
-                                  deviceToken: androidId,
-                                  mailIdToken: googleUserData?.uid,
-                                  authType: "email"));
-                            }
-                          });
-                        });
-                      } catch (e) {
-                        debugPrint(e.toString());
-                      }
-                    },
-                  ),
-                  SignInButton.mini(
-                    buttonType: ButtonType.facebook,
-                    onPressed: () async{
-                      facebookAuthentication.facebookLogin().then((value) {
-                            var fbUserData = FirebaseAuth.instance.currentUser;
-                            debugPrint(fbUserData?.email.toString());
-                            debugPrint(fbUserData?.displayName.toString());
-                            debugPrint(fbUserData?.uid.toString());
-                          });
-                    },
-                  ),
-                  const Spacer(),
+                  // const SizedBox(width: 30),
+                  // Row(
+                  //   children: [
+                  //     const SizedBox(width: 8),
+                  //     Text(
+                  //       "Sign with",
+                  //       style: TextStyle(
+                  //         color: Colors.black,
+                  //         fontWeight: FontWeight.w400,
+                  //         fontSize: 18,
+                  //         fontFamily: GoogleFonts.roboto().fontFamily
+                  //       ),
+                  //     ),
+                  //     SignInButton.mini(
+                  //       buttonType: ButtonType.google,
+                  //       padding: 2,
+                  //       onPressed: () {
+                  //         try {
+                  //           googleAuthentication.googleSignIn().then((value) {
+                  //             var googleUserData =
+                  //                 FirebaseAuth.instance.currentUser;
+                  //             print(googleUserData?.email!.toString());
+                  //             print("-------");
+                  //             print(googleUserData?.uid.toString());
+                  //             print(googleUserData?.displayName.toString());
+                  //             apiService
+                  //                 .checkSocialAuthUserApi(
+                  //                     email:
+                  //                         googleUserData?.email!.toString())
+                  //                 .then((value) {
+                  //               if (value!.isavailable == "1") {
+                  //                 apiService
+                  //                     .socialAuthUserApi(
+                  //                         email: googleUserData?.email!,
+                  //                         userName:
+                  //                             googleUserData?.displayName!,
+                  //                         deviceToken:
+                  //                             box1!.get("device_token"),
+                  //                         mailIdToken: googleUserData?.uid,
+                  //                         androidId: androidId,
+                  //                         authType: "email",
+                  //                         phoneNumber: null)
+                  //                     .then((value) {
+                  //                   if (value!.apiToken != "null") {
+                  //                     box1!.put('data0',
+                  //                         value.user!.name.toString());
+                  //                     box1!.put('data1',
+                  //                         value.user!.phonenumber.toString());
+                  //                     box1!.put('data2',
+                  //                         value.user!.email.toString());
+                  //                     box1!.put(
+                  //                         'data3', value.user!.id.toString());
+                  //                     box1!.put(
+                  //                         'data4', value.apiToken.toString());
+                  //                     box1!.put('isLogged', true);
+                  //                     box1!.put("welcomeNotification", false);
+                  //                     box1!.put("isGoogleAuth", true);
+                  //                     var checkVehicleList = apiService
+                  //                         .getvechiledetailsbyuserid(
+                  //                             token:
+                  //                                 value.apiToken.toString(),
+                  //                             id: value.user!.id.toString());
+                  //                     checkVehicleList?.then((value) {
+                  //                       value!.body.isEmpty
+                  //                           ? Get.off(
+                  //                               () => const RegisterVehicle())
+                  //                           : Get.off(() => Dashboard());
+                  //                     });
+                  //                   } else {
+                  //                     Fluttertoast.showToast(
+                  //                         msg: "Sign up failed");
+                  //                     googleAuthentication.logOut();
+                  //                   }
+                  //                 });
+                  //               } else {
+                  //                 Get.to(() => SocialAuthMobileVerification(
+                  //                     email: googleUserData?.email!,
+                  //                     userName: googleUserData?.displayName!,
+                  //                     deviceToken: androidId,
+                  //                     mailIdToken: googleUserData?.uid,
+                  //                     authType: "email"));
+                  //               }
+                  //             });
+                  //           });
+                  //         } catch (e) {
+                  //           debugPrint(e.toString());
+                  //         }
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
+                  // // SignInButton.mini(
+                  // //   buttonType: ButtonType.facebook,
+                  // //   onPressed: () async{
+                  // //     facebookAuthentication.facebookLogin().then((value) {
+                  // //           var fbUserData = FirebaseAuth.instance.currentUser;
+                  // //           debugPrint(fbUserData?.email.toString());
+                  // //           debugPrint(fbUserData?.displayName.toString());
+                  // //           debugPrint(fbUserData?.uid.toString());
+                  // //         });
+                  // //   },
+                  // // ),
+                  // const Spacer(),
                   Padding(
                     padding: const EdgeInsets.only(right: 40),
-                    child: TextButton(
-                      child: style.Roboto(
-                          text: "Sign In",
-                          fontwight: FontWeight.w400,
-                          size: 18,
-                          color: Colors.black),
-                      onPressed: () => Get.to(() => const SignIn()),
+                    child: Row(
+                      children: [
+                        style.Roboto(
+                            text: "I have account! ",
+                            fontwight: FontWeight.w400,
+                            color: Colors.black),
+                        TextButton(
+                          child: Constants.linkText("Sign In"),
+                          onPressed: () => Get.to(() => const SignIn()),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -230,27 +279,29 @@ class _SignUpState extends State<SignUp> {
     if (form!.validate()) {
       // _register();
       form.save();
-      try{
-        var sendOtp = apiService.OtpToMobileNumberVerify(phoneNumber: _phoneController.text.toString());
+      try {
+        var sendOtp = apiService.OtpToMobileNumberVerify(
+            phoneNumber: _phoneController.text.toString());
         sendOtp.then((value) {
-          if(value!.success == 1){
-            Get.to(()=> VerifyUser(
-              phoneNumber: _phoneController.text.toString(),
-              userName: _nameController.text.toString(),
-              userEmail: _emailController.text.toString(),
-              userPassword: _passwordController.text.toString(),
-              confirmPassword: _confrmpasswordController.text.toString(),
-              smsId: value.smsid.toString(),
-            ));
-          }else{
-            Get.snackbar(value.message.toString(),'Email or/and phone number should be unique',
+          if (value!.success == 1) {
+            Get.to(() => VerifyUser(
+                  phoneNumber: _phoneController.text.toString(),
+                  userName: _nameController.text.toString(),
+                  userEmail: _emailController.text.toString(),
+                  userPassword: _passwordController.text.toString(),
+                  confirmPassword: _confrmpasswordController.text.toString(),
+                  smsId: value.smsid.toString(),
+                ));
+          } else {
+            Get.snackbar(value.message.toString(),
+                'Email or/and phone number should be unique',
                 snackPosition: SnackPosition.TOP,
                 duration: const Duration(seconds: 5),
                 backgroundColor: Colors.white,
                 colorText: Colors.red);
           }
         });
-      }catch(e){
+      } catch (e) {
         debugPrint(e.toString());
       }
 
@@ -333,6 +384,7 @@ class _SignUpState extends State<SignUp> {
 
 class DeviceInfoApi {
   static final _deviceInfoPlugin = DeviceInfoPlugin();
+
   static Future<String> getDeviceAndroidId() async {
     String data = '';
     if (Platform.isAndroid) {

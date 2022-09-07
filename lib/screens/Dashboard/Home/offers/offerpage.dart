@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:bike_cafe/models/Products/check_wishlist_model.dart';
+import 'package:bike_cafe/main.dart';
 import 'package:bike_cafe/models/Products/product_review_rating_model.dart';
-
 import 'package:bike_cafe/models/Products/products_model.dart';
+import 'package:bike_cafe/screens/Dashboard/Cart/add_cart.dart';
 import 'package:bike_cafe/screens/Dashboard/Cart/cart.dart';
 import 'package:bike_cafe/screens/Dashboard/OurService/bike_car_service.dart';
 import 'package:bike_cafe/screens/Dashboard/OurService/buy_sell_vehicles.dart';
 import 'package:bike_cafe/screens/Dashboard/product/locale/productviewdetails.dart';
+import 'package:bike_cafe/screens/Dashboard/wishlist/add_to_wishlist.dart';
 import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/config.dart';
 import 'package:bike_cafe/widget/constrants.dart';
+import 'package:bike_cafe/widget/locale/ShimmerWidget.dart';
 
 class OfferPage extends StatefulWidget {
-  OfferPage({Key? key, required this.token, required this.userId})
-      : super(key: key);
-
-  final String token;
-  final String userId;
+  OfferPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<OfferPage> createState() => _OfferPageState();
@@ -29,12 +28,19 @@ class _OfferPageState extends State<OfferPage> {
 
   TextWidgetStyle style = TextWidgetStyle();
   CartController cartController = Get.put(CartController());
+  String token = box1.get("data4");
+  String userId = box1.get("data3");
+
+  AddCart addCart = AddCart();
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<GetProducts?>(
-      future: service.getProductsApi(token: widget.token),
+      future: service.getProductsApi(token: token),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return productShimmer();
+        }
         if (snapshot.hasData) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +67,7 @@ class _OfferPageState extends State<OfferPage> {
                         ),
                         child: InkWell(
                           onTap: () {
-                            Get.to(() => const BikeAndCarServices());
+                            // Get.to(() => const BikeAndCarServices());
                           },
                           child: SizedBox(
                             width: Config.Width * 0.43,
@@ -77,7 +83,8 @@ class _OfferPageState extends State<OfferPage> {
                                 ),
                                 style.Roboto(
                                     text: "Bike & car Services", size: 16),
-                                style.Roboto(text: "Services", size: 15)
+                                style.Roboto(text: "Services", size: 15),
+                                const SizedBox(height: 8)
                               ],
                             ),
                           ),
@@ -90,7 +97,7 @@ class _OfferPageState extends State<OfferPage> {
                         ),
                         child: InkWell(
                           onTap: () {
-                            Get.to(() => const BuyAndSellVehicles());
+                            // Get.to(() => const BuyAndSellVehicles());
                           },
                           child: SizedBox(
                             width: Config.Width * 0.43,
@@ -106,7 +113,8 @@ class _OfferPageState extends State<OfferPage> {
                                   ),
                                 ),
                                 style.Roboto(text: "Buy & Sell", size: 16),
-                                style.Roboto(text: "Vehicles", size: 15)
+                                style.Roboto(text: "Vehicles", size: 15),
+                                const SizedBox(height: 8)
                               ],
                             ),
                           ),
@@ -162,7 +170,7 @@ class _OfferPageState extends State<OfferPage> {
     return InkWell(
       onTap: () {
         Get.to(() => ProductViewDetails(
-            token: widget.token,
+            token: token,
             productId: products.productid,
             productName: products.proName.toString().toUpperCase()));
       },
@@ -206,7 +214,7 @@ class _OfferPageState extends State<OfferPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2.0),
                     child: Text(
-                      products.proName.toString().toUpperCase(),
+                      products.proName.toString(),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -239,104 +247,27 @@ class _OfferPageState extends State<OfferPage> {
                               text: "₹ " + products.procosMrp.toString(),
                               fontwight: FontWeight.w400,
                               color: Colors.grey,
-                              size: 16),
+                              size: 14),
                           style.Roboto(
                               text: " ₹ " +
                                   products.procosSellingPrice.toString() +
                                   "/-",
                               fontwight: FontWeight.w300,
                               color: Colors.black,
-                              size: 14),
+                              size: 16),
                           const Spacer(),
-                          InkWell(
-                            // style: ButtonStyle(
-                            //     backgroundColor:
-                            //         MaterialStateProperty.all(Colors.red),
-                            //     shape: MaterialStateProperty.all(
-                            //         RoundedRectangleBorder(
-                            //             borderRadius:
-                            //                 BorderRadius.circular(24.0),
-                            //             side: BorderSide(color: Colors.red)))),
-                            onTap: () {
-                              var addItemApi = service.addItemToCart(
-                                  token: widget.token,
-                                  userId: widget.userId,
-                                  productId: products.productid);
-                              int? success = 0;
-                              addItemApi.then((value) {
-                                success = value!.success;
-                                // print("up $success");
-                                if (success == 1) {
-                                  Fluttertoast.showToast(
-                                      msg: 'Item added to cart');
-                                  service
-                                      .cartCheckoutApi(
-                                          token: widget.token,
-                                          userId: widget.userId)
-                                      .then((value) {
-                                    cartController.cartItemsCount.value =
-                                        value!.products!.length;
-                                  });
-                                } else {
-                                  Fluttertoast.showToast(
-                                      msg: 'Failed to add item to cart');
-                                }
-                              });
-                            },
-                            child: const Card(
-                              color: Colors.red,
-                              child: Padding(
-                                padding: EdgeInsets.all(4.0),
-                                child: Icon(Icons.add_shopping_cart_sharp,
-                                    size: 18,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ),
+                          addCart.addToCart(
+                              token, userId, products.productid!.toInt()),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: InkWell(
-                    onTap: () {
-                      service
-                          .addToWishlistApi(
-                              token: widget.token,
-                              userId: widget.userId,
-                              productId: products.productid.toString())
-                          .then((value) {
-                        setState(() {});
-                      });
-                    },
-                    child: FutureBuilder<CheckWishlisted?>(
-                      future: service.checkWishlist(
-                          token: widget.token,
-                          userId: widget.userId,
-                          productId: products.productid.toString()),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          if (snapshot.data!.checkout.iswishlist == 1) {
-                            return const Icon(Icons.favorite,
-                                color: Colors.red, size: 24);
-                          } else {
-                            return const Icon(Icons.favorite_border,
-                                color: Colors.grey, size: 24);
-                          }
-                        } else {
-                          return const Icon(Icons.favorite_border,
-                              color: Colors.grey, size: 24);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ),
+              AddWishlist(
+                  token: token,
+                  userId: userId,
+                  productId: products.productid.toString()),
               Positioned(
                 top: 4,
                 left: 4,
@@ -360,11 +291,25 @@ class _OfferPageState extends State<OfferPage> {
     );
   }
 
+  Widget productShimmer() {
+    return Container(
+      height: 200,
+      margin: const EdgeInsets.only(left: 8),
+      child: Row(
+        children: const [
+          ShimmerWidget.rectangular(width: 150, height: 180),
+          SizedBox(width: 4),
+          ShimmerWidget.rectangular(width: 150, height: 180),
+        ],
+      ),
+    );
+  }
+
   // rate widget
   Widget rateWidget(String? productId) {
     return FutureBuilder<GetProductReviewAndRatingModel?>(
       future: service.productRatingAndReview(
-          token: widget.token.toString(), productId: productId.toString()),
+          token: token.toString(), productId: productId.toString()),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data!.avgRating.avgRating == null) {
@@ -446,7 +391,7 @@ class _ProductListCardState extends State<ProductListCard> {
                     child: Text(
                       products.proName.toString(),
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
@@ -454,17 +399,17 @@ class _ProductListCardState extends State<ProductListCard> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star_border_outlined,
-                          color: Colors.black, size: 10),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: const [
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star_border_outlined,
+                  //         color: Colors.black, size: 10),
+                  //   ],
+                  // ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Align(
@@ -476,14 +421,14 @@ class _ProductListCardState extends State<ProductListCard> {
                               text: "₹ " + products.procosMrp.toString(),
                               fontwight: FontWeight.w400,
                               color: Colors.grey,
-                              size: 10),
+                              size: 14),
                           style.Roboto(
                               text: " ₹ " +
                                   products.procosSellingPrice.toString() +
                                   "/-",
                               fontwight: FontWeight.w300,
                               color: Colors.black,
-                              size: 12),
+                              size: 16),
                           const Spacer(),
                           InkWell(
                               onTap: () {},

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:bike_cafe/models/Order_Model/order_details_model.dart';
 import 'package:bike_cafe/models/Storage/address/get_addressby_add_id_model.dart';
 import 'package:bike_cafe/screens/Dashboard/MyOrder/rating_and_review_widget.dart';
@@ -12,11 +13,14 @@ import 'package:bike_cafe/widget/locale/downloadinvoice.dart';
 import 'package:bike_cafe/widget/locale/scaffold.dart';
 import 'package:hive/hive.dart';
 import 'package:get/get.dart';
+import 'package:timeline_tile/timeline_tile.dart';
 
+import '../../../models/Order_Model/TrackOrderByShipIdModel.dart';
 import '../../chatbotScreen/chatbot.dart';
 
 class OrdersDetails extends StatefulWidget {
-  OrdersDetails({Key? key, this.ordersOrderId, this.ordersProductId}) : super(key: key);
+  OrdersDetails({Key? key, this.ordersOrderId, this.ordersProductId})
+      : super(key: key);
 
   @override
   _OrdersDetailsState createState() => _OrdersDetailsState();
@@ -45,9 +49,10 @@ class _OrdersDetailsState extends State<OrdersDetails> {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: "My Orders",
       body: box1?.get('data4') == null
-          ? const Center(child: CircularProgressIndicator())
+          ? Constants.circularWidget()
           : GestureDetector(
               onTap: () {
                 FocusScope.of(context).unfocus();
@@ -63,14 +68,17 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                             userId: box1?.get('data3'),
                             orderId: widget.ordersOrderId.toString()),
                         builder: (context, snapshot) {
-                          if (snapshot.hasData) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Constants.circularWidget();
+                          } else if (snapshot.hasData) {
                             if (snapshot.data!.productorder.isNotEmpty) {
                               return orderViewWidget(snapshot);
                             } else {
                               return Container();
                             }
                           } else {
-                            return Container();
+                            return Constants.circularWidget();
                           }
                         },
                       ),
@@ -100,7 +108,8 @@ class _OrdersDetailsState extends State<OrdersDetails> {
         orderDetailsWidget(orderProduct),
         const SizedBox(height: 8),
         RatingAndReview(
-          token: box1?.get('data4'), userId: box1?.get('data3'),
+          token: box1?.get('data4'),
+          userId: box1?.get('data3'),
           orderId: widget.ordersOrderId.toString(),
           productId: widget.ordersProductId.toString(),
         ),
@@ -136,7 +145,7 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
                 margin: const EdgeInsets.only(left: 24),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text('Order Id : '),
                     SizedBox(height: 5),
@@ -153,7 +162,8 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                     Text(orderProduct.ordRefid.toString(),
                         style: Constants.redtext),
                     const SizedBox(height: 5),
-                    Text(orderProduct.deliveryDate.toString(), style: Constants.redtext),
+                    Text(orderProduct.deliveryDate.toString(),
+                        style: Constants.redtext),
                     const SizedBox(height: 5),
                     Text('₹ ' + orderProduct.proordPrice.toString(),
                         style: Constants.redtext),
@@ -162,24 +172,221 @@ class _OrdersDetailsState extends State<OrdersDetails> {
               ),
             ],
           ),
-          Divider(color: Colors.black,),
-          ElevatedButton(
-            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
-            onPressed: () {
-              log('ta'.toString());
-              DownloadInvoice invoice=DownloadInvoice();
-              invoice.openFile('http://www.africau.edu/images/default/sample.pdf');
-            },
-            child: Container(
-              child: const Text('Download Invoice'),
-              padding: const EdgeInsets.all(8),
-              //margin: EdgeInsets.symmetric(vertical: 4),
-            ),
+          const Divider(color: Colors.black),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(kPrimaryColor)),
+                onPressed: () {
+                  //  log('ta'.toString());
+                  // service.downloadinvoice(token: box1?.get('data4'),orderId:widget.ordersOrderId.toString() );
+                  service.DownloadOrderInvoice(
+                          token: box1?.get('data4'),
+                          orderId: widget.ordersOrderId.toString())
+                      .then((value) {
+                    if (value?.isInvoiceCreated == true) {
+                      DownloadInvoice download = DownloadInvoice();
+                      download.openFile(value!.invoiceUrl.toString());
+                    } else {
+                      Fluttertoast.showToast(msg: "Unable to Download invoice");
+                    }
+                  });
+                },
+                child: Container(
+                  child: const Text('Download Invoice'),
+                  padding: const EdgeInsets.all(8),
+                  //margin: EdgeInsets.symmetric(vertical: 4),
+                ),
+              ),
+              const SizedBox(width: 6),
+              ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(kPrimaryColor)),
+                onPressed: () async {
+                  await service.getShipRocketToken().then((value) {
+                    if (value!.shiprocketToken != null) {
+                      trackOrderModal(orderProduct.proordDeliveryRefid,
+                          value.shiprocketToken);
+                    }
+                  });
+                },
+                child: const Text("Track Order"),
+              )
+            ],
           ),
-          SizedBox(height: 8,)
+          // SizedBox(height: 8,)
         ],
       ),
     );
+  }
+
+  // track order widget
+  Future trackOrderModal(String? shipmentId, shipToken) async {
+    return Get.bottomSheet(
+      SingleChildScrollView(
+        child: FutureBuilder<TrackOrderByShipIdModel?>(
+          future: service.trackOrderByShipmentIdApi(
+            shipmentId: shipmentId.toString(),
+            token: shipToken.toString(),
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                height: 300,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: kPrimaryColor,
+                  ),
+                ),
+              );
+            } else if (snapshot.hasData) {
+              var trackData = snapshot.data!.trackingData;
+              return snapshot.data!.trackingData.trackStatus == 0
+                  ? SizedBox(
+                      height: 300,
+                      child: Center(
+                        child: valueText("No tracking data present now..."),
+                      ),
+                    )
+                  : Container(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            children: [
+                              labelText("Tracking Id : "),
+                              valueText(
+                                  trackData.shipmentTrack![0].id.toString())
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            children: [
+                              labelText("Delivery Status : "),
+                              Text(
+                                  trackData.shipmentTrack![0].currentStatus
+                                      .toString(),
+                                  style: trackData
+                                              .shipmentTrack![0].currentStatus
+                                              .toString() ==
+                                          "Delivered"
+                                      ? const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w400)
+                                      : const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400))
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          if (trackData.shipmentTrackActivities!.isNotEmpty)
+                            Column(
+                              children: [
+                                for (int i = 0;
+                                    i <
+                                        trackData
+                                            .shipmentTrackActivities!.length;
+                                    i++)
+                                  if (trackData.shipmentTrackActivities![i]
+                                              .status ==
+                                          "pickup_scheduled" ||
+                                      trackData.shipmentTrackActivities![i]
+                                              .status ==
+                                          "pickup_complete" ||
+                                      trackData.shipmentTrackActivities![i]
+                                              .status ==
+                                          "shipment_expected" ||
+                                      trackData.shipmentTrackActivities![i]
+                                              .status ==
+                                          "out_for_delivery")
+                                    TimelineTile(
+                                      alignment: TimelineAlign.manual,
+                                      lineXY: 0.1,
+                                      isFirst: i == 0 ? true : false,
+                                      isLast: i ==
+                                              trackData.shipmentTrackActivities!
+                                                      .length -
+                                                  1
+                                          ? true
+                                          : false,
+                                      afterLineStyle:
+                                          const LineStyle(color: Colors.green),
+                                      beforeLineStyle:
+                                          const LineStyle(color: Colors.green),
+                                      indicatorStyle: const IndicatorStyle(
+                                          color: Colors.green),
+                                      endChild: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 24, right: 6),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(trackData
+                                                .shipmentTrackActivities![i]
+                                                .srStatusLabel
+                                                .toString()),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Text(trackData
+                                                    .shipmentTrackActivities![i]
+                                                    .date
+                                                    .toString()
+                                                    .substring(0, 10)),
+                                                const SizedBox(width: 6),
+                                                Text(trackData
+                                                    .shipmentTrackActivities![i]
+                                                    .date
+                                                    .toString()
+                                                    .substring(10, 16)),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                              ],
+                            )
+                        ],
+                      ),
+                    );
+            } else {
+              return SizedBox(
+                height: 300,
+                child: Center(
+                  child: valueText("No tracking data present now..."),
+                ),
+              );
+            }
+          },
+        ),
+      ),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(15),
+        ),
+      ),
+    );
+  }
+
+  Widget labelText(String text) {
+    return Text(text,
+        style: const TextStyle(
+            fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w400));
+  }
+
+  Widget valueText(String text) {
+    return Text(text,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400));
   }
 
   //Order details
@@ -225,8 +432,7 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                         Text(orderProduct.proName.toString(),
                             style: Constants.text1),
                         const SizedBox(height: 8),
-                        Text(
-                            'Qty: ' + orderProduct.proordQuantity.toString(),
+                        Text('Qty: ' + orderProduct.proordQuantity.toString(),
                             style: Constants.halfopacity),
                         const SizedBox(height: 16),
                       ],
@@ -244,34 +450,35 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                   )
                 ],
               ),
-              Container(
-                decoration: const BoxDecoration(
-                    border: Border(
-                        top: BorderSide(color: Colors.black, width: 0.5))),
-                child: Row(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.all(6),
-                      child: Column(
-                        children: [
-                          const Text('Estimated delivery'),
-                          const SizedBox(height: 4),
-                          Text(orderProduct.deliveryDate.toString(), style: Constants.redtext),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    InkWell(
-                      onTap: () {},
-                      child: Container(
-                        child: const Text('Track order'),
-                        padding: const EdgeInsets.all(8),
-                        //margin: EdgeInsets.symmetric(vertical: 4),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Container(
+              //   decoration: const BoxDecoration(
+              //       border: Border(
+              //           top: BorderSide(color: Colors.black, width: 0.5))),
+              //   child: Row(
+              //     children: [
+              //       Container(
+              //         margin: const EdgeInsets.all(6),
+              //         child: Column(
+              //           children: [
+              //             const Text('Estimated delivery'),
+              //             const SizedBox(height: 4),
+              //             Text(orderProduct.deliveryDate.toString(),
+              //                 style: Constants.redtext),
+              //           ],
+              //         ),
+              //       ),
+              //       const Spacer(),
+              //       InkWell(
+              //         onTap: () {},
+              //         child: Container(
+              //           child: const Text('Track order'),
+              //           padding: const EdgeInsets.all(8),
+              //           //margin: EdgeInsets.symmetric(vertical: 4),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -408,7 +615,7 @@ class _OrdersDetailsState extends State<OrdersDetails> {
         ),
         const SizedBox(height: 5),
         InkWell(
-          onTap: (){
+          onTap: () {
             setState(() {
               widget.ordersOrderId = orderProduct.proordOrderId.toString();
               widget.ordersProductId = orderProduct.proordProductId.toString();
@@ -448,7 +655,8 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                               style: Constants.text1),
                           const SizedBox(height: 8),
                           Text(
-                              'Qty: ' + orderProduct.packageItemsCount.toString(),
+                              'Qty: ' +
+                                  orderProduct.packageItemsCount.toString(),
                               style: Constants.halfopacity),
                           const SizedBox(height: 16),
                         ],
@@ -458,7 +666,8 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                       margin: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
                         children: [
-                          if(orderProduct.proordOrderStatusId != 1 && orderProduct.proordOrderStatusId != 9)
+                          if (orderProduct.proordOrderStatusId != 1 &&
+                              orderProduct.proordOrderStatusId != 9)
                             orderStatusWidget(orderProduct.proordOrderStatusId),
                         ],
                       ),
@@ -495,7 +704,8 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                 // CheckoutWidgets.priceRow('Golo Coins (GC)', '-₹ 0'),
                 // CheckoutWidgets.priceRow('Tax(18%)', '+₹ 30'),
                 // CheckoutWidgets.priceRow('Delivery Charges', 'Free'),
-                const Divider(color: Colors.black),
+                // const Divider(color: Colors.black),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     const Text(
@@ -534,19 +744,23 @@ class _OrdersDetailsState extends State<OrdersDetails> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'you saved ₹ 99 on this order',
-                  style: TextStyle(color: Colors.green),
-                ),
+                // const Text(
+                //   'you saved ₹ 99 on this order',
+                //   style: TextStyle(color: Colors.green),
+                // ),
                 const SizedBox(height: 15),
                 Row(
                   children: [
                     const Spacer(),
                     InkWell(
-                      onTap: (){
-                        Get.to(()=> ChatBotPage(orderId: orderProduct.proordOrderId.toString()));
+                      onTap: () {
+                        Get.to(() => ChatBotPage(
+                            orderId: orderProduct.proordOrderId.toString()));
                       },
-                      child: const Text("Help?"),
+                      child: const Text(
+                        "Help?",
+                        style: TextStyle(color: kPrimaryColor),
+                      ),
                     ),
                     const SizedBox(width: 15),
                   ],
@@ -559,42 +773,46 @@ class _OrdersDetailsState extends State<OrdersDetails> {
     );
   }
 
-  Widget orderStatusWidget(int? orderStatusId){
+  Widget orderStatusWidget(int? orderStatusId) {
     var orderStatusText = '';
     var orderStatusColor;
     var orderStatusTextColor;
-    if(orderStatusId == 2 || orderStatusId == 3){
+    if (orderStatusId == 2 || orderStatusId == 3) {
       orderStatusText = "Processing";
       orderStatusColor = const Color.fromRGBO(255, 245, 235, 1);
       orderStatusTextColor = const Color.fromRGBO(251, 126, 21, 1);
     }
-    if(orderStatusId == 4 || orderStatusId == 5) {
+    if (orderStatusId == 4 || orderStatusId == 5) {
       orderStatusText = "In Transit";
       orderStatusColor = const Color.fromRGBO(217, 255, 244, 1);
       orderStatusTextColor = const Color.fromRGBO(21, 251, 182, 1);
     }
-    if(orderStatusId == 6){
+    if (orderStatusId == 6) {
       orderStatusText = "Delivered";
       orderStatusColor = const Color.fromRGBO(207, 255, 239, 1);
       orderStatusTextColor = const Color.fromRGBO(13, 160, 106, 1);
     }
-    if(orderStatusId == 8){
+    if (orderStatusId == 8) {
       orderStatusText = "Cancelled";
       orderStatusColor = const Color.fromRGBO(255, 150, 150, 1);
       orderStatusTextColor = const Color.fromRGBO(255, 245, 235, 1);
     }
 
     return InkWell(
-      onTap: (){},
+      onTap: () {},
       child: Container(
         margin: const EdgeInsets.only(right: 6),
         height: 40,
         decoration: BoxDecoration(
-            color: orderStatusColor, borderRadius: const BorderRadius.all(Radius.circular(20))),
+            color: orderStatusColor,
+            borderRadius: const BorderRadius.all(Radius.circular(20))),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(orderStatusText, style: TextStyle(color: orderStatusTextColor),),
+            child: Text(
+              orderStatusText,
+              style: TextStyle(color: orderStatusTextColor),
+            ),
           ),
         ),
       ),

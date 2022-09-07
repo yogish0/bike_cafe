@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:bike_cafe/models/Order_Model/users_product_review_model.dart';
 import 'package:bike_cafe/screens/Dashboard/profile/locale/gallery_widget.dart';
@@ -11,7 +13,9 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class RatingAndReview extends StatefulWidget {
-  RatingAndReview({Key? key, this.token, this.userId,this.orderId, this.productId}) : super(key: key);
+  RatingAndReview(
+      {Key? key, this.token, this.userId, this.orderId, this.productId})
+      : super(key: key);
 
   String? token, userId, orderId, productId;
 
@@ -26,18 +30,19 @@ class _RatingAndReviewState extends State<RatingAndReview> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<GetUsersProductReview?>(
-      future: service.getUsersReviewProduct(token: widget.token.toString(),
+      future: service.getUsersReviewProduct(
+          token: widget.token.toString(),
           userId: widget.userId.toString(),
           productId: widget.productId.toString()),
-      builder: (context, snapshot){
-        if(snapshot.hasData){
-          if(snapshot.data!.reviews.isNotEmpty){
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data!.reviews.isNotEmpty) {
             return ratingAndReviewWidget(snapshot);
-          }else{
+          } else {
             // return ratingAndReviewWidget(snapshot, false);
             return ratingAndReviewWidgetBefore();
           }
-        }else{
+        } else {
           return Container();
         }
       },
@@ -64,23 +69,27 @@ class _RatingAndReviewState extends State<RatingAndReview> {
                       const Text("Rate this product"),
                       const SizedBox(height: 4),
                       reviewData.prorevRate == null
-                          ? giveRate(0,reviewData.reviewid)
-                          : giveRate(reviewData.prorevRate,reviewData.reviewid),
+                          ? giveRate(0, reviewData.reviewid)
+                          : giveRate(
+                              reviewData.prorevRate, reviewData.reviewid),
                     ],
                   ),
                 ),
                 const Spacer(),
                 ElevatedButton(
                   onPressed: () {
-                    service.updateUserReviewForProductApi(
-                      token: widget.token.toString(), userId: widget.userId.toString(),
+                    service
+                        .updateUserReviewForProductApi(
+                      token: widget.token.toString(),
+                      userId: widget.userId.toString(),
                       orderId: widget.orderId.toString(),
                       productId: widget.productId.toString(),
                       reviewId: reviewData.reviewid.toString(),
                       proRating: reviewData.prorevRate.toString(),
                       proReview: reviewTextController.text.toString(),
-                    ).then((value) {
-                      if(value?.success == "1") {
+                    )
+                        .then((value) {
+                      if (value?.success == "1") {
                         setState(() {});
                       }
                     });
@@ -94,7 +103,8 @@ class _RatingAndReviewState extends State<RatingAndReview> {
             ),
             writeReview(reviewData.prorevReview.toString()),
             const SizedBox(height: 4),
-            reviewImagesWidget(reviewData.prorevProductImg, reviewData.reviewid.toString())
+            reviewImagesWidget(
+                reviewData.productreviewimages, reviewData.reviewid.toString())
           ],
         ),
       ),
@@ -125,21 +135,25 @@ class _RatingAndReviewState extends State<RatingAndReview> {
                           for (var i = 1; i <= 5; i++)
                             InkWell(
                               onTap: () {
-                                service.userReviewForProductApi(
-                                  token: widget.token.toString(), userId: widget.userId.toString(),
+                                service
+                                    .userReviewForProductApi(
+                                  token: widget.token.toString(),
+                                  userId: widget.userId.toString(),
                                   orderId: widget.orderId.toString(),
                                   productId: widget.productId.toString(),
                                   proRating: i.toString(),
                                   proReview: "",
-                                ).then((value) {
-                                  if(value?.success == "1") {
+                                )
+                                    .then((value) {
+                                  if (value?.success == "1") {
                                     setState(() {});
                                   }
                                 });
                               },
                               child: i > 0
                                   ? const Icon(Icons.star_outline_outlined)
-                                  : const Icon(Icons.star, color: Color.fromRGBO(251, 188, 4, 1)),
+                                  : const Icon(Icons.star,
+                                      color: Color.fromRGBO(251, 188, 4, 1)),
                             ),
                         ],
                       ),
@@ -149,14 +163,17 @@ class _RatingAndReviewState extends State<RatingAndReview> {
                 const Spacer(),
                 ElevatedButton(
                   onPressed: () {
-                    service.userReviewForProductApi(
-                      token: widget.token.toString(), userId: widget.userId.toString(),
+                    service
+                        .userReviewForProductApi(
+                      token: widget.token.toString(),
+                      userId: widget.userId.toString(),
                       orderId: widget.orderId.toString(),
                       productId: widget.productId.toString(),
                       proRating: 0.toString(),
                       proReview: reviewTextController.text.toString(),
-                    ).then((value) {
-                      if(value?.success == "1") {
+                    )
+                        .then((value) {
+                      if (value?.success == "1") {
                         setState(() {});
                       }
                     });
@@ -170,16 +187,18 @@ class _RatingAndReviewState extends State<RatingAndReview> {
             ),
             writeReview(""),
             TextButton(
-              onPressed: (){
+              onPressed: () {
                 Fluttertoast.showToast(msg: "Give rating and review");
               },
-              child: const Text("+ Add images", style: TextStyle(color: Colors.black)),
+              child: const Text("+ Add images",
+                  style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
       ),
     );
   }
+
   //
   Widget giveRate(int? rating, int? reviewId) {
     return Row(
@@ -188,15 +207,18 @@ class _RatingAndReviewState extends State<RatingAndReview> {
         for (var i = 1; i <= 5; i++)
           InkWell(
             onTap: () {
-              service.updateUserReviewForProductApi(
-                token: widget.token.toString(), userId: widget.userId.toString(),
+              service
+                  .updateUserReviewForProductApi(
+                token: widget.token.toString(),
+                userId: widget.userId.toString(),
                 orderId: widget.orderId.toString(),
                 productId: widget.productId.toString(),
                 reviewId: reviewId.toString(),
                 proRating: i.toString(),
                 proReview: reviewTextController.text.toString(),
-              ).then((value) {
-                if(value?.success == "1") {
+              )
+                  .then((value) {
+                if (value?.success == "1") {
                   setState(() {});
                 }
               });
@@ -239,37 +261,57 @@ class _RatingAndReviewState extends State<RatingAndReview> {
     );
   }
 
-  Widget reviewImagesWidget(String? reviewImages, String? reviewId){
-    var imageList = [
-      // "https://msilonline.in" + reviewImages.toString(),
-      "http://3.109.69.39"+reviewImages.toString(),
-    ];
+  List imageList(List? reviewImages) {
+    List imgData = [];
+    for (int i = 0; i < reviewImages!.length; i++) {
+      imgData.add("http://" + reviewImages[i].proReviewImage.toString());
+    }
+
+    return imgData;
+  }
+
+  Widget reviewImagesWidget(List? reviewImages, String? reviewId) {
+    var imgList = imageList(reviewImages);
+
     return Row(
       children: [
-        if(reviewImages != null)
+        if (reviewImages!.isNotEmpty)
           SizedBox(
-            height: 50,
-            width: 50,
-            child: InkWell(
-              onTap: (){
-                Get.to(() => GalleryWidget(urlImages: imageList));
+            width: Config.screenWidth! * 0.7,
+            height: 70,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: imgList.length,
+              itemBuilder: (context, index) {
+                var img = imgList[index];
+                return Container(
+                  height: 70,
+                  width: 70,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  child: InkWell(
+                    onTap: () {
+                      Get.to(() =>
+                          GalleryWidget2(urlImages: imgList, index: index));
+                    },
+                    child: Image.network(img),
+                  ),
+                );
               },
-              child: Image.network("http://3.109.69.39"+reviewImages.toString()),
             ),
           ),
         TextButton(
-          onPressed: (){
+          onPressed: () {
             showModalBottomSheet(
               context: context,
               builder: (context) => uploadOptions(reviewId),
               isScrollControlled: true,
               shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(15)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
               ),
             );
           },
-          child: const Text("+ Add images", style: TextStyle(color: Colors.black)),
+          child: Text(reviewImages.isNotEmpty ? "+ Add" : "+ Add images",
+              style: TextStyle(color: Colors.black)),
         ),
       ],
     );
@@ -279,7 +321,7 @@ class _RatingAndReviewState extends State<RatingAndReview> {
   bool storagePermission = false;
 
   //ask permission for camera
-  void checkCameraPermission(String? reviewId) async{
+  void checkCameraPermission(String? reviewId) async {
     if (await Permission.camera.request().isGranted) {
       setState(() {
         cameraPermission = true;
@@ -298,7 +340,7 @@ class _RatingAndReviewState extends State<RatingAndReview> {
   }
 
   //ask permission for storage
-  void checkStoragePermission(String? reviewId) async{
+  void checkStoragePermission(String? reviewId) async {
     if (await Permission.storage.request().isGranted) {
       setState(() {
         storagePermission = true;
@@ -317,7 +359,7 @@ class _RatingAndReviewState extends State<RatingAndReview> {
   }
 
   //image upload options
-  Widget uploadOptions(String? reviewId){
+  Widget uploadOptions(String? reviewId) {
     return Container(
       padding: const EdgeInsets.all(12),
       child: Row(
@@ -360,12 +402,17 @@ class _RatingAndReviewState extends State<RatingAndReview> {
   final picker = ImagePicker();
 
   //pick image from gallery/camera
-  Future pickImage(ImageSource imgSource, String? token, String? reviewId) async {
-    final pickedFile = await picker.pickImage(source: imgSource, imageQuality: 50);
+  Future pickImage(
+      ImageSource imgSource, String? token, String? reviewId) async {
+    final pickedFile =
+        await picker.pickImage(source: imgSource, imageQuality: 50);
     if (pickedFile != null) {
       image = File(pickedFile.path);
       if (image != null) {
-        service.addReviewImagesApi(token: token, reviewId: reviewId.toString(), img: image!).then((value) {
+        service
+            .addReviewImagesApi(
+                token: token, reviewId: reviewId.toString(), img: image!)
+            .then((value) {
           setState(() {});
         });
       }

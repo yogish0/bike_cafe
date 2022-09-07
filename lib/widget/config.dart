@@ -50,7 +50,14 @@ class TextWidgetStyle {
   }
 
   Widget Roboto(
-      {String? text, var color, double? size, var fontwight, var dec, TextAlign? textAlign, int? maxLine, TextOverflow? overflow}) {
+      {String? text,
+      var color,
+      double? size,
+      var fontwight,
+      var dec,
+      TextAlign? textAlign,
+      int? maxLine,
+      TextOverflow? overflow}) {
     return Text(
       text!,
       textAlign: textAlign,

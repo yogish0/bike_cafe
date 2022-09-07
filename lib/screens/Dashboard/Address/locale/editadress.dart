@@ -80,10 +80,11 @@ class _EditAdressPageState extends State<EditAdressPage> {
           isDefault: defaultAddress ? '1' : '0');
 
       addressApi.then((value) {
-        if(widget.routeName == null){
+        if (widget.routeName == null) {
           Get.off(() => AddressPageList(routeName: '/myprofile'));
-        }else{
-          Get.off(() => AddressPageList(routeName: widget.routeName.toString()));
+        } else {
+          Get.off(
+              () => AddressPageList(routeName: widget.routeName.toString()));
         }
       });
       return true;
@@ -94,6 +95,7 @@ class _EditAdressPageState extends State<EditAdressPage> {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: "My Address",
       body: box1?.get("data4") == null
           ? const Center()
@@ -184,7 +186,8 @@ class _EditAdressPageState extends State<EditAdressPage> {
                             textalign: TextAlign.center,
                             heading: "Mobile Number *",
                             validator: (input) {
-                              bool _isNumberValid = RegExp(r"^[6-9][0-9]{9}").hasMatch(input!);
+                              bool _isNumberValid =
+                                  RegExp(r"^[6-9][0-9]{9}").hasMatch(input!);
                               if (!_isNumberValid) {
                                 return 'Invalid phone number';
                               }
@@ -210,7 +213,8 @@ class _EditAdressPageState extends State<EditAdressPage> {
                             children: [
                               const SizedBox(height: 15),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 25),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 25),
                                 child: TextFieldWidget2(
                                   type: TextInputType.number,
                                   controller: alternatenumber,
@@ -262,7 +266,7 @@ class _EditAdressPageState extends State<EditAdressPage> {
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius:
-                              BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                               boxShadow: [
                                 BoxShadow(
                                     color: Colors.grey,
@@ -276,22 +280,32 @@ class _EditAdressPageState extends State<EditAdressPage> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   _statesList = [];
-                                  for (var i = 0;i < snapshot.data!.statelists.length;i++) {
-                                    _statesList.add(snapshot.data!.statelists[i].stateName.toString());
+                                  for (var i = 0;
+                                      i < snapshot.data!.statelists.length;
+                                      i++) {
+                                    _statesList.add(snapshot
+                                        .data!.statelists[i].stateName
+                                        .toString());
                                   }
                                   return MySearchField(
                                     suggestions: _statesList,
-                                    suggestionState:
-                                    SuggestionState.enabled,
+                                    suggestionState: SuggestionState.enabled,
                                     controller: state,
                                     hint: 'State *',
-                                    searchInputDecoration: const InputDecoration(border: InputBorder.none,),
+                                    searchInputDecoration:
+                                        const InputDecoration(
+                                      border: InputBorder.none,
+                                    ),
                                     searchStyle: const TextStyle(),
                                     onTap: (value) {
-                                      var index = _statesList.indexOf(value.toString());
-                                      _cityStateController.stateId.value = snapshot.data!.statelists[index].id.toString();
+                                      var index =
+                                          _statesList.indexOf(value.toString());
+                                      _cityStateController.stateId.value =
+                                          snapshot.data!.statelists[index].id
+                                              .toString();
                                       setState(() {});
-                                      debugPrint(_cityStateController.stateId.value);
+                                      debugPrint(
+                                          _cityStateController.stateId.value);
                                       city.clear();
                                       _cityStateController.cityId.value = '0';
                                       pincode.clear();
@@ -311,7 +325,7 @@ class _EditAdressPageState extends State<EditAdressPage> {
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius:
-                              BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                               boxShadow: [
                                 BoxShadow(
                                     color: Colors.grey,
@@ -326,24 +340,31 @@ class _EditAdressPageState extends State<EditAdressPage> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   _citiesList = [];
-                                  for (var i = 0;i < snapshot.data!.cities.length;i++) {
-                                    _citiesList.add(snapshot.data!.cities[i].cityName);
+                                  for (var i = 0;
+                                      i < snapshot.data!.cities.length;
+                                      i++) {
+                                    _citiesList
+                                        .add(snapshot.data!.cities[i].cityName);
                                   }
                                   return MySearchField(
                                     suggestions: _citiesList,
-                                    suggestionState:
-                                    SuggestionState.enabled,
+                                    suggestionState: SuggestionState.enabled,
                                     controller: city,
                                     hint: 'City *',
-                                    searchInputDecoration: const InputDecoration(
+                                    searchInputDecoration:
+                                        const InputDecoration(
                                       border: InputBorder.none,
                                     ),
                                     searchStyle: const TextStyle(),
                                     onTap: (value) {
-                                      var index = _citiesList.indexOf(value.toString());
-                                      _cityStateController.cityId.value = snapshot.data!.cities[index].id.toString();
+                                      var index =
+                                          _citiesList.indexOf(value.toString());
+                                      _cityStateController.cityId.value =
+                                          snapshot.data!.cities[index].id
+                                              .toString();
                                       setState(() {});
-                                      debugPrint(_cityStateController.cityId.value);
+                                      debugPrint(
+                                          _cityStateController.cityId.value);
                                       pincode.clear();
                                     },
                                   );
@@ -363,7 +384,8 @@ class _EditAdressPageState extends State<EditAdressPage> {
                             textalign: TextAlign.center,
                             heading: "PinCode *",
                             validator: (input) {
-                              bool _isNumberValid = RegExp(r"^[0-9]{6}").hasMatch(input!);
+                              bool _isNumberValid =
+                                  RegExp(r"^[0-9]{6}").hasMatch(input!);
                               if (!_isNumberValid) {
                                 return 'Invalid pincode';
                               }
@@ -415,8 +437,7 @@ class TextFieldWidget2 extends StatelessWidget {
       this.textalign,
       this.minLine,
       this.maxLine,
-      this.validator
-      })
+      this.validator})
       : super(key: key);
   String? heading;
   final TextInputType? type;
@@ -438,9 +459,7 @@ class TextFieldWidget2 extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(10)),
             boxShadow: [
               BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset(0, 1),
-                  blurRadius: 6.0),
+                  color: Colors.grey, offset: Offset(0, 1), blurRadius: 6.0),
             ],
           ),
           child: TextFormField(
@@ -453,21 +472,17 @@ class TextFieldWidget2 extends StatelessWidget {
             maxLines: maxLine,
             decoration: InputDecoration(
               enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: containerColor),
-                borderRadius: BorderRadius.all(Radius.circular(10))
-              ),
+                  borderSide: BorderSide(color: containerColor),
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
               focusedBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: containerColor),
-                  borderRadius: BorderRadius.all(Radius.circular(10))
-              ),
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
               errorBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.all(Radius.circular(10))
-              ),
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
               focusedErrorBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.red),
-                  borderRadius: BorderRadius.all(Radius.circular(10))
-              ),
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
               contentPadding: const EdgeInsets.symmetric(vertical: 6),
               fillColor: Colors.white,
               filled: true,

@@ -4,16 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:bike_cafe/controllers/bottombarcontroller.dart';
-import 'package:bike_cafe/models/Products/check_wishlist_model.dart';
 import 'package:bike_cafe/models/Products/products_model.dart';
 import 'package:bike_cafe/screens/Dashboard/NavBar/bottomNavBar.dart';
 import 'package:bike_cafe/screens/Dashboard/product/locale/productviewdetails.dart';
 import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/config.dart';
+import 'package:bike_cafe/widget/constrants.dart';
 import 'package:hive/hive.dart';
+import '../Cart/add_cart.dart';
+import '../wishlist/add_to_wishlist.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -48,6 +49,8 @@ class _SearchPageState extends State<SearchPage> {
   TextEditingController searchController = TextEditingController();
   bool isSearched = false;
 
+  AddCart addCart = AddCart();
+
   @override
   Widget build(BuildContext context) {
     return box1?.get('data4') == null
@@ -64,27 +67,21 @@ class _SearchPageState extends State<SearchPage> {
             child: Scaffold(
               resizeToAvoidBottomInset: false,
               backgroundColor: const Color.fromRGBO(236, 243, 249, 1),
-              bottomNavigationBar:
-                  buildBottomBar.buildBottomBar(context, bottomcontroller),
-              body: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: Get.height * 0.06,
-                    ),
-                    Container(
-                      width: Config.Width,
-                      decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(20)),
-                      padding: EdgeInsets.only(left: 12),
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+              bottomNavigationBar: buildBottomBar.buildBottomBar(
+                context,
+                bottomcontroller,
+              ),
+              appBar: AppBar(
+                elevation: 2,
+                backgroundColor: AppBarColor,
+                actions: [
+                  Expanded(
+                    child: Container(
+                      // width: Config.Width - 40,
+                      // decoration: BoxDecoration(
+                      //     border: Border.all(color: Colors.black38),
+                      //     borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.all(6),
                       child: TextFormField(
                         controller: searchController,
                         onChanged: (val) {
@@ -95,9 +92,11 @@ class _SearchPageState extends State<SearchPage> {
                         },
                         textInputAction: TextInputAction.search,
                         decoration: InputDecoration(
+                          hintText: "Search",
                           hintStyle: const TextStyle(fontSize: 18),
                           border: InputBorder.none,
-                          prefixIcon: Icon(Icons.search_outlined),
+                          prefixIcon: const Icon(Icons.search_outlined,
+                              color: Colors.black38),
                           suffixIcon: InkWell(
                             onTap: () {
                               searchController.clear();
@@ -108,46 +107,80 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                     ),
-                    Container(
-                      height: Get.height * 0.7,
-                      margin: const EdgeInsets.all(6),
-                      child: ListView(children: [
-                        FutureBuilder<GetProducts?>(
-                          future: service.searchProducts(
-                              token: box1?.get('data4'),
-                              searchString: searchfiled.toString()),
-                          builder: (context, snapshot) {
-                            log(searchController.text);
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                            if (snapshot.data == null) {
-                              return Center(
-                                child: Text('No Item Found'),
-                              );
-                            }
-                            if (snapshot.hasData) {
-                              return StaggeredGrid.count(
-                                crossAxisCount: 2,
-                                children: [
-                                  if (snapshot.data!.products.isNotEmpty)
-                                    for (var i = 0;
-                                        i < snapshot.data!.products.length;
-                                        i++)
-                                      productsList(i, snapshot)
-                                ],
-                              );
-                            } else {
-                              return Container();
-                            }
-                          },
+                  ),
+                ],
+              ),
+              body: SafeArea(
+                child: GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // const SizedBox(height: 6),
+                      Expanded(
+                        // height: Get.height * 0.7,
+                        // margin: const EdgeInsets.all(6),
+                        child: ListView(
+                          children: [
+                            FutureBuilder<GetProducts?>(
+                              future: service.searchProducts(
+                                  token: box1?.get('data4'),
+                                  searchString: searchfiled.toString()),
+                              builder: (context, snapshot) {
+                                log(searchController.text);
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Constants.circularWidget();
+                                }
+                                if (snapshot.data == null) {
+                                  return Column(
+                                    children: const [
+                                      SizedBox(height: 50),
+                                      Center(
+                                        child: Text('Search for products',
+                                            style: Constants.halfopacity),
+                                      ),
+                                    ],
+                                  );
+                                }
+                                if (snapshot.hasData) {
+                                  return snapshot.data!.products.isEmpty
+                                      ? Column(
+                                          children: const [
+                                            SizedBox(height: 50),
+                                            Center(
+                                              child: Text(
+                                                  'Searched product not found',
+                                                  style: Constants.halfopacity),
+                                            ),
+                                          ],
+                                        )
+                                      : StaggeredGrid.count(
+                                          crossAxisCount: 2,
+                                          children: [
+                                            if (snapshot
+                                                .data!.products.isNotEmpty)
+                                              for (var i = 0;
+                                                  i <
+                                                      snapshot.data!.products
+                                                          .length;
+                                                  i++)
+                                                productsList(i, snapshot)
+                                          ],
+                                        );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                          ],
                         ),
-                      ]),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -207,7 +240,7 @@ class _SearchPageState extends State<SearchPage> {
                   child: Text(
                     products.proName.toString(),
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 1,
@@ -215,17 +248,6 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star_border_outlined,
-                        color: Colors.black, size: 10),
-                  ],
-                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
@@ -237,102 +259,42 @@ class _SearchPageState extends State<SearchPage> {
                             text: "₹ " + products.procosMrp.toString(),
                             fontwight: FontWeight.w400,
                             color: Colors.grey,
-                            size: 10),
+                            size: 14),
                         style.Roboto(
                             text: " ₹ " +
                                 products.procosSellingPrice.toString() +
                                 "/-",
                             fontwight: FontWeight.w300,
                             color: Colors.black,
-                            size: 12),
+                            size: 16),
                         const Spacer(),
-                        InkWell(
-                            onTap: () {
-                              var addItemApi = service.addItemToCart(
-                                  token: box1?.get('data4'),
-                                  userId: box1?.get('data3'),
-                                  productId: products.productid);
-                              int? success = 0;
-                              addItemApi.then((value) {
-                                success = value!.success;
-                                // print("up $success");
-                                if (success == 1) {
-                                  Fluttertoast.showToast(
-                                      msg: 'Item added to cart');
-                                  service
-                                      .cartCheckoutApi(
-                                          token: box1?.get('data4'),
-                                          userId: box1?.get('data3'))
-                                      .then((value) {
-                                    cartController.cartItemsCount.value =
-                                        value!.products!.length;
-                                  });
-                                } else {
-                                  Fluttertoast.showToast(
-                                      msg: 'Failed to add item to cart');
-                                }
-                              });
-                            },
-                            child: const Icon(Icons.add_shopping_cart_sharp,
-                                size: 18))
+                        addCart.addToCart(box1?.get('data4'),
+                            box1?.get('data3'), products.productid!.toInt()),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: InkWell(
-                  onTap: () {
-                    service
-                        .addToWishlistApi(
-                            token: box1?.get('data4'),
-                            userId: box1?.get('data3'),
-                            productId: products.productid.toString())
-                        .then((value) {
-                      setState(() {});
-                    });
-                  },
-                  child: FutureBuilder<CheckWishlisted?>(
-                    future: service.checkWishlist(
-                        token: box1?.get('data4'),
-                        userId: box1?.get('data3'),
-                        productId: products.productid.toString()),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data!.checkout.iswishlist == 1) {
-                          return const Icon(Icons.favorite,
-                              color: Colors.red, size: 24);
-                        } else {
-                          return const Icon(Icons.favorite_border,
-                              color: Colors.grey, size: 24);
-                        }
-                      } else {
-                        return const Icon(Icons.favorite_border,
-                            color: Colors.grey, size: 24);
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ),
+            AddWishlist(
+                token: box1?.get('data4'),
+                userId: box1?.get('data3'),
+                productId: products.productid.toString()),
             Positioned(
               top: 4,
               left: 4,
               child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    color: Color.fromRGBO(244, 248, 236, 1),
-                  ),
-                  child: style.Roboto(
-                      text: '$discount % Off',
-                      fontwight: FontWeight.w400,
-                      color: Colors.grey,
-                      size: 10)),
+                padding: const EdgeInsets.all(3),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  color: Color.fromRGBO(244, 248, 236, 1),
+                ),
+                child: style.Roboto(
+                    text: '$discount % Off',
+                    fontwight: FontWeight.w400,
+                    color: Colors.grey,
+                    size: 10),
+              ),
             ),
           ],
         ),

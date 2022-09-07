@@ -10,8 +10,10 @@ class EchargePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar:
-          buildBottomBar.buildBottomBar(context, bottomcontroller),
+      bottomNavigationBar: buildBottomBar.buildBottomBar(
+        context,
+        bottomcontroller,
+      ),
       body: Container(
         child: Center(
             child: Text(

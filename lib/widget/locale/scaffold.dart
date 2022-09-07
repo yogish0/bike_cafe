@@ -9,7 +9,8 @@ import 'package:bike_cafe/screens/Dashboard/Notification/notification.dart';
 import 'package:bike_cafe/widget/constrants.dart';
 
 class GetScaffold extends StatelessWidget {
-  GetScaffold({Key? key, this.title, this.body}) : super(key: key);
+  GetScaffold({Key? key, this.title, this.body, required this.index})
+      : super(key: key);
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   String? title;
@@ -17,25 +18,29 @@ class GetScaffold extends StatelessWidget {
   BottomNavigationController bottomcontroller = BottomNavigationController();
 
   dynamic? body;
+  int index;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      bottomNavigationBar:
-          buildBottomBar.buildBottomBar(context, bottomcontroller),
+      bottomNavigationBar: buildBottomBar.buildBottomBar(
+        context,
+        bottomcontroller,
+      ),
       appBar: AppBar(
+        elevation: 2,
         backgroundColor: AppBarColor,
-        title: Text(title.toString(),
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                fontWeight: FontWeight.w500)),
+        title: Text(
+          title.toString(),
+          style: const TextStyle(
+              color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+        ),
         leading: IconButton(
           onPressed: () {
             Get.back(canPop: true);
           },
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_outlined,
             color: Colors.black,
           ),
@@ -48,7 +53,7 @@ class GetScaffold extends StatelessWidget {
                   Get.to(() => ChatBotPage());
                 },
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: SvgPicture.asset('assets/img/svg/Help_and_support.svg',
                       height: 24, width: 24),
                 ),
@@ -58,7 +63,7 @@ class GetScaffold extends StatelessWidget {
                   Get.to(() => const NotificationPage());
                 },
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: SvgPicture.asset('assets/img/svg/My Notification.svg',
                       height: 24, width: 24),
                 ),

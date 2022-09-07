@@ -20,7 +20,7 @@ class TabbarPage extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 width: Config.Width,
-                height: 40,
+                height: 45,
                 child: TabBar(
                   indicatorColor: Colors.white,
                   unselectedLabelColor: Colors.black,
@@ -62,7 +62,7 @@ class TabbarPage extends StatelessWidget {
           ),
           Container(
             // color: Colors.red,
-            height: Config.Height * 0.5,
+            height: Config.Height * 0.9,
             child: TabBarView(children: children),
           ),
         ],

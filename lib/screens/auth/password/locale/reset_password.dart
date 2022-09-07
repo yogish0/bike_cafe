@@ -10,14 +10,13 @@ import 'package:bike_cafe/widget/config.dart';
 class PasswordReset extends StatefulWidget {
   const PasswordReset({Key? key, required this.userId}) : super(key: key);
 
-   final String? userId;
+  final String? userId;
 
   @override
   _PasswordResetState createState() => _PasswordResetState();
 }
 
 class _PasswordResetState extends State<PasswordReset> {
-
   APIService apiService = APIService();
 
   final _formKey = GlobalKey<FormState>();
@@ -30,14 +29,16 @@ class _PasswordResetState extends State<PasswordReset> {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      try{
-        var resetResponse = apiService.resetPasswordApi(userId: widget.userId.toString(), password: _passwordController.text.toString());
+      try {
+        var resetResponse = apiService.resetPasswordApi(
+            userId: widget.userId.toString(),
+            password: _passwordController.text.toString());
         resetResponse.then((value) {
-          if(value?.success == 1){
+          if (value?.success == 1) {
             Get.off(() => SignIn());
           }
         });
-      }catch(e){
+      } catch (e) {
         print(e.toString());
       }
       return true;
@@ -143,4 +144,3 @@ class _PasswordResetState extends State<PasswordReset> {
     );
   }
 }
-

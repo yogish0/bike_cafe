@@ -38,7 +38,8 @@ class _ListedVehicleState extends State<ListedVehicle> {
     if (PickedFile != null) {
       image = File(PickedFile.path);
       if (image != null) {
-        service.vehicleImageUploadApi(
+        service
+            .vehicleImageUploadApi(
                 token: token, userId: userId, vehicleId: vehicleId, img: image!)
             .then((value) {
           setState(() {});
@@ -65,7 +66,7 @@ class _ListedVehicleState extends State<ListedVehicle> {
                 children: [
                   appbartheme(),
                   Container(
-                    height: height * 0.7,
+                    height: height * 0.65,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: FutureBuilder<GetVechiclebyuserid?>(
@@ -76,11 +77,12 @@ class _ListedVehicleState extends State<ListedVehicle> {
                           AsyncSnapshot<GetVechiclebyuserid?> snapshot) {
                         if (snapshot.connectionState != ConnectionState.done) {}
                         if (!snapshot.hasData) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                              child: CircularProgressIndicator());
                         } else {
                           if (snapshot.data!.body.isEmpty) {
                             return SizedBox(
-                              height: height * 0.8,
+                              height: height * 0.65,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -134,14 +136,21 @@ class _ListedVehicleState extends State<ListedVehicle> {
                                                         const TextSpan(
                                                             text: 'Brand: ',
                                                             style: TextStyle(
-                                                                color: Colors.black,
-                                                                fontWeight: FontWeight.bold)),
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
                                                         TextSpan(
-                                                            text: vechile.variantName.toString(),
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontWeight: FontWeight.w400,
-                                                                    color: Colors.black)),
+                                                            text: vechile
+                                                                .variantName
+                                                                .toString(),
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: Colors
+                                                                    .black)),
                                                       ],
                                                     ),
                                                   ),
@@ -153,19 +162,21 @@ class _ListedVehicleState extends State<ListedVehicle> {
                                                         const TextSpan(
                                                             text: 'Model: ',
                                                             style: TextStyle(
-                                                                color: Colors.black,
-                                                                fontWeight: FontWeight.bold)),
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
                                                         TextSpan(
                                                             text: vechile
                                                                 .modelName
                                                                 .toString(),
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Colors
-                                                                        .black)),
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: Colors
+                                                                    .black)),
                                                       ],
                                                     ),
                                                   ),
@@ -177,16 +188,20 @@ class _ListedVehicleState extends State<ListedVehicle> {
                                                         const TextSpan(
                                                             text: 'CC: ',
                                                             style: TextStyle(
-                                                                color: Colors.black,
+                                                                color: Colors
+                                                                    .black,
                                                                 fontWeight:
-                                                                    FontWeight.bold)),
+                                                                    FontWeight
+                                                                        .bold)),
                                                         TextSpan(
-                                                            text: vechile.cc.toString(),
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight.w400,
-                                                                    color: Colors.black)),
+                                                            text: vechile.cc
+                                                                .toString(),
+                                                            style: const TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: Colors
+                                                                    .black)),
                                                       ],
                                                     ),
                                                   ),
@@ -199,8 +214,13 @@ class _ListedVehicleState extends State<ListedVehicle> {
                                                           children: <TextSpan>[
                                                             TextSpan(
                                                               text: 'Year: ',
-                                                              style: TextStyle(color: Colors.black,
-                                                                    fontWeight: FontWeight.bold),),
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
                                                           ],
                                                         ),
                                                       ),
@@ -209,23 +229,37 @@ class _ListedVehicleState extends State<ListedVehicle> {
                                                           // style: DefaultTextStyle.of(context).style,
                                                           children: <TextSpan>[
                                                             TextSpan(
-                                                                text: vechile.launchYear.toString(),
+                                                                text: vechile
+                                                                    .launchYear
+                                                                    .toString(),
                                                                 style: const TextStyle(
-                                                                    fontWeight: FontWeight.w400,
-                                                                    color: Colors.black)),
-                                                            if(vechile.endYear.toString() != "null")
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Colors
+                                                                        .black)),
+                                                            if (vechile.endYear
+                                                                    .toString() !=
+                                                                "null")
                                                               TextSpan(
-                                                                text: ' - ' + vechile.endYear.toString(),
+                                                                  text: ' - ' +
+                                                                      vechile
+                                                                          .endYear
+                                                                          .toString(),
                                                                   style: const TextStyle(
-                                                                      fontWeight: FontWeight.w400,
-                                                                      color: Colors.black)
-                                                              )
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      color: Colors
+                                                                          .black))
                                                           ],
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                  if (vechile.usevehVehicleNumber != null)
+                                                  if (vechile
+                                                          .usevehVehicleNumber !=
+                                                      null)
                                                     RichText(
                                                       text: TextSpan(
                                                         // style: DefaultTextStyle.of(context).style,
@@ -236,14 +270,19 @@ class _ListedVehicleState extends State<ListedVehicle> {
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .black,
-                                                                  fontWeight: FontWeight.bold)),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
                                                           TextSpan(
                                                               text: vechile
-                                                                  .usevehVehicleNumber.toString(),
+                                                                  .usevehVehicleNumber
+                                                                  .toString(),
                                                               style: const TextStyle(
                                                                   fontWeight:
-                                                                      FontWeight.w400,
-                                                                  color: Colors.black)),
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: Colors
+                                                                      .black)),
                                                         ],
                                                       ),
                                                     ),
@@ -257,46 +296,71 @@ class _ListedVehicleState extends State<ListedVehicle> {
                                                       const Spacer(),
                                                       InkWell(
                                                         onTap: () {
-                                                          Get.to(() =>
-                                                              EditVeichle(
-                                                                token: box1.get("data4").toString(),
-                                                                userId: box1.get("data3").toString(),
-                                                                vehicleId: vechile.usevehRegId.toString(),
-                                                              ));
+                                                          Get.to(
+                                                              () => EditVeichle(
+                                                                    token: box1
+                                                                        .get(
+                                                                            "data4")
+                                                                        .toString(),
+                                                                    userId: box1
+                                                                        .get(
+                                                                            "data3")
+                                                                        .toString(),
+                                                                    vehicleId: vechile
+                                                                        .usevehRegId
+                                                                        .toString(),
+                                                                  ));
                                                         },
                                                         child: const SizedBox(
                                                           width: 40,
                                                           height: 30,
-                                                          child: Icon(Icons.edit_outlined),
+                                                          child: Icon(Icons
+                                                              .edit_outlined),
                                                         ),
                                                       ),
                                                       InkWell(
                                                         onTap: () {
                                                           Get.defaultDialog(
                                                               content: Text('Do you want to remove ' +
-                                                                  vechile.variantName.toString() +
+                                                                  vechile
+                                                                      .variantName
+                                                                      .toString() +
                                                                   ' from vehicles list'),
                                                               radius: 5,
                                                               onCancel: () {},
                                                               onConfirm: () {
                                                                 var deleteVehicle = service.deleteVehicleById(
-                                                                    token: box1.get("data4"),
-                                                                    userId: box1.get("data3").toString(),
-                                                                    vehicleId: vechile.usevehRegId.toString());
-                                                                deleteVehicle.then((value) {
-                                                                  setState(() {});
+                                                                    token: box1.get(
+                                                                        "data4"),
+                                                                    userId: box1
+                                                                        .get(
+                                                                            "data3")
+                                                                        .toString(),
+                                                                    vehicleId: vechile
+                                                                        .usevehRegId
+                                                                        .toString());
+                                                                deleteVehicle
+                                                                    .then(
+                                                                        (value) {
+                                                                  setState(
+                                                                      () {});
                                                                   Get.back();
                                                                 });
                                                               },
-                                                              textConfirm: 'Confirm',
-                                                              buttonColor: kPrimaryColor,
-                                                              cancelTextColor: kPrimaryColor,
-                                                              confirmTextColor: Colors.white);
+                                                              textConfirm:
+                                                                  'Confirm',
+                                                              buttonColor:
+                                                                  kPrimaryColor,
+                                                              cancelTextColor:
+                                                                  kPrimaryColor,
+                                                              confirmTextColor:
+                                                                  Colors.white);
                                                         },
                                                         child: const SizedBox(
                                                           width: 40,
                                                           height: 30,
-                                                          child: Icon(Icons.delete_outline),
+                                                          child: Icon(Icons
+                                                              .delete_outline),
                                                         ),
                                                       ),
                                                       const SizedBox(width: 6)
@@ -367,7 +431,7 @@ class _ListedVehicleState extends State<ListedVehicle> {
   Widget imgContainer(Body vechile) {
     var imageList = [
       // "https://msilonline.in" + vechile.vehicleImage.toString(),
-      "http://3.109.69.39" + vechile.vehicleImage.toString(),
+      "https://bikecafe.co.in" + vechile.vehicleImage.toString(),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -381,14 +445,15 @@ class _ListedVehicleState extends State<ListedVehicle> {
                     height: 120, width: 150, child: Icon(Icons.image, size: 50))
                 : Center(
                     child: InkWell(
-                      onTap: (){
-                        Get.to(() => GalleryWidget(urlImages: imageList));
-                      },
-                      child: Image.network(
-                          // "https://msilonline.in" + vechile.vehicleImage.toString(),
-                          "http://3.109.69.39" + vechile.vehicleImage.toString(),
-                          width: 130),
-                    )),
+                    onTap: () {
+                      Get.to(() => GalleryWidget(urlImages: imageList));
+                    },
+                    child: Image.network(
+                        // "https://msilonline.in" + vechile.vehicleImage.toString(),
+                        "https://bikecafe.co.in" +
+                            vechile.vehicleImage.toString(),
+                        width: 130),
+                  )),
             Padding(
               padding: const EdgeInsets.only(left: 4),
               child: Align(
@@ -420,13 +485,13 @@ class _ListedVehicleState extends State<ListedVehicle> {
   bool storagePermission = false;
 
   //ask permission for camera
-  void checkCameraPermission(String vehicleId) async{
+  void checkCameraPermission(String vehicleId) async {
     if (await Permission.camera.request().isGranted) {
       setState(() {
         cameraPermission = true;
       });
-      pickImage(ImageSource.camera, box1.get('data4'),
-          box1.get('data3'), vehicleId.toString());
+      pickImage(ImageSource.camera, box1.get('data4'), box1.get('data3'),
+          vehicleId.toString());
     } else if (await Permission.camera.request().isPermanentlyDenied) {
       await openAppSettings();
       debugPrint('object3');
@@ -440,13 +505,13 @@ class _ListedVehicleState extends State<ListedVehicle> {
   }
 
   //ask permission for storage
-  void checkStoragePermission(String vehicleId) async{
+  void checkStoragePermission(String vehicleId) async {
     if (await Permission.storage.request().isGranted) {
       setState(() {
         storagePermission = true;
       });
-      pickImage(ImageSource.gallery, box1.get('data4'),
-          box1.get('data3'), vehicleId.toString());
+      pickImage(ImageSource.gallery, box1.get('data4'), box1.get('data3'),
+          vehicleId.toString());
     } else if (await Permission.storage.request().isPermanentlyDenied) {
       await openAppSettings();
       debugPrint('object3');
@@ -520,8 +585,8 @@ Widget appbartheme() {
               onPressed: () {
                 Get.back();
               },
-              icon:
-                  const Icon(Icons.chevron_left_sharp, size: 40, color: Colors.white),
+              icon: const Icon(Icons.chevron_left_sharp,
+                  size: 40, color: Colors.white),
             ),
           ),
         ],

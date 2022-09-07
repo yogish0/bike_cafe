@@ -9,6 +9,7 @@ class ServiceViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: "Service",
       body: service(),
     );

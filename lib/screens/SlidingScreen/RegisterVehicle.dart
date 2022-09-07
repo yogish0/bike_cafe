@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:bike_cafe/controllers/vechileListController.dart';
 import 'package:bike_cafe/models/Vechile/getbrand.dart';
 import 'package:bike_cafe/models/Vechile/getmodel.dart';
 import 'package:bike_cafe/models/Vechile/getvariant.dart';
@@ -59,12 +61,11 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
   TextEditingController vehicleYear = TextEditingController();
   TextEditingController vehicleCC = TextEditingController();
 
-  VehicleRegisterController vehicleRegisterController = Get.put(VehicleRegisterController());
+  VehicleRegisterController vehicleRegisterController =
+      Get.put(VehicleRegisterController());
 
   @override
   Widget build(BuildContext context) {
-
-
     //vehicle types lists
     List<String> _vehicleType = [];
     //vehicle brand list
@@ -84,11 +85,11 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
       body: box1?.get("data4") == null
           ? Center(child: CircularProgressIndicator())
           : GestureDetector(
-            onTap: (){
-              FocusScope.of(context).unfocus();
-              validate();
-            },
-            child: ListView(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+                validate();
+              },
+              child: ListView(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -126,10 +127,10 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 4),
                             child: TextFormField(
-                              controller: vehicleNumber,
-                              textAlign: TextAlign.center,
-                              decoration: validationDecor('Vehicle Number'),
-                            ),
+                                controller: vehicleNumber,
+                                textAlign: TextAlign.center,
+                                decoration: validationDecor('Vehicle Number'),
+                                inputFormatters: [UpperCaseTextFormatter()]),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -140,8 +141,12 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               _vehicleType = [];
-                              for (var i = 0;i < snapshot.data!.body.length;i++) {
-                                _vehicleType.add(snapshot.data!.body[i].vehcatVehicleType.toString());
+                              for (var i = 0;
+                                  i < snapshot.data!.body.length;
+                                  i++) {
+                                _vehicleType.add(snapshot
+                                    .data!.body[i].vehcatVehicleType
+                                    .toString());
                               }
                               return Padding(
                                 padding:
@@ -155,16 +160,25 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                                     controller: _vehicleTypeText,
                                     searchInputDecoration: validationDecor(''),
                                     onTap: (value) {
-                                      var index = _vehicleType.indexOf(value.toString());
-                                      vehicleRegisterController.vehicleTypeId.value =
-                                          snapshot.data!.body[index].id.toString();
+                                      var index = _vehicleType
+                                          .indexOf(value.toString());
+                                      vehicleRegisterController
+                                              .vehicleTypeId.value =
+                                          snapshot.data!.body[index].id
+                                              .toString();
 
-                                      vehicleRegisterController.vehicleBrandId.value = '0';
-                                      vehicleRegisterController.vehicleModelId.value = '0';
-                                      vehicleRegisterController.vehicleVariantId.value = '0';
-                                      vehicleRegisterController.vehicleYear.value = '';
-                                      vehicleRegisterController.vehicleEndYear.value = '';
-                                      vehicleRegisterController.vehicleCC.value = '';
+                                      vehicleRegisterController
+                                          .vehicleBrandId.value = '0';
+                                      vehicleRegisterController
+                                          .vehicleModelId.value = '0';
+                                      vehicleRegisterController
+                                          .vehicleVariantId.value = '0';
+                                      vehicleRegisterController
+                                          .vehicleYear.value = '';
+                                      vehicleRegisterController
+                                          .vehicleEndYear.value = '';
+                                      vehicleRegisterController
+                                          .vehicleCC.value = '';
                                       _vehicleBrandText.clear();
                                       _vehicleModelText.clear();
                                       _vehicleVariantText.clear();
@@ -190,12 +204,18 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                         FutureBuilder<VechiletypeBrand?>(
                           future: service.getuserbrandbyvechicletype(
                               token: box1?.get('data4'),
-                              vtypeid: vehicleRegisterController.vehicleTypeId.value.toString()),
+                              vtypeid: vehicleRegisterController
+                                  .vehicleTypeId.value
+                                  .toString()),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               _vehicleBrand = [];
-                              for (var i = 0;i < snapshot.data!.body.length;i++) {
-                                _vehicleBrand.add(snapshot.data!.body[i].brandName.toString());
+                              for (var i = 0;
+                                  i < snapshot.data!.body.length;
+                                  i++) {
+                                _vehicleBrand.add(snapshot
+                                    .data!.body[i].brandName
+                                    .toString());
                               }
                               return Padding(
                                 padding:
@@ -209,15 +229,23 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                                     controller: _vehicleBrandText,
                                     searchInputDecoration: validationDecor(''),
                                     onTap: (value) {
-                                      var index = _vehicleBrand.indexOf(value.toString());
-                                      vehicleRegisterController.vehicleBrandId.value =
-                                          snapshot.data!.body[index].brandid.toString();
+                                      var index = _vehicleBrand
+                                          .indexOf(value.toString());
+                                      vehicleRegisterController
+                                              .vehicleBrandId.value =
+                                          snapshot.data!.body[index].brandid
+                                              .toString();
 
-                                      vehicleRegisterController.vehicleModelId.value = '0';
-                                      vehicleRegisterController.vehicleVariantId.value = '0';
-                                      vehicleRegisterController.vehicleYear.value = '';
-                                      vehicleRegisterController.vehicleEndYear.value = '';
-                                      vehicleRegisterController.vehicleCC.value = '';
+                                      vehicleRegisterController
+                                          .vehicleModelId.value = '0';
+                                      vehicleRegisterController
+                                          .vehicleVariantId.value = '0';
+                                      vehicleRegisterController
+                                          .vehicleYear.value = '';
+                                      vehicleRegisterController
+                                          .vehicleEndYear.value = '';
+                                      vehicleRegisterController
+                                          .vehicleCC.value = '';
                                       _vehicleModelText.clear();
                                       _vehicleVariantText.clear();
 
@@ -242,12 +270,18 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                         FutureBuilder<VechileModelByBrandId?>(
                           future: service.getusermodelbybrandtype(
                               token: box1?.get('data4'),
-                              brandid: vehicleRegisterController.vehicleBrandId.value.toString()),
+                              brandid: vehicleRegisterController
+                                  .vehicleBrandId.value
+                                  .toString()),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               _vehicleModel = [];
-                              for (var i = 0;i < snapshot.data!.body.length;i++) {
-                                _vehicleModel.add(snapshot.data!.body[i].vehmodName.toString());
+                              for (var i = 0;
+                                  i < snapshot.data!.body.length;
+                                  i++) {
+                                _vehicleModel.add(snapshot
+                                    .data!.body[i].vehmodName
+                                    .toString());
                               }
                               return Padding(
                                 padding:
@@ -261,13 +295,21 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                                     controller: _vehicleModelText,
                                     searchInputDecoration: validationDecor(''),
                                     onTap: (value) {
-                                      var index = _vehicleModel.indexOf(value.toString());
-                                      vehicleRegisterController.vehicleModelId.value = snapshot.data!.body[index].id.toString();
+                                      var index = _vehicleModel
+                                          .indexOf(value.toString());
+                                      vehicleRegisterController
+                                              .vehicleModelId.value =
+                                          snapshot.data!.body[index].id
+                                              .toString();
 
-                                      vehicleRegisterController.vehicleVariantId.value = '0';
-                                      vehicleRegisterController.vehicleYear.value = '';
-                                      vehicleRegisterController.vehicleEndYear.value = '';
-                                      vehicleRegisterController.vehicleCC.value = '';
+                                      vehicleRegisterController
+                                          .vehicleVariantId.value = '0';
+                                      vehicleRegisterController
+                                          .vehicleYear.value = '';
+                                      vehicleRegisterController
+                                          .vehicleEndYear.value = '';
+                                      vehicleRegisterController
+                                          .vehicleCC.value = '';
                                       _vehicleVariantText.clear();
                                       setState(() {});
                                     },
@@ -299,8 +341,9 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                               for (var i = 0;
                                   i < snapshot.data!.body.length;
                                   i++) {
-                                _vehicleVariant.add(
-                                    snapshot.data!.body[i].vehvarName.toString());
+                                _vehicleVariant.add(snapshot
+                                    .data!.body[i].vehvarName
+                                    .toString());
                               }
                               return Padding(
                                 padding:
@@ -316,16 +359,27 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                                     onTap: (value) {
                                       var index = _vehicleVariant
                                           .indexOf(value.toString());
-                                      vehicleRegisterController.vehicleVariantId.value =
-                                          snapshot.data!.body[index].id.toString();
-                                      vehicleRegisterController.vehicleYear.value =
-                                          snapshot.data!.body[index].vehvarLaunchYear.toString();
-                                      vehicleRegisterController.vehicleEndYear.value =
-                                          snapshot.data!.body[index].vehvarEndYear.toString();
-                                      vehicleRegisterController.vehicleCC.value =
-                                          snapshot.data!.body[index].vehvarCc.toString();
+                                      vehicleRegisterController
+                                              .vehicleVariantId.value =
+                                          snapshot.data!.body[index].id
+                                              .toString();
+                                      vehicleRegisterController
+                                              .vehicleYear.value =
+                                          snapshot.data!.body[index]
+                                              .vehvarLaunchYear
+                                              .toString();
+                                      vehicleRegisterController
+                                              .vehicleEndYear.value =
+                                          snapshot
+                                              .data!.body[index].vehvarEndYear
+                                              .toString();
+                                      vehicleRegisterController
+                                              .vehicleCC.value =
+                                          snapshot.data!.body[index].vehvarCc
+                                              .toString();
                                       setState(() {});
-                                      print(vehicleRegisterController.vehicleVariantId.value);
+                                      print(vehicleRegisterController
+                                          .vehicleVariantId.value);
                                     },
                                     validator: (input) {
                                       if (input.toString().length == 0) {
@@ -349,20 +403,41 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                             decoration: BoxDecoration(
                                 color: containerColor,
                                 border: Border.all(color: containerColor),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(15))),
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(15))),
                             child: Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  vehicleRegisterController.vehicleYear.value == ''
-                                      ? Text("Year", style: TextStyle(color: Color.fromRGBO(0,0,0,0.5),fontSize: 17),)
-                                      : Text(vehicleRegisterController.vehicleYear.value.toString() + ' - ' , style: TextStyle(fontSize: 17)),
-                                  vehicleRegisterController.vehicleEndYear.value == ''
+                                  vehicleRegisterController.vehicleYear.value ==
+                                          ''
+                                      ? Text(
+                                          "Year",
+                                          style: TextStyle(
+                                              color:
+                                                  Color.fromRGBO(0, 0, 0, 0.5),
+                                              fontSize: 17),
+                                        )
+                                      : Text(
+                                          vehicleRegisterController
+                                                  .vehicleYear.value
+                                                  .toString() +
+                                              ' - ',
+                                          style: TextStyle(fontSize: 17)),
+                                  vehicleRegisterController
+                                              .vehicleEndYear.value ==
+                                          ''
                                       ? Text("")
-                                      : vehicleRegisterController.vehicleEndYear.value == 'null'
-                                      ? Text("" ,style: TextStyle(fontSize: 17))
-                                      : Text(vehicleRegisterController.vehicleEndYear.value.toString(), style: TextStyle(fontSize: 17)),
+                                      : vehicleRegisterController
+                                                  .vehicleEndYear.value ==
+                                              'null'
+                                          ? Text("",
+                                              style: TextStyle(fontSize: 17))
+                                          : Text(
+                                              vehicleRegisterController
+                                                  .vehicleEndYear.value
+                                                  .toString(),
+                                              style: TextStyle(fontSize: 17)),
                                 ],
                               ),
                             ),
@@ -372,17 +447,28 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                                color: containerColor,
-                                border: Border.all(color: containerColor),
-                                borderRadius: const BorderRadius.all(Radius.circular(15))),
-                            child: Center(
-                              child: vehicleRegisterController.vehicleCC.value == ''
-                                  ? Text("CC", style: TextStyle(color: Color.fromRGBO(0,0,0,0.5),fontSize: 17),)
-                                  : Text(vehicleRegisterController.vehicleCC.value.toString(), style: TextStyle(fontSize: 17)),
-                            )
-                          ),
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                  color: containerColor,
+                                  border: Border.all(color: containerColor),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(15))),
+                              child: Center(
+                                child: vehicleRegisterController
+                                            .vehicleCC.value ==
+                                        ''
+                                    ? Text(
+                                        "CC",
+                                        style: TextStyle(
+                                            color: Color.fromRGBO(0, 0, 0, 0.5),
+                                            fontSize: 17),
+                                      )
+                                    : Text(
+                                        vehicleRegisterController
+                                            .vehicleCC.value
+                                            .toString(),
+                                        style: TextStyle(fontSize: 17)),
+                              )),
                         ),
                       ],
                     ),
@@ -418,7 +504,7 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
                   ),
                 ],
               ),
-          ),
+            ),
     );
   }
 
@@ -430,25 +516,32 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
     }
     return false;
   }
+
   bool validateAndSave() {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      service.postvechilebyuser(
-          response: requestmodel,
-          id: ' ${box1!.get('data3')}',
-          token: box1!.get('data4'),
-          categoryid: vehicleRegisterController.vehicleTypeId.value.toString(),
-          brandid: vehicleRegisterController.vehicleBrandId.value.toString(),
-          variantid: vehicleRegisterController.vehicleVariantId.value.toString(),
-          modelid: vehicleRegisterController.vehicleModelId.value.toString(),
-          vehicleNumber: vehicleNumber.text).then((value) {
+      service
+          .postvechilebyuser(
+              response: requestmodel,
+              id: ' ${box1!.get('data3')}',
+              token: box1!.get('data4'),
+              categoryid:
+                  vehicleRegisterController.vehicleTypeId.value.toString(),
+              brandid:
+                  vehicleRegisterController.vehicleBrandId.value.toString(),
+              variantid:
+                  vehicleRegisterController.vehicleVariantId.value.toString(),
+              modelid:
+                  vehicleRegisterController.vehicleModelId.value.toString(),
+              vehicleNumber: vehicleNumber.text)
+          .then((value) {
         vehicleRegisterController.vehicleTypeId.value = '0';
         vehicleRegisterController.vehicleBrandId.value = '0';
         vehicleRegisterController.vehicleModelId.value = '0';
         vehicleRegisterController.vehicleVariantId.value = '0';
-        vehicleRegisterController.vehicleYear.value ='';
-        vehicleRegisterController.vehicleEndYear.value ='';
+        vehicleRegisterController.vehicleYear.value = '';
+        vehicleRegisterController.vehicleEndYear.value = '';
         vehicleRegisterController.vehicleCC.value = '';
         setState(() {});
         Get.to(() => ListedVehicle());
@@ -459,32 +552,35 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
   }
 
   validationDecor(String? hintText) => InputDecoration(
-    enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: containerColor),
-        borderRadius: BorderRadius.all(Radius.circular(15))
-    ),
-    focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: containerColor),
-        borderRadius: BorderRadius.all(Radius.circular(15))
-    ),
-    errorBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.red),
-        borderRadius: BorderRadius.all(Radius.circular(15))
-    ),
-    focusedErrorBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.red),
-        borderRadius: BorderRadius.all(Radius.circular(15))
-    ),
-    contentPadding: EdgeInsets.symmetric(vertical: 12),
-    fillColor: containerColor,
-    filled: true,
-    hoverColor: Colors.black,
-    border: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black26),
-        borderRadius: BorderRadius.all(Radius.circular(15))
-    ),
-    hintText: hintText.toString()
-  );
+      enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: containerColor),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
+      focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: containerColor),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
+      errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
+      focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
+      contentPadding: EdgeInsets.symmetric(vertical: 12),
+      fillColor: containerColor,
+      filled: true,
+      hoverColor: Colors.black,
+      border: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.black26),
+          borderRadius: BorderRadius.all(Radius.circular(15))),
+      hintText: hintText.toString());
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+        text: newValue.text.toUpperCase(), selection: newValue.selection);
+  }
 }
 
 class VehicleRegisterController extends GetxController {

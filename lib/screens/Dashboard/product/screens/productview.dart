@@ -11,6 +11,8 @@ import 'package:bike_cafe/screens/Dashboard/product/locale/productviewdetails.da
 import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/config.dart';
 
+import '../../Cart/add_cart.dart';
+
 class ProductViewPage extends StatefulWidget {
   ProductViewPage({Key? key, required this.token, required this.userId})
       : super(key: key);
@@ -30,6 +32,8 @@ class _ProductViewPageState extends State<ProductViewPage> {
   CategoryProductsController categoryController =
       Get.put(CategoryProductsController());
   CartController cartController = Get.put(CartController());
+
+  AddCart addCart = AddCart();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +63,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                     ),
                   );
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center();
                 }
               },
             ),
@@ -72,7 +76,11 @@ class _ProductViewPageState extends State<ProductViewPage> {
                         token: widget.token,
                         categoryId: categoryController.selectedCatId.value),
                     builder: (context, snapshot) {
-                      if (snapshot.hasData) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                            child: CircularProgressIndicator(
+                                color: kPrimaryColor));
+                      } else if (snapshot.hasData) {
                         return SingleChildScrollView(
                           child: Column(
                             children: [
@@ -86,11 +94,14 @@ class _ProductViewPageState extends State<ProductViewPage> {
                                       productsList(i, snapshot)
                                 ],
                               ),
+                              SizedBox(height: Config.screenHeight! * 0.28)
                             ],
                           ),
                         );
                       } else {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                            child: CircularProgressIndicator(
+                                color: kPrimaryColor));
                       }
                     },
                   )
@@ -102,7 +113,11 @@ class _ProductViewPageState extends State<ProductViewPage> {
                         variantId: categoryController.selectedVariantId.value
                             .toString()),
                     builder: (context, snapshot) {
-                      if (snapshot.hasData) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                            child: CircularProgressIndicator(
+                                color: kPrimaryColor));
+                      } else if (snapshot.hasData) {
                         return SingleChildScrollView(
                           child: Column(
                             children: [
@@ -116,11 +131,14 @@ class _ProductViewPageState extends State<ProductViewPage> {
                                       productsListByVariant(i, snapshot)
                                 ],
                               ),
+                              SizedBox(height: Config.screenHeight! * 0.28)
                             ],
                           ),
                         );
                       } else {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                            child: CircularProgressIndicator(
+                                color: kPrimaryColor));
                       }
                     },
                   ),
@@ -239,17 +257,17 @@ class _ProductViewPageState extends State<ProductViewPage> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star_border_outlined,
-                        color: Colors.black, size: 10),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: const [
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star_border_outlined,
+                //         color: Colors.black, size: 10),
+                //   ],
+                // ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
@@ -270,51 +288,8 @@ class _ProductViewPageState extends State<ProductViewPage> {
                             color: Colors.black,
                             size: 13),
                         const Spacer(),
-                        ElevatedButton(
-                           style: ButtonStyle(
-                               minimumSize: MaterialStateProperty.all(Size(25,40)),
-
-                               shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                        side: BorderSide(color: Colors.red),
-                                    ),
-                                ),
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.red)),
-                            onPressed: () {
-                              var addItemApi = service.addItemToCart(
-                                  token: widget.token,
-                                  userId: widget.userId,
-                                  productId: products.productid);
-                              int? success = 0;
-                              addItemApi.then((value) {
-                                success = value!.success;
-                                // debugPrint("up $success");
-                                if (success == 1) {
-                                  Fluttertoast.showToast(
-                                      msg: 'Item added to cart');
-                                  service
-                                      .cartCheckoutApi(
-                                          token: widget.token,
-                                          userId: widget.userId)
-                                      .then((value) {
-                                    if (value?.products!.length !=
-                                        null) {
-                                      cartController.cartItemsCount.value =
-                                          value!.products!.length;
-                                    }
-                                  });
-                                } else {
-                                  Fluttertoast.showToast(
-                                      msg: 'Failed to add item to cart');
-                                }
-                              });
-                            },
-                            child: const Icon(Icons.add_shopping_cart_sharp,
-                                size: 18))
+                        addCart.addToCart(widget.token, widget.userId,
+                            products.productid!.toInt()),
                       ],
                     ),
                   ),
@@ -431,7 +406,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2.0),
                   child: Text(
-                    products.proName.toString().toUpperCase(),
+                    products.proName.toString(),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -441,17 +416,17 @@ class _ProductViewPageState extends State<ProductViewPage> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star, color: Colors.yellow, size: 14),
-                    Icon(Icons.star_border_outlined,
-                        color: Colors.black, size: 10),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: const [
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                //     Icon(Icons.star_border_outlined,
+                //         color: Colors.black, size: 10),
+                //   ],
+                // ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
@@ -472,49 +447,8 @@ class _ProductViewPageState extends State<ProductViewPage> {
                             color: Colors.black,
                             size: 14),
                         const Spacer(),
-                        ElevatedButton(
-                            style: ButtonStyle(
-                                minimumSize: MaterialStateProperty.all(Size(25,40)),
-                                // maximumSize: MaterialStateProperty.all(Size(40,40)),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30.0),
-                                        side: BorderSide(color: Colors.red))),
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.red)),
-                            onPressed: () {
-                              var addItemApi = service.addItemToCart(
-                                  token: widget.token,
-                                  userId: widget.userId,
-                                  productId: products.productid);
-                              int? success = 0;
-                              addItemApi.then((value) {
-                                success = value!.success;
-                                // debugPrint("up $success");
-                                if (success == 1) {
-                                  Fluttertoast.showToast(
-                                      msg: 'Item added to cart');
-                                  service
-                                      .cartCheckoutApi(
-                                          token: widget.token,
-                                          userId: widget.userId)
-                                      .then((value) {
-                                    if (value?.products!.length !=
-                                        null) {
-                                      cartController.cartItemsCount.value =
-                                          value!.products!.length;
-                                    }
-                                  });
-                                } else {
-                                  Fluttertoast.showToast(
-                                      msg: 'Failed to add item to cart');
-                                }
-                              });
-                            },
-                            child: const Icon(Icons.add_shopping_cart_sharp,
-                                size: 18))
+                        addCart.addToCart(widget.token, widget.userId,
+                            products.productid!.toInt())
                       ],
                     ),
                   ),

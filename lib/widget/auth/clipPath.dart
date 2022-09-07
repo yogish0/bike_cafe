@@ -1,6 +1,9 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:bike_cafe/widget/auth/TextWidget.dart';
 import 'package:bike_cafe/widget/auth/vector.dart';
+import 'package:bike_cafe/widget/config.dart';
 
 class ClipPathWidget extends StatelessWidget {
   const ClipPathWidget({Key? key}) : super(key: key);

@@ -20,8 +20,9 @@ class _ChatBotPageState extends State<ChatBotPage> {
   void initState() {
     super.initState();
     createBox();
-    if(widget.orderId != null){
-      serviceOrOrderIdController.value = TextEditingValue(text: widget.orderId.toString());
+    if (widget.orderId != null) {
+      serviceOrOrderIdController.value =
+          TextEditingValue(text: widget.orderId.toString());
       queryType = "Orders";
     }
   }

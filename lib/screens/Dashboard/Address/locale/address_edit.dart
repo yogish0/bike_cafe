@@ -17,8 +17,7 @@ class AddressEditPage extends StatefulWidget {
       required this.token,
       required this.userId,
       required this.addressId,
-        this.routeName
-      })
+      this.routeName})
       : super(key: key);
 
   final String token;
@@ -60,12 +59,12 @@ class _AddressEditPageState extends State<AddressEditPage> {
           isDefault: isDefault.text);
 
       addressApi.then((value) {
-        if(widget.routeName == null){
+        if (widget.routeName == null) {
           Get.off(() => AddressPageList());
-        }else{
-          Get.off(() => AddressPageList(routeName: widget.routeName.toString()));
+        } else {
+          Get.off(
+              () => AddressPageList(routeName: widget.routeName.toString()));
         }
-
       });
       return true;
     }
@@ -84,8 +83,11 @@ class _AddressEditPageState extends State<AddressEditPage> {
   void initState() {
     super.initState();
     createBox();
-    apiService.addressDataByAddId(token: widget.token,
-        userId: widget.userId, addressId: widget.addressId)
+    apiService
+        .addressDataByAddId(
+            token: widget.token,
+            userId: widget.userId,
+            addressId: widget.addressId)
         .then((value) {
       var addresss = value!.address[0];
       name.value = TextEditingValue(text: addresss.name.toString());
@@ -93,12 +95,15 @@ class _AddressEditPageState extends State<AddressEditPage> {
       alternatenumber.value = addresss.altPhonenumber == null
           ? const TextEditingValue(text: '')
           : TextEditingValue(text: addresss.altPhonenumber.toString());
-      addressText.value = TextEditingValue(text: addresss.addAddress.toString());
-      landmark.value = TextEditingValue(text: addresss.addDescription.toString());
+      addressText.value =
+          TextEditingValue(text: addresss.addAddress.toString());
+      landmark.value =
+          TextEditingValue(text: addresss.addDescription.toString());
       pincode.value = TextEditingValue(text: addresss.addPincode.toString());
       state.value = TextEditingValue(text: addresss.stateName.toString());
       city.value = TextEditingValue(text: addresss.cityName.toString());
-      isDefault.value = TextEditingValue(text: addresss.addIsDefault.toString());
+      isDefault.value =
+          TextEditingValue(text: addresss.addIsDefault.toString());
       _cityStateController2.stateId.value = addresss.cityStateId.toString();
       _cityStateController2.cityId.value = addresss.cityId.toString();
       setState(() {});
@@ -125,6 +130,7 @@ class _AddressEditPageState extends State<AddressEditPage> {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: "My Address",
       body: box1?.get("data4") == null
           ? const Center()
@@ -225,7 +231,8 @@ class _AddressEditPageState extends State<AddressEditPage> {
               textalign: TextAlign.center,
               heading: "Mobile Number *",
               validator: (input) {
-                bool _isNumberValid = RegExp(r"^[6-9][0-9]{9}").hasMatch(input!);
+                bool _isNumberValid =
+                    RegExp(r"^[6-9][0-9]{9}").hasMatch(input!);
                 if (!_isNumberValid) {
                   return 'Invalid phone number';
                 }
@@ -289,8 +296,8 @@ class _AddressEditPageState extends State<AddressEditPage> {
               textalign: TextAlign.center,
               heading: "Landmark *",
               validator: (input) {
-                if (input.toString().length <= 10) {
-                  return 'landmark should be atleast 10 characters';
+                if (input.toString().length <= 5) {
+                  return 'landmark should be atleast 5 characters';
                 }
                 return null;
               },
@@ -311,24 +318,26 @@ class _AddressEditPageState extends State<AddressEditPage> {
                 ],
               ),
               child: FutureBuilder<GetStatesList?>(
-                future:
-                    apiService.getAddressStates(token: box1?.get("data4")),
+                future: apiService.getAddressStates(token: box1?.get("data4")),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     _statesList = [];
-                    for (var i = 0;i < snapshot.data!.statelists.length;i++) {
-                      _statesList.add(snapshot.data!.statelists[i].stateName.toString());
+                    for (var i = 0; i < snapshot.data!.statelists.length; i++) {
+                      _statesList.add(
+                          snapshot.data!.statelists[i].stateName.toString());
                     }
                     return MySearchField(
                       suggestions: _statesList,
                       suggestionState: SuggestionState.enabled,
                       controller: state,
                       hint: 'State *',
-                      searchInputDecoration: const InputDecoration(border: InputBorder.none),
+                      searchInputDecoration:
+                          const InputDecoration(border: InputBorder.none),
                       searchStyle: const TextStyle(),
                       onTap: (value) {
                         var index = _statesList.indexOf(value.toString());
-                        _cityStateController2.stateId.value = snapshot.data!.statelists[index].id.toString();
+                        _cityStateController2.stateId.value =
+                            snapshot.data!.statelists[index].id.toString();
                         setState(() {});
                         debugPrint(_cityStateController2.stateId.value);
                         city.clear();
@@ -364,7 +373,7 @@ class _AddressEditPageState extends State<AddressEditPage> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     _citiesList = [];
-                    for (var i = 0;i < snapshot.data!.cities.length;i++) {
+                    for (var i = 0; i < snapshot.data!.cities.length; i++) {
                       _citiesList.add(snapshot.data!.cities[i].cityName);
                     }
                     return MySearchField(
@@ -372,11 +381,13 @@ class _AddressEditPageState extends State<AddressEditPage> {
                       suggestionState: SuggestionState.enabled,
                       controller: city,
                       hint: 'City *',
-                      searchInputDecoration: const InputDecoration(border: InputBorder.none),
+                      searchInputDecoration:
+                          const InputDecoration(border: InputBorder.none),
                       searchStyle: const TextStyle(),
                       onTap: (value) {
                         var index = _citiesList.indexOf(value.toString());
-                        _cityStateController2.cityId.value = snapshot.data!.cities[index].id.toString();
+                        _cityStateController2.cityId.value =
+                            snapshot.data!.cities[index].id.toString();
                         setState(() {});
                         debugPrint(_cityStateController2.cityId.value);
                         pincode.clear();

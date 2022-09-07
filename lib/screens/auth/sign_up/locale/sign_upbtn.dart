@@ -1,7 +1,15 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bike_cafe/controllers/authcontroller.dart';
+import 'package:bike_cafe/models/auth/login_model.dart';
+import 'package:bike_cafe/models/auth/signIn_model.dart';
+
+import 'package:bike_cafe/screens/root.dart';
+import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/auth/button.dart';
+import 'package:bike_cafe/widget/auth/txt_bttn.dart';
 import 'package:bike_cafe/widget/config.dart';
 
 class SignUpButtons extends StatefulWidget {

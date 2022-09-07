@@ -19,13 +19,13 @@ class GetProductReviewAndRatingModel {
 
   List<Productreview> productreview;
   AvgRating avgRating;
-  Totaltrating totaltrating;
-  Totaltreview totaltreview;
-  Numofrating1 numofrating1;
-  Numofrating2 numofrating2;
-  Numofrating3 numofrating3;
-  Numofrating4 numofrating4;
-  Numofrating5 numofrating5;
+  Totaltrating? totaltrating;
+  Totaltreview? totaltreview;
+  Numofrating1? numofrating1;
+  Numofrating2? numofrating2;
+  Numofrating3? numofrating3;
+  Numofrating4? numofrating4;
+  Numofrating5? numofrating5;
 
   factory GetProductReviewAndRatingModel.fromMap(Map<String, dynamic> json) => GetProductReviewAndRatingModel(
     productreview: List<Productreview>.from(json["productreview"].map((x) => Productreview.fromMap(x))),
@@ -42,19 +42,19 @@ class GetProductReviewAndRatingModel {
   Map<String, dynamic> toMap() => {
     "productreview": List<dynamic>.from(productreview.map((x) => x.toMap())),
     "avg_rating": avgRating.toMap(),
-    "totaltrating": totaltrating.toMap(),
-    "totaltreview": totaltreview.toMap(),
-    "numofrating1": numofrating1.toMap(),
-    "numofrating2": numofrating2.toMap(),
-    "numofrating3": numofrating3.toMap(),
-    "numofrating4": numofrating4.toMap(),
-    "numofrating5": numofrating5.toMap(),
+    "totaltrating": totaltrating?.toMap(),
+    "totaltreview": totaltreview?.toMap(),
+    "numofrating1": numofrating1?.toMap(),
+    "numofrating2": numofrating2?.toMap(),
+    "numofrating3": numofrating3?.toMap(),
+    "numofrating4": numofrating4?.toMap(),
+    "numofrating5": numofrating5?.toMap(),
   };
 }
 
 class AvgRating {
   AvgRating({
-    required this.avgRating,
+    this.avgRating,
   });
 
   String? avgRating;
@@ -70,7 +70,7 @@ class AvgRating {
 
 class Numofrating1 {
   Numofrating1({
-    required this.numofrating1,
+    this.numofrating1,
   });
 
   int? numofrating1;
@@ -86,7 +86,7 @@ class Numofrating1 {
 
 class Numofrating2 {
   Numofrating2({
-    required this.numofrating2,
+    this.numofrating2,
   });
 
   int? numofrating2;
@@ -102,7 +102,7 @@ class Numofrating2 {
 
 class Numofrating3 {
   Numofrating3({
-    required this.numofrating3,
+    this.numofrating3,
   });
 
   int? numofrating3;
@@ -118,7 +118,7 @@ class Numofrating3 {
 
 class Numofrating4 {
   Numofrating4({
-    required this.numofrating4,
+    this.numofrating4,
   });
 
   int? numofrating4;
@@ -134,7 +134,7 @@ class Numofrating4 {
 
 class Numofrating5 {
   Numofrating5({
-    required this.numofrating5,
+    this.numofrating5,
   });
 
   int? numofrating5;
@@ -150,18 +150,18 @@ class Numofrating5 {
 
 class Productreview {
   Productreview({
-    required this.id,
-    required this.prorevReview,
-    required this.prorevDescription,
-    required this.prorevRate,
-    required this.prorevUserId,
-    required this.prorevProductId,
-    required this.prorevProductImg,
-    required this.prorevIsactive,
-    required this.prorevIsdeleted,
-    required this.username,
-    required this.prorevLike,
-    required this.prorevDislike,
+    this.id,
+    this.prorevReview,
+    this.prorevDescription,
+    this.prorevRate,
+    this.prorevUserId,
+    this.prorevProductId,
+    this.prorevProductImg,
+    this.prorevIsactive,
+    this.prorevIsdeleted,
+    this.username,
+    this.prorevLike,
+    this.prorevDislike,
   });
 
   int? id;
@@ -210,7 +210,7 @@ class Productreview {
 
 class Totaltrating {
   Totaltrating({
-    required this.totalrate,
+    this.totalrate,
   });
 
   int? totalrate;

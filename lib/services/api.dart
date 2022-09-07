@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:bike_cafe/controllers/paymentstatuscontroller.dart';
+import 'package:bike_cafe/main.dart';
 import 'package:bike_cafe/models/Cart_Model/add_cart_model.dart';
 import 'package:bike_cafe/models/Cart_Model/cart_checkout_model.dart';
 import 'package:bike_cafe/models/Cart_Model/cart_list_model.dart';
@@ -13,6 +15,7 @@ import 'package:bike_cafe/models/Order_Model/online_payment_initiate_model.dart'
 import 'package:bike_cafe/models/Order_Model/online_payment_verify.dart';
 import 'package:bike_cafe/models/Order_Model/order_details_model.dart';
 import 'package:bike_cafe/models/Order_Model/order_response_model.dart';
+import 'package:bike_cafe/models/Order_Model/orderdetailsmodeltwo.dart';
 import 'package:bike_cafe/models/Order_Model/orders_by_id_model.dart';
 import 'package:bike_cafe/models/Order_Model/users_product_review_model.dart';
 import 'package:bike_cafe/models/Products/aadto_wishlist_model.dart';
@@ -49,17 +52,23 @@ import 'package:bike_cafe/models/auth/signIn_model.dart';
 import 'package:bike_cafe/models/auth/verify_otp_model.dart';
 import 'package:bike_cafe/models/Vechile/vechileDetailsModel.dart';
 import 'package:bike_cafe/screens/Dashboard/Address/address.dart';
+import 'package:bike_cafe/screens/Dashboard/Cart/cart.dart';
+import 'package:bike_cafe/screens/auth/login/signin.dart';
+import 'package:bike_cafe/widget/locale/downloadinvoice.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../models/Notifications/get_notification_model.dart';
+import '../models/Order_Model/DownloadInvoiceModel.dart';
+import '../models/Order_Model/TrackOrderByShipIdModel.dart';
 import '../models/Order_Model/push_order_model.dart';
 import '../models/auth/social_auth_model.dart';
 
 class APIService {
-
   // String baseurl = "https://msilonline.in/";
-  String baseurl = "http://3.109.69.39/";
+  // String baseurl = "http://3.109.69.39/";
+  String baseurl = "https://bikecafe.co.in/";
+  // String baseurl = "http://192.168.1.5:8000/";
 
   Map<String, String> defaultHeaderParams(String? token) =>
       {"Content-Type": "application/json", "Authorization": "Bearer $token"};
@@ -67,7 +76,6 @@ class APIService {
   Future<LoginResponseModel?> login(
       LoginRequestModel requestModel, String apiUrl0) async {
     try {
-
       log(requestModel.email.toString());
       log(requestModel.password.toString());
       log(requestModel.deviceToken.toString());
@@ -75,7 +83,6 @@ class APIService {
       log(requestModel.web_id.toString());
 
       log(requestModel.toJson().toString());
-
 
       final response = await http.post(Uri.parse(baseurl + apiUrl0),
           body: requestModel.toJson());
@@ -90,6 +97,7 @@ class APIService {
             backgroundColor: Colors.white,
             colorText: Colors.red);
       } else {
+        Get.offAll(() => SignIn());
         Get.snackbar('Failed..', 'The provided credentials do not match.',
             snackPosition: SnackPosition.TOP,
             duration: const Duration(seconds: 5),
@@ -102,37 +110,6 @@ class APIService {
   }
 
   //login using mobile number
-  Future<LoginResponseModel?> loginUsingNumber({String? mobileNumber,
-    String? password, String? deviceToken}) async {
-    try {
-      final response = await http.post(Uri.parse(baseurl + "logindevice"),
-          body: {"phone_no" : mobileNumber.toString(),
-            "password" : password.toString(),
-            "login_type" : "phone_no",
-            "device_token" : deviceToken
-          },
-      );
-      if (response.statusCode == 200) {
-        var data = LoginResponseModel.fromJson(json.decode(response.body));
-
-        return data;
-      } else if (response.statusCode == 500) {
-        Get.snackbar(response.statusCode.toString(), 'Internal server error',
-            snackPosition: SnackPosition.TOP,
-            duration: const Duration(seconds: 5),
-            backgroundColor: Colors.white,
-            colorText: Colors.red);
-      } else {
-        Get.snackbar('Failed..', 'The provided credentials do not match.',
-            snackPosition: SnackPosition.TOP,
-            duration: const Duration(seconds: 5),
-            backgroundColor: Colors.white,
-            colorText: Colors.red);
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
 
   Future<SignUpResponseModel?> signUp(
       {SignInRequestModel? requestModel1,
@@ -156,8 +133,10 @@ class APIService {
         // Get.to(() => SignIn());
         return SignUpResponseModel.fromMap(jsonDecode(response.body));
       } else {
-        var failResponse = SignUpResponseModel.fromMap(jsonDecode(response.body));
-        Get.snackbar(response.statusCode.toString(), failResponse.message.toString(),
+        var failResponse =
+            SignUpResponseModel.fromMap(jsonDecode(response.body));
+        Get.snackbar(
+            response.statusCode.toString(), failResponse.message.toString(),
             snackPosition: SnackPosition.TOP,
             duration: const Duration(seconds: 5),
             backgroundColor: Colors.white,
@@ -169,7 +148,11 @@ class APIService {
     }
   }
 
-  Future<EditProfileResponseModel?> edituser({String? id, String? token, String? name, String? email,
+  Future<EditProfileResponseModel?> edituser(
+      {String? id,
+      String? token,
+      String? name,
+      String? email,
       String? number}) async {
     try {
       var response = await http.post(
@@ -186,11 +169,11 @@ class APIService {
       // debugPrint(response.body);
       if (response.statusCode == 200) {
         return EditProfileResponseModel.fromMap(jsonDecode(response.body));
-      } else if(response.statusCode == 400){
-        var responseMessage = EditProfileResponseModel.fromMap(jsonDecode(response.body));
+      } else if (response.statusCode == 400) {
+        var responseMessage =
+            EditProfileResponseModel.fromMap(jsonDecode(response.body));
         Fluttertoast.showToast(msg: responseMessage.message.toString());
-      }
-      else {
+      } else {
         Get.snackbar('Failed', 'Failed to update user profile',
             snackPosition: SnackPosition.TOP,
             duration: const Duration(seconds: 5),
@@ -283,7 +266,8 @@ class APIService {
 
   Future<LogoutModel> logout(
       {LogoutModel? responsemodel, String? token}) async {
-    http.Response response = await http.post(Uri.parse(baseurl + "logoutdevice"), body: {"api_token": token});
+    http.Response response = await http
+        .post(Uri.parse(baseurl + "logoutdevice"), body: {"api_token": token});
     // debugPrint(response.body);
     if (response.statusCode == 200 || response.statusCode == 400) {
       return LogoutModel.fromJson(json.decode(response.body));
@@ -464,7 +448,7 @@ class APIService {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token"
     });
-    try{
+    try {
       if (response.statusCode == 200) {
         final categoryList = GetCategories.fromMap(jsonDecode(response.body));
         return categoryList;
@@ -476,33 +460,34 @@ class APIService {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  Future<GetVechiclebyuserid?>? getvechiledetailsbyuserid({String? token, id}) async {
+  Future<GetVechiclebyuserid?>? getvechiledetailsbyuserid(
+      {String? token, id}) async {
     http.Response response = await http.get(
         Uri.parse(baseurl + "api/v1/vehicle/getregisteredvehicle/$id"),
         headers: defaultHeaderParams(token));
-    try{
+    try {
       if (response.statusCode == 200) {
         return GetVechiclebyuserid.fromMap(jsonDecode(response.body));
       } else {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
-
   }
 
   //get Products api request
   Future<GetProducts?> getProductsApi({String? token}) async {
-    http.Response response = await http.get(Uri.parse(baseurl + "api/v1/products/getproductsall"),
+    http.Response response = await http.get(
+        Uri.parse(baseurl + "api/v1/products/getproductsall"),
         headers: defaultHeaderParams(token));
-    try{
+    try {
       if (response.statusCode == 200) {
         final productsList = GetProducts.fromMap(jsonDecode(response.body));
         return productsList;
@@ -510,7 +495,7 @@ class APIService {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
@@ -521,7 +506,7 @@ class APIService {
     http.Response response = await http.get(
         Uri.parse(baseurl + "api/v1/products/getproductbypd/$productId"),
         headers: defaultHeaderParams(token));
-    try{
+    try {
       if (response.statusCode == 200) {
         final productsList = GetProducts.fromMap(jsonDecode(response.body));
         return productsList;
@@ -529,7 +514,7 @@ class APIService {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
@@ -540,15 +525,16 @@ class APIService {
     http.Response response = await http.get(
         Uri.parse(baseurl + "api/v1/vehicle/getvariantbyproductid/$productId"),
         headers: defaultHeaderParams(token));
-    try{
+    try {
       if (response.statusCode == 200) {
-        final productsList = GetProductRelatedVariant.fromMap(jsonDecode(response.body));
+        final productsList =
+            GetProductRelatedVariant.fromMap(jsonDecode(response.body));
         return productsList;
       } else {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
@@ -580,12 +566,57 @@ class APIService {
   //get Products related vehicles
   Future<CartItemList?> getCartItemList({String? token, String? userId}) async {
     try {
-      http.Response response = await http
-          .get(Uri.parse(baseurl + "getitemfromcart/$userId"),
+      http.Response response = await http.get(
+          Uri.parse(baseurl + "getitemfromcart/$userId"),
           headers: defaultHeaderParams(token));
       if (response.statusCode == 200) {
         final cartList = CartItemList.fromMap(jsonDecode(response.body));
         return cartList;
+      } else {
+        debugPrint(response.statusCode.toString());
+        debugPrint(response.body.toString());
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<DownloadInvoiceModel?> DownloadOrderInvoice(
+      {String? token, String? orderId}) async {
+    try {
+      http.Response response = await http.post(
+          Uri.parse(baseurl + "api/v1/shopping/invoicefromshiprocket/$orderId"),
+          headers: defaultHeaderParams(token));
+      if (response.statusCode == 200) {
+        final invoice = DownloadInvoiceModel.fromMap(jsonDecode(response.body));
+        return invoice;
+      } else {
+        debugPrint(response.statusCode.toString());
+        debugPrint(response.body.toString());
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future downloadinvoice({String? token, String? orderId}) async {
+    try {
+      log(token.toString());
+      log(orderId.toString());
+
+      http.Response response = await http.post(
+          Uri.parse(baseurl + "api/v1/shopping/invoicefromshiprocket/$orderId"),
+          headers: defaultHeaderParams(token));
+
+      log(response.statusCode.toString());
+      if (response.statusCode == 200) {
+        var invoice_data = jsonDecode(response.body);
+
+        log(invoice_data.toString());
+
+        DownloadInvoice invoice = DownloadInvoice();
+        invoice.openFile(invoice_data['invoice_url'].toString());
+        final cartList = CartItemList.fromMap(jsonDecode(response.body));
       } else {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
@@ -653,7 +684,8 @@ class APIService {
           body: cartItem);
 
       if (response.statusCode == 200) {
-        final addResponse = SetDefaultAddress.fromMap(jsonDecode(response.body));
+        final addResponse =
+            SetDefaultAddress.fromMap(jsonDecode(response.body));
         return addResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -705,7 +737,7 @@ class APIService {
     http.Response response = await http.get(
         Uri.parse(baseurl + "api/v1/products/getproductbycd/$categoryId"),
         headers: defaultHeaderParams(token));
-    try{
+    try {
       if (response.statusCode == 200) {
         final productsList = GetProducts.fromMap(jsonDecode(response.body));
         return productsList;
@@ -713,7 +745,7 @@ class APIService {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
@@ -722,17 +754,19 @@ class APIService {
   Future<GetProductsByCatAndVarientIdModel?> getProductsByCatIdVariantIdApi(
       {String? token, String? categoryId, String? variantId}) async {
     http.Response response = await http.get(
-        Uri.parse(baseurl + "api/v1/products/getproductbycatvarid/$categoryId/$variantId"),
+        Uri.parse(baseurl +
+            "api/v1/products/getproductbycatvarid/$categoryId/$variantId"),
         headers: defaultHeaderParams(token));
-    try{
+    try {
       if (response.statusCode == 200) {
-        final productsList = GetProductsByCatAndVarientIdModel.fromMap(jsonDecode(response.body));
+        final productsList = GetProductsByCatAndVarientIdModel.fromMap(
+            jsonDecode(response.body));
         return productsList;
       } else {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
@@ -742,11 +776,13 @@ class APIService {
       {String? token, String? userId, String? vehicleId}) async {
     try {
       http.Response response = await http.post(
-          Uri.parse(baseurl + "api/v1/vehicle/deleteuservehicle/$userId/$vehicleId"),
+          Uri.parse(
+              baseurl + "api/v1/vehicle/deleteuservehicle/$userId/$vehicleId"),
           headers: defaultHeaderParams(token));
 
       if (response.statusCode == 200) {
-        final deleteResponse = DeleteVehicleById.fromMap(jsonDecode(response.body));
+        final deleteResponse =
+            DeleteVehicleById.fromMap(jsonDecode(response.body));
         return deleteResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -777,18 +813,15 @@ class APIService {
     }
   }
 
-  Future applycuponpost(
-      {String? token, userId,cuponid}) async {
+  Future applycuponpost({String? token, userId, cuponid}) async {
     http.Response response = await http.post(
         Uri.parse(baseurl + "api/v1/shopping/applycoupon/$userId"),
-        body:jsonEncode( {
-          "couponid":"$cuponid"
-        }),
+        body: jsonEncode({"couponid": "$cuponid"}),
         headers: defaultHeaderParams(token));
     log(response.statusCode.toString());
     try {
       if (response.statusCode == 200) {
-        final checkout = cartCheckoutApi(token: token,userId: userId);
+        final checkout = cartCheckoutApi(token: token, userId: userId);
         return checkout;
       } else {
         debugPrint(response.statusCode.toString());
@@ -800,16 +833,13 @@ class APIService {
     }
   }
 
-
-  Future cancelcupon(
-      {String? token, userId}) async {
+  Future cancelcupon({String? token, userId}) async {
     http.Response response = await http.post(
         Uri.parse(baseurl + "api/v1/shopping/cancelcoupon/$userId"),
-
         headers: defaultHeaderParams(token));
     try {
       if (response.statusCode == 200) {
-        final checkout = cartCheckoutApi(token: token,userId: userId);
+        final checkout = cartCheckoutApi(token: token, userId: userId);
         return checkout;
       } else {
         debugPrint(response.statusCode.toString());
@@ -937,7 +967,8 @@ class APIService {
           body: address);
 
       if (response.statusCode == 200) {
-        final addResponse = PostAddressModel.fromJson(jsonDecode(response.body));
+        final addResponse =
+            PostAddressModel.fromJson(jsonDecode(response.body));
         return addResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -990,8 +1021,7 @@ class APIService {
       var uri = Uri.parse(baseurl + "api/v1/accounts/uploaduserimage/$userId");
       var request = http.MultipartRequest("POST", uri);
 
-      var multipartData = http.MultipartFile(
-          'profile_photo_path', stream, len,
+      var multipartData = http.MultipartFile('profile_photo_path', stream, len,
           filename: img.path.toString());
       request.files.add(multipartData);
       // request.headers["Content-Type"] = "multipart/form-data";
@@ -1040,7 +1070,8 @@ class APIService {
         headers: defaultHeaderParams(token));
     try {
       if (response.statusCode == 200) {
-        var vehicleResponse = GetVechiclebyuserid.fromMap(jsonDecode(response.body));
+        var vehicleResponse =
+            GetVechiclebyuserid.fromMap(jsonDecode(response.body));
         return vehicleResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1094,7 +1125,10 @@ class APIService {
   //cod payment order api
   Future<OrderResponseModel?> codPaymentOrderApi(
       {String? token, String? userId}) async {
+    PaymentStatusController controller = Get.put(PaymentStatusController());
+
     var paymentMethod = jsonEncode(<String, dynamic>{"payment": 1});
+    controller.coninuelodaing.value = true;
     try {
       http.Response response = await http.post(
           Uri.parse(baseurl + "api/v1/shopping/paymentmethod/$userId"),
@@ -1102,6 +1136,29 @@ class APIService {
           body: paymentMethod);
 
       if (response.statusCode == 200) {
+        // controller.codpaymentresponse.value = 1;
+        controller.coninuelodaing.value = false;
+        controller.currentStep.value += 1;
+
+        var getdata = jsonDecode(response.body);
+
+        var orderId = getdata['orders']['orderid'];
+        log(orderId.toString());
+
+        box1.put('orderId', orderId.toString());
+
+        CartController cartController = Get.put(CartController());
+
+        cartCheckoutApi(token: token, userId: userId).then((value) {
+          // if (value!.products == []) {
+          //   cartController.cartItemsCount.value = value!.products!.length;
+          //   debugPrint("cart length: "+value!.products!.length.toString());
+          // }
+          cartController.cartItemsCount.value = value!.products!.length;
+          debugPrint("cart Updated +${value.products!.length}");
+          // setState(() {});
+        });
+
         final orderResponse =
             OrderResponseModel.fromMap(jsonDecode(response.body));
         return orderResponse;
@@ -1119,17 +1176,16 @@ class APIService {
   //forgot password otp api
   Future<ForgotPasswordResponseModel?> forgotPasswordOtpApi(
       {String? phoneNumber}) async {
-    var phone = jsonEncode(
-        <String, dynamic>{ "phonenumber": phoneNumber});
+    var phone = jsonEncode(<String, dynamic>{"phonenumber": phoneNumber});
     try {
       http.Response response = await http.post(
           Uri.parse(baseurl + "api/v1/accounts/forgetpasswordotp"),
           headers: {"Content-Type": "application/json"},
-          body: phone
-      );
+          body: phone);
 
       if (response.statusCode == 200) {
-        final otpResponse = ForgotPasswordResponseModel.fromMap(jsonDecode(response.body));
+        final otpResponse =
+            ForgotPasswordResponseModel.fromMap(jsonDecode(response.body));
         return otpResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1142,18 +1198,17 @@ class APIService {
 
   //forgot password reset api
   Future<ForgotPasswordResponseModel?> resetPasswordApi(
-      {String? userId,String? password}) async {
-    var passwordText = jsonEncode(
-        <String, dynamic>{ "password": password});
+      {String? userId, String? password}) async {
+    var passwordText = jsonEncode(<String, dynamic>{"password": password});
     try {
       http.Response response = await http.post(
           Uri.parse(baseurl + "api/v1/accounts/forgetpassword/$userId"),
           headers: {"Content-Type": "application/json"},
-          body: passwordText
-      );
+          body: passwordText);
 
       if (response.statusCode == 200) {
-        final passwordResponse = ForgotPasswordResponseModel.fromMap(jsonDecode(response.body));
+        final passwordResponse =
+            ForgotPasswordResponseModel.fromMap(jsonDecode(response.body));
         return passwordResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1165,19 +1220,19 @@ class APIService {
   }
 
   //edit users existing vehicle
-  Future<EditVehicleResponseModel?> editVehicleByUserVehicleIdApi({
-    String? token,
-    String? userId,
-    String? vehicleId,
-    String? vehicleTypeId,
-    String? brandId,
-    String? modelId,
-    String? variantId,
-    String? vehicleNumber
-  }) async {
+  Future<EditVehicleResponseModel?> editVehicleByUserVehicleIdApi(
+      {String? token,
+      String? userId,
+      String? vehicleId,
+      String? vehicleTypeId,
+      String? brandId,
+      String? modelId,
+      String? variantId,
+      String? vehicleNumber}) async {
     try {
       var response = await http.post(
-          Uri.parse(baseurl + "api/v1/vehicle/editregisteredvehicle/$userId/$vehicleId"),
+          Uri.parse(baseurl +
+              "api/v1/vehicle/editregisteredvehicle/$userId/$vehicleId"),
           headers: {
             "Authorization": "Bearer $token"
           },
@@ -1195,9 +1250,10 @@ class APIService {
         //     backgroundColor: const Color.fromRGBO(0,0,0,0.8),
         //     colorText: Colors.white);
         Fluttertoast.showToast(msg: "Vehicle edit successfully");
-        var editVehicleResponse = EditVehicleResponseModel.fromMap(jsonDecode(response.body));
+        var editVehicleResponse =
+            EditVehicleResponseModel.fromMap(jsonDecode(response.body));
         return editVehicleResponse;
-      }else{
+      } else {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
         Fluttertoast.showToast(msg: "Failed to edit vehicle details");
@@ -1210,17 +1266,55 @@ class APIService {
 
   //online payment order api
   Future<OnlinePaymentInitiateModel?> onlinePaymentInitiateApi(
-      {String? token, String? userId}) async {
-    var paymentMethod = jsonEncode(
-        <String, dynamic>{ "payment": 2});
+      {String? token, String? userId, String? payment_trans_id}) async {
+    var paymentMethod = jsonEncode(<String, dynamic>{"payment": 2});
     http.Response response = await http.post(
         Uri.parse(baseurl + "api/v1/shopping/paymentmethodonline/$userId"),
         headers: defaultHeaderParams(token),
-        body: paymentMethod
-    );
+        body: paymentMethod);
     try {
       if (response.statusCode == 200) {
-        final paymentResponse = OnlinePaymentInitiateModel.fromMap(jsonDecode(response.body));
+        PaymentStatusController controller = Get.put(PaymentStatusController());
+
+        controller.currentStep.value += 1;
+
+        var res = jsonDecode(response.body);
+
+        var gologixtransId = res["orders"]["GologixTranctionid"].toString();
+        var orderId = res["orders"]["orderid"].toString();
+        box1.put('orderId', orderId.toString());
+
+        Map<String, dynamic> body = {
+          "payment": "2",
+          "GologixTranctionid": "${gologixtransId}",
+          "orderid": "${orderId}",
+          "GatewayTransctionid": "${payment_trans_id}",
+          "paymentstatus": "1"
+        };
+
+        http.Response trans_response = await http.post(
+            Uri.parse(baseurl + "api/v1/shopping/checkTransction/$userId"),
+            headers: defaultHeaderParams(token),
+            body: jsonEncode(body));
+
+        if (trans_response.statusCode == 200) {
+          CartController cartController = Get.put(CartController());
+
+          cartCheckoutApi(token: token, userId: userId).then((value) {
+            // if (value!.products == []) {
+            //   cartController.cartItemsCount.value = value!.products!.length;
+            //   debugPrint("cart length: "+value!.products!.length.toString());
+            // }
+            cartController.cartItemsCount.value = value!.products!.length;
+            debugPrint("cart Updated +${value.products!.length}");
+            // setState(() {});
+          });
+          //  controller.currentStep.value+=1;
+          return null;
+        }
+
+        final paymentResponse =
+            OnlinePaymentInitiateModel.fromMap(jsonDecode(response.body));
         return paymentResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1234,29 +1328,28 @@ class APIService {
 
   //online payment verify api
   Future<VerifyOnlinePaymentModel?> onlinePaymentVerifyApi(
-      {String? token, String? userId,
-        String? goTransactionId,
-        String? orderId,
-        String? paymentTransactionId,
-        String? paymentStatus
-      }) async {
-    var paymentDetails = jsonEncode(
-        <String, dynamic>{
-          "payment": "2",
-          "GologixTranctionid" : goTransactionId.toString(),
-          "orderid" : orderId.toString(),
-          "GatewayTransctionid" : paymentTransactionId.toString(),
-          "paymentstatus" : paymentStatus.toString()
-        });
+      {String? token,
+      String? userId,
+      String? goTransactionId,
+      String? orderId,
+      String? paymentTransactionId,
+      String? paymentStatus}) async {
+    var paymentDetails = jsonEncode(<String, dynamic>{
+      "payment": "2",
+      "GologixTranctionid": goTransactionId.toString(),
+      "orderid": orderId.toString(),
+      "GatewayTransctionid": paymentTransactionId.toString(),
+      "paymentstatus": paymentStatus.toString()
+    });
     try {
       http.Response response = await http.post(
           Uri.parse(baseurl + "api/v1/shopping/checkTransction/$userId"),
           headers: defaultHeaderParams(token),
-          body: paymentDetails
-      );
+          body: paymentDetails);
 
       if (response.statusCode == 200) {
-        final paymentVerifyResponse = VerifyOnlinePaymentModel.fromMap(jsonDecode(response.body));
+        final paymentVerifyResponse =
+            VerifyOnlinePaymentModel.fromMap(jsonDecode(response.body));
         return paymentVerifyResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1268,13 +1361,15 @@ class APIService {
   }
 
   //get products by banners
-  Future<GetProductsByBannerModel?> getProductsByBanners({String? token, String? bannerId}) async {
+  Future<GetProductsByBannerModel?> getProductsByBanners(
+      {String? token, String? bannerId}) async {
     try {
       http.Response response = await http.get(
           Uri.parse(baseurl + "api/v1/shopping/getproductsbybanner/$bannerId"),
           headers: defaultHeaderParams(token));
       if (response.statusCode == 200) {
-        final bannerData = GetProductsByBannerModel.fromMap(jsonDecode(response.body));
+        final bannerData =
+            GetProductsByBannerModel.fromMap(jsonDecode(response.body));
         return bannerData;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1293,7 +1388,8 @@ class APIService {
         headers: defaultHeaderParams(token));
     try {
       if (response.statusCode == 200) {
-        final orderData = GetUserOrdersByIdModel.fromMap(jsonDecode(response.body));
+        final orderData =
+            GetUserOrdersByIdModel.fromMap(jsonDecode(response.body));
         // debugPrint(response.body);
         return orderData;
       } else {
@@ -1301,7 +1397,7 @@ class APIService {
         debugPrint(response.body.toString());
       }
     } catch (e) {
-      debugPrint("exception : "+ e.toString());
+      debugPrint("exception : " + e.toString());
       debugPrint(response.body);
     }
   }
@@ -1321,23 +1417,43 @@ class APIService {
         debugPrint(response.body.toString());
       }
     } catch (e) {
-      debugPrint("exception : "+ e.toString());
+      debugPrint("exception : " + e.toString());
+      debugPrint(response.body);
+    }
+  }
+
+  Future<GetPaymentOrder?> getUserOrdersDetailsinorderlist(
+      {String? token, orderId}) async {
+    http.Response response = await http.get(
+        Uri.parse(baseurl + "api/v1/shopping/getorderbyorderid/$orderId"),
+        headers: defaultHeaderParams(token));
+    try {
+      if (response.statusCode == 200) {
+        final orderData = GetPaymentOrder.fromMap(jsonDecode(response.body));
+        return orderData;
+      } else {
+        debugPrint(response.statusCode.toString());
+        debugPrint(response.body.toString());
+      }
+    } catch (e) {
+      debugPrint("exception : " + e.toString());
       debugPrint(response.body);
     }
   }
 
   //send otp to verify mobile number api while register
-  Future<OtpRequestToMobileModel?> OtpToMobileNumberVerify({String? phoneNumber}) async {
-    var phone = jsonEncode(<String, dynamic>{ "phonenumber": phoneNumber});
+  Future<OtpRequestToMobileModel?> OtpToMobileNumberVerify(
+      {String? phoneNumber}) async {
+    var phone = jsonEncode(<String, dynamic>{"phonenumber": phoneNumber});
     try {
       http.Response response = await http.post(
           Uri.parse(baseurl + "api/v1/accounts/usernumber/Register"),
           headers: {"Content-Type": "application/json"},
-          body: phone
-      );
+          body: phone);
 
       if (response.statusCode == 200) {
-        final otpResponse = OtpRequestToMobileModel.fromMap(jsonDecode(response.body));
+        final otpResponse =
+            OtpRequestToMobileModel.fromMap(jsonDecode(response.body));
         return otpResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1359,7 +1475,8 @@ class APIService {
           body: otp);
 
       if (response.statusCode == 200) {
-        final verifyResponse = OtpVerifyByMobileModel.fromMap(jsonDecode(response.body));
+        final verifyResponse =
+            OtpVerifyByMobileModel.fromMap(jsonDecode(response.body));
         return verifyResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1373,7 +1490,8 @@ class APIService {
   //get related products
   Future<GetProducts?> getRelatedProducts(
       {String? token, String? productId}) async {
-    var product = jsonEncode(<String, dynamic>{"product_id": productId.toString()});
+    var product =
+        jsonEncode(<String, dynamic>{"product_id": productId.toString()});
     try {
       http.Response response = await http.post(
           Uri.parse(baseurl + "api/v1/shopping/relateproduct"),
@@ -1395,7 +1513,8 @@ class APIService {
   //get related products
   Future<GetProducts?> searchProducts(
       {String? token, String? searchString}) async {
-    var searchText = jsonEncode(<String, dynamic>{"term": searchString.toString()});
+    var searchText =
+        jsonEncode(<String, dynamic>{"term": searchString.toString()});
     try {
       http.Response response = await http.post(
           Uri.parse(baseurl + "api/v1/shopping/relateproductbyname"),
@@ -1414,19 +1533,17 @@ class APIService {
     }
   }
 
-
-   //get related products
-  Future<GetCuponProductModel?> getcuponprodut(
-      {String? token}) async {
-   
+  //get related products
+  Future<GetCuponProductModel?> getcuponprodut({String? token}) async {
     try {
       http.Response response = await http.get(
-          Uri.parse(baseurl + "api/v1/shopping/getCoupons"),
-          headers: defaultHeaderParams(token),
-          );
+        Uri.parse(baseurl + "api/v1/shopping/getCoupons"),
+        headers: defaultHeaderParams(token),
+      );
 
       if (response.statusCode == 200) {
-        final productResponse = GetCuponProductModel.fromMap(jsonDecode(response.body));
+        final productResponse =
+            GetCuponProductModel.fromMap(jsonDecode(response.body));
         return productResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1445,27 +1562,32 @@ class APIService {
         headers: defaultHeaderParams(token));
     try {
       if (response.statusCode == 200) {
-        final reviewData = GetProductReviewAndRatingModel.fromMap(jsonDecode(response.body));
+        final reviewData =
+            GetProductReviewAndRatingModel.fromMap(jsonDecode(response.body));
         return reviewData;
       } else {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
       }
     } catch (e) {
-      debugPrint("exception : "+ e.toString());
+      debugPrint("exception : " + e.toString());
       debugPrint(response.body);
     }
   }
 
   //to send query
-  Future<SendQueryModel?> sendQueryApi({
-    String? queryType, serviceOrOrderId, emailId, mobileNumber, queryText}) async {
+  Future<SendQueryModel?> sendQueryApi(
+      {String? queryType,
+      serviceOrOrderId,
+      emailId,
+      mobileNumber,
+      queryText}) async {
     var queryInputs = jsonEncode(<String, dynamic>{
       "queryrelated": queryType.toString(),
-      "orderid" : serviceOrOrderId.toString(),
-      "email" : emailId.toString(),
-      "phonenumber" : mobileNumber.toString(),
-      "Querydetails" : queryText.toString()
+      "orderid": serviceOrOrderId.toString(),
+      "email": emailId.toString(),
+      "phonenumber": mobileNumber.toString(),
+      "Querydetails": queryText.toString()
     });
     try {
       http.Response response = await http.post(
@@ -1490,11 +1612,12 @@ class APIService {
       {String? token, userId, productId}) async {
     try {
       http.Response response = await http.get(
-          Uri.parse(baseurl + "api/v1/products/getproductreview/$userId/$productId"),
+          Uri.parse(
+              baseurl + "api/v1/products/getproductreview/$userId/$productId"),
           headers: defaultHeaderParams(token));
       if (response.statusCode == 200) {
         final reviewData =
-        GetUsersProductReview.fromMap(jsonDecode(response.body));
+            GetUsersProductReview.fromMap(jsonDecode(response.body));
         return reviewData;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1510,18 +1633,20 @@ class APIService {
       {String? token, userId, orderId, productId, proRating, proReview}) async {
     var userReview = jsonEncode(<String, dynamic>{
       "prorev_review": proReview.toString(),
-      "prorev_rate" : proRating.toString(),
-      "order_id" : orderId.toString(),
+      "prorev_rate": proRating.toString(),
+      "order_id": orderId.toString(),
     });
 
     http.Response response = await http.post(
-        Uri.parse(baseurl + "api/v1/products/productreviewfromuser/$userId/$productId"),
+        Uri.parse(baseurl +
+            "api/v1/products/productreviewfromuser/$userId/$productId"),
         headers: defaultHeaderParams(token),
         body: userReview);
 
     try {
       if (response.statusCode == 200) {
-        final reviewResponse = ProductReviewByUserModel.fromMap(jsonDecode(response.body));
+        final reviewResponse =
+            ProductReviewByUserModel.fromMap(jsonDecode(response.body));
         return reviewResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1535,21 +1660,29 @@ class APIService {
 
   //update user review for product api
   Future<ProductReviewByUserModel?> updateUserReviewForProductApi(
-      {String? token, userId, orderId, productId, reviewId, proRating, proReview}) async {
+      {String? token,
+      userId,
+      orderId,
+      productId,
+      reviewId,
+      proRating,
+      proReview}) async {
     var userReview = jsonEncode(<String, dynamic>{
       "prorev_review": proReview.toString(),
-      "prorev_rate" : proRating.toString(),
-      "order_id" : orderId.toString(),
+      "prorev_rate": proRating.toString(),
+      "order_id": orderId.toString(),
     });
 
     http.Response response = await http.post(
-        Uri.parse(baseurl + "api/v1/products/updateproductreview/$userId/$productId/$reviewId"),
+        Uri.parse(baseurl +
+            "api/v1/products/updateproductreview/$userId/$productId/$reviewId"),
         headers: defaultHeaderParams(token),
         body: userReview);
 
     try {
       if (response.statusCode == 200) {
-        final reviewResponse = ProductReviewByUserModel.fromMap(jsonDecode(response.body));
+        final reviewResponse =
+            ProductReviewByUserModel.fromMap(jsonDecode(response.body));
         return reviewResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1568,11 +1701,12 @@ class APIService {
       var stream = http.ByteStream(img!.openRead());
       stream.cast();
       var len = await img.length();
-      var uri = Uri.parse(baseurl + "api/v1/products/uploadproductreviewimage/$reviewId");
+      var uri = Uri.parse(
+          baseurl + "api/v1/products/uploadproductreviewimage/$reviewId");
       var request = http.MultipartRequest("POST", uri);
 
-      var multipartData = http.MultipartFile(
-          'prorev_product_img', stream, len, filename: img.path.toString());
+      var multipartData = http.MultipartFile('prorev_product_img', stream, len,
+          filename: img.path.toString());
       request.files.add(multipartData);
       request.headers["Authorization"] = "Bearer $token";
 
@@ -1583,7 +1717,7 @@ class APIService {
         // Fluttertoast.showToast(msg: 'Profile photo updated');
       } else {
         // Fluttertoast.showToast(msg: 'Failed to update profile photo');
-        debugPrint('failed....'+response.statusCode.toString());
+        debugPrint('failed....' + response.statusCode.toString());
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -1595,10 +1729,12 @@ class APIService {
       {String? token, userId, productReviewId}) async {
     try {
       http.Response response = await http.get(
-          Uri.parse(baseurl + "api/v1/products/checklikeordislike/$userId/$productReviewId"),
+          Uri.parse(baseurl +
+              "api/v1/products/checklikeordislike/$userId/$productReviewId"),
           headers: defaultHeaderParams(token));
       if (response.statusCode == 200) {
-        final reviewLikes = ReviewsLikesDislikesModel.fromMap(jsonDecode(response.body));
+        final reviewLikes =
+            ReviewsLikesDislikesModel.fromMap(jsonDecode(response.body));
         return reviewLikes;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1614,8 +1750,8 @@ class APIService {
       {String? token, userId, reviewId, like, dislike}) async {
     var likeReview = jsonEncode(<String, dynamic>{
       "like": like.toString(),
-      "dislike" : dislike.toString(),
-      "userid" : userId.toString()
+      "dislike": dislike.toString(),
+      "userid": userId.toString()
     });
 
     http.Response response = await http.post(
@@ -1625,7 +1761,8 @@ class APIService {
 
     try {
       if (response.statusCode == 200) {
-        final reviewResponse = ProductReviewByUserModel.fromMap(jsonDecode(response.body));
+        final reviewResponse =
+            ProductReviewByUserModel.fromMap(jsonDecode(response.body));
         return reviewResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1648,7 +1785,8 @@ class APIService {
 
     try {
       if (response.statusCode == 200) {
-        final checkResponse = SocialAuthCheckUserModel.fromMap(jsonDecode(response.body));
+        final checkResponse =
+            SocialAuthCheckUserModel.fromMap(jsonDecode(response.body));
         return checkResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1662,16 +1800,22 @@ class APIService {
 
   //social auth check api to check user is exist or new user
   Future<SocialAuthModel?> socialAuthUserApi(
-      {String? email, userName, deviceToken, mailIdToken, authType, phoneNumber, androidId}) async {
+      {String? email,
+      userName,
+      deviceToken,
+      mailIdToken,
+      authType,
+      phoneNumber,
+      androidId}) async {
     var authData = jsonEncode(<String, dynamic>{
       "email": email.toString(),
-      "name" : userName.toString(),
+      "name": userName.toString(),
       "device_token": deviceToken.toString(),
       "token": mailIdToken.toString(),
       "typeid": authType.toString(),
       "phonenumber": phoneNumber,
-      "web_id" : "",
-      "android_id" : androidId.toString()
+      "web_id": "",
+      "android_id": androidId.toString()
     });
     http.Response response = await http.post(
         Uri.parse(baseurl + "api/v1/accounts/login/google/callback"),
@@ -1680,7 +1824,8 @@ class APIService {
 
     try {
       if (response.statusCode == 200) {
-        final socialAuthResponse = SocialAuthModel.fromMap(jsonDecode(response.body));
+        final socialAuthResponse =
+            SocialAuthModel.fromMap(jsonDecode(response.body));
         return socialAuthResponse;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1693,8 +1838,7 @@ class APIService {
   }
 
   //push order api
-  Future<PushOrderModel?> pushOrderApi(
-      {String? token, orderId}) async {
+  Future<PushOrderModel?> pushOrderApi({String? token, orderId}) async {
     try {
       http.Response response = await http.get(
           Uri.parse(baseurl + "api/v1/shopping/pushorder/$orderId"),
@@ -1723,7 +1867,8 @@ class APIService {
 
     try {
       if (response.statusCode == 200) {
-        final responseData = ShipmentIdModel.fromJson(jsonDecode(response.body));
+        final responseData =
+            ShipmentIdModel.fromJson(jsonDecode(response.body));
         return responseData;
       } else {
         debugPrint(response.statusCode.toString());
@@ -1744,7 +1889,8 @@ class APIService {
           Uri.parse(baseurl + "api/v1/accounts/getnotifications/$userId"),
           headers: defaultHeaderParams(token));
       if (response.statusCode == 200) {
-        final responseData = GetNotificationModel.fromMap(jsonDecode(response.body));
+        final responseData =
+            GetNotificationModel.fromMap(jsonDecode(response.body));
         return responseData;
       } else {
         // debugPrint(response.statusCode.toString());
@@ -1757,19 +1903,18 @@ class APIService {
   }
 
   //update device token
-  Future updateDeviceTokenApi(
-      {String? userId, deviceToken, androidId}) async {
+  Future updateDeviceTokenApi({String? userId, deviceToken, androidId}) async {
     http.Response response = await http.post(
         Uri.parse(baseurl + "api/v1/accounts/updatedevicetoken/$userId"),
-        body:jsonEncode( {
+        body: jsonEncode({
           "android_id": androidId.toString(),
-          "device_token" : deviceToken.toString()
+          "device_token": deviceToken.toString()
         }),
         headers: {"Content-Type": "application/json"});
 
     try {
       if (response.statusCode == 200) {
-        log(response.statusCode.toString()+" token upadated");
+        log(response.statusCode.toString() + " token upadated");
       } else {
         debugPrint(response.statusCode.toString());
         debugPrint(response.body.toString());
@@ -1780,4 +1925,47 @@ class APIService {
     }
   }
 
+  Future<GetShiprocketTokenModel?> getShipRocketToken() async {
+    try {
+      http.Response response = await http.get(
+          Uri.parse("http://3.109.69.39/api/v1/shopping/getshirockettokens"));
+      if (response.statusCode == 200) {
+        final responseData =
+            GetShiprocketTokenModel.fromMap(jsonDecode(response.body));
+        return responseData;
+      } else {
+        debugPrint(response.body.toString());
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return null;
+  }
+
+  //track order by shipment id
+  Future<TrackOrderByShipIdModel?> trackOrderByShipmentIdApi(
+      {String? shipmentId, String? token}) async {
+    http.Response response = await http.get(
+        Uri.parse(
+            "https://apiv2.shiprocket.in/v1/external/courier/track/shipment/" +
+                shipmentId.toString()),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token!
+        });
+    try {
+      if (response.statusCode == 200) {
+        final trackResponse =
+            TrackOrderByShipIdModel.fromMap(jsonDecode(response.body));
+        return trackResponse;
+      } else {
+        debugPrint(response.statusCode.toString());
+        debugPrint(response.body.toString());
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      debugPrint(response.body.toString());
+    }
+    return null;
+  }
 }

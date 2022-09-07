@@ -39,13 +39,11 @@ class ServicePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Text(
                   image_caption,
                   maxLines: 2,
-                  style: TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 10),
                 ),
               ],
             ),
@@ -140,6 +138,7 @@ class ServicePage extends StatelessWidget {
       ),
     );
   }
+
   Widget serviceWidget() {
     return SizedBox(
       height: Config.Height,
@@ -147,20 +146,32 @@ class ServicePage extends StatelessWidget {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            getCategory2("assets/bike_cafe/bikewash.jpg", "Automatic bike wash in 2 minutes"),
+            const SizedBox(
+              height: 100,
+              child: Center(
+                child: Text(
+                  "Coming soon...",
+                  style: TextStyle(color: kPrimaryColor, fontSize: 22),
+                ),
+              ),
+            ),
+            getCategory2("assets/bike_cafe/bikewash.jpg",
+                "Automatic bike wash in 2 minutes"),
             getCategory2("assets/bike_cafe/carwash.jpg", "Automatic car wash"),
             getCategory2("assets/img/msc.png", "General Services"),
-            const SizedBox(height: 35)
+            SizedBox(height: Config.screenHeight! * 0.25)
           ],
         ),
       ),
     );
   }
+
   Widget getCategory2(String imageLocation, String imageCaption) {
     return Container(
       margin: const EdgeInsets.all(2),
       child: Card(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15))),
         child: InkWell(
           onTap: () {
             // Get.to(() => ProductPage());
@@ -177,7 +188,8 @@ class ServicePage extends StatelessWidget {
                 imageCaption,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
             ],

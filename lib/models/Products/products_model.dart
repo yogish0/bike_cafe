@@ -69,7 +69,7 @@ class Product {
   int? id;
   String? proName;
   String? proDescription;
-  int? proCapacity;
+  dynamic proCapacity;
   String? proCode;
   String? proSku;
   int? packageItemsCount;

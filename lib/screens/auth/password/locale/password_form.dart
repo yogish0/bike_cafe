@@ -4,6 +4,7 @@ import 'package:bike_cafe/screens/auth/login/signin.dart';
 import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/auth/txt_formfield.dart';
 import 'package:bike_cafe/widget/config.dart';
+import 'package:bike_cafe/widget/constrants.dart';
 
 import 'forgot_password_otp.dart';
 
@@ -17,7 +18,6 @@ class ResetForm extends StatefulWidget {
 }
 
 class _ResetFormState extends State<ResetForm> {
-
   APIService apiService = APIService();
 
   final _formKey = GlobalKey<FormState>();
@@ -27,13 +27,18 @@ class _ResetFormState extends State<ResetForm> {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      try{
-        apiService.forgotPasswordOtpApi(phoneNumber: _mobileController.text.toString()).then((value){
-          if(value?.userid != null){
-            Get.to(()=> ForgotPasswordOtp(userId: value?.userid.toString(),phoneNumber: _mobileController.text.toString()));
+      try {
+        apiService
+            .forgotPasswordOtpApi(
+                phoneNumber: _mobileController.text.toString())
+            .then((value) {
+          if (value?.userid != null) {
+            Get.to(() => ForgotPasswordOtp(
+                userId: value?.userid.toString(),
+                phoneNumber: _mobileController.text.toString()));
           }
         });
-      }catch(e){
+      } catch (e) {
         debugPrint(e.toString());
       }
       return true;
@@ -58,11 +63,13 @@ class _ResetFormState extends State<ResetForm> {
             child: RoundedTextFormField(
               hintText: 'Mobile Number',
               controller: _mobileController,
+              type: TextInputType.number,
               validator: (value) {
-                bool _isnumberValid = RegExp(r"^[6-9][0-9]{9}").hasMatch(value!);
-                if(value == ''){
+                bool _isnumberValid =
+                    RegExp(r"^[6-9][0-9]{9}").hasMatch(value!);
+                if (value == '') {
                   return 'Enter Mobile Number';
-                }else if (!_isnumberValid) {
+                } else if (!_isnumberValid) {
                   return 'Invalid Number.';
                 }
                 return null;
@@ -77,13 +84,7 @@ class _ResetFormState extends State<ResetForm> {
                 Align(
                   alignment: Alignment.bottomRight,
                   child: TextButton(
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 22,
-                          color: Colors.black),
-                    ),
+                    child: Constants.linkText("Sign In"),
                     onPressed: () => Get.to(() => const SignIn()),
                   ),
                 ),
@@ -91,12 +92,7 @@ class _ResetFormState extends State<ResetForm> {
                 FloatingActionButton(
                   backgroundColor: kPrimaryColor,
                   onPressed: () {
-                    // if (_formKey.currentState!.validate()) {
-                    //   // _authController
-                    //   //     .resetPassword(_mobileController.text.trim());
-                    // }
                     validateAndSave();
-
                   },
                   child: const Icon(Icons.arrow_right_alt_outlined),
                 ),

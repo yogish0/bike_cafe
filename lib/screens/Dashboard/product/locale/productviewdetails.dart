@@ -7,13 +7,18 @@ import 'package:bike_cafe/models/Products/product_related_variants.dart';
 import 'package:bike_cafe/models/Products/product_review_rating_model.dart';
 import 'package:bike_cafe/models/Products/products_model.dart';
 import 'package:bike_cafe/screens/Dashboard/Cart/cart.dart';
-import 'package:bike_cafe/screens/Dashboard/payment/locale/checkout.dart';
 import 'package:bike_cafe/screens/Dashboard/product/locale/productdetails/reviews.dart';
 import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/config.dart';
+import 'package:bike_cafe/widget/constrants.dart';
+import 'package:bike_cafe/widget/locale/ShimmerWidget.dart';
 import 'package:bike_cafe/widget/locale/scaffold.dart';
 import 'package:carousel_nullsafety/carousel_nullsafety.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
+
+import '../../Cart/add_cart.dart';
+import '../../wishlist/add_to_wishlist.dart';
 
 class ProductViewDetails extends StatefulWidget {
   ProductViewDetails(
@@ -49,8 +54,10 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
 
   APIService service = APIService();
 
-  ProductOrderController priceController = Get.put(ProductOrderController());
+  // ProductOrderController priceController = Get.put(ProductOrderController());
   CartController cartController = Get.put(CartController());
+
+  AddCart addCart = AddCart();
 
   int mrp = 0;
   int discount = 0;
@@ -60,6 +67,7 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: widget.productName,
       body: Scaffold(
         bottomNavigationBar: BottomAppBar(
@@ -84,12 +92,17 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
                       // print("up $success");
                       if (success == 1) {
                         Fluttertoast.showToast(msg: 'Item added to cart');
-                        service.cartCheckoutApi(token: widget.token, userId: box1?.get('data3')).then((value) {
-                          cartController.cartItemsCount.value = value!.products!.length;
+                        service
+                            .cartCheckoutApi(
+                                token: widget.token, userId: box1?.get('data3'))
+                            .then((value) {
+                          cartController.cartItemsCount.value =
+                              value!.products!.length;
                         });
                         // Get.to(()=> CartPage());
                       } else {
-                        Fluttertoast.showToast(msg: 'Failed to add item to cart');
+                        Fluttertoast.showToast(
+                            msg: 'Failed to add item to cart');
                       }
                     });
                     // print(success);
@@ -110,25 +123,29 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
           ),
         ),
         body: box1?.get("data3") == null
-            ? const Center()
+            ? Constants.circularWidget()
             : SingleChildScrollView(
                 child: Column(
                   children: [
                     FutureBuilder<GetProducts?>(
                       future: service.getProductsByIdApi(
-                          token: widget.token, productId: widget.productId.toString()),
+                          token: widget.token,
+                          productId: widget.productId.toString()),
                       builder: (context, snapshot) {
-                        if (snapshot.hasData) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Constants.circularWidget();
+                        } else if (snapshot.hasData) {
                           return Column(
                             children: [
-                              for (var i = 0;i < snapshot.data!.products.length;i++)
+                              for (var i = 0;
+                                  i < snapshot.data!.products.length;
+                                  i++)
                                 productDetailsWidget(i, snapshot)
                             ],
                           );
                         } else {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
+                          return Constants.circularWidget();
                         }
                       },
                     ),
@@ -184,7 +201,9 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
     int? discount = 0;
 
     discount = (((productObj.procosMrp! - productObj.procosSellingPrice) /
-                productObj.procosMrp) * 100).round();
+                productObj.procosMrp) *
+            100)
+        .round();
     return Column(
       children: [
         Stack(
@@ -219,116 +238,96 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
               children: [
                 style.Roboto(
                     text: productObj.proName.toString(),
-                    size: 18,
+                    size: 20,
                     fontwight: FontWeight.w400,
                     color: Colors.black),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     style.Roboto(
                         dec: TextDecoration.lineThrough,
                         text: "₹" + productObj.procosMrp.toString(),
                         color: Colors.grey,
-                        size: 14),
-                    style.Roboto(
-                        text: " ₹ " + productObj.procosSellingPrice.toString() + "/-",
-                        color: Colors.black,
                         size: 16),
+                    style.Roboto(
+                        text: " ₹ " +
+                            productObj.procosSellingPrice.toString() +
+                            "/-",
+                        color: Colors.black,
+                        size: 18),
                   ],
                 ),
                 const SizedBox(height: 6),
-
                 rateWidget(productObj.productid.toString()),
-
                 const SizedBox(height: 14),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Column(
-                      children: [
-                        style.Roboto(
-                            text: "SKU:",
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.grey),
-                        const SizedBox(height: 20),
-                        style.Roboto(
-                            text: "Category:",
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.grey),
-                        const SizedBox(height: 20),
-                        style.Roboto(
-                            text: "Stock:",
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.grey),
-                      ],
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: Config.screenWidth! * 0.45,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            children: [
+                              extraDetailsLabel("SKU:  "),
+                              extraDetailsText(productObj.proSku.toString())
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Wrap(
+                            children: [
+                              extraDetailsLabel("Category:  "),
+                              extraDetailsText(productObj.catName.toString())
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Wrap(
+                            children: [
+                              extraDetailsLabel("Stock:  "),
+                              productObj.proIsoutofstock == 0
+                                  ? style.Roboto(
+                                      text: "In-stock",
+                                      size: 14,
+                                      fontwight: FontWeight.w400,
+                                      color: Colors.green)
+                                  : style.Roboto(
+                                      text: "Out-of-Stock",
+                                      size: 14,
+                                      fontwight: FontWeight.w400,
+                                      color: Colors.red)
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    Column(
-                      children: [
-                        style.Roboto(
-                            text: productObj.proSku.toString(),
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.black),
-                        const SizedBox(height: 20),
-                        style.Roboto(
-                            text: productObj.catName.toString(),
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.black),
-                        const SizedBox(height: 20),
-                        productObj.proIsoutofstock == 0
-                            ? style.Roboto(
-                                text: "In-stock",
-                                size: 12,
-                                fontwight: FontWeight.w400,
-                                color: Colors.green)
-                            : style.Roboto(
-                                text: "Out-of-Stock",
-                                size: 12,
-                                fontwight: FontWeight.w400,
-                                color: Colors.red)
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        style.Roboto(
-                            text: "Buy by:",
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.grey),
-                        const SizedBox(height: 20),
-                        style.Roboto(
-                            text: "Delivery:",
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.grey),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        style.Roboto(
-                            text: productObj.packageItemsCount.toString() + ' pcs',
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.black),
-                        const SizedBox(height: 20),
-                        style.Roboto(
-                            text: "1-2 Working Days",
-                            size: 12,
-                            fontwight: FontWeight.w400,
-                            color: Colors.black),
-                        const SizedBox(height: 20),
-                      ],
+                    SizedBox(
+                      width: Config.screenWidth! * 0.45,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            children: [
+                              extraDetailsLabel("Buy by:  "),
+                              extraDetailsText(
+                                  productObj.packageItemsCount.toString() +
+                                      ' pcs')
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Wrap(
+                            children: [
+                              extraDetailsLabel("Delivery:  "),
+                              extraDetailsText("1-2 Days")
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -339,14 +338,33 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              style.Roboto(text: "Description", size: 18, fontwight: FontWeight.w400),
+              style.Roboto(
+                  text: "Description", size: 20, fontwight: FontWeight.w400),
               const SizedBox(height: 10),
-              style.Roboto(text: productObj.proDescription.toString(), size: 12),
+              style.Roboto(
+                  text: productObj.proDescription.toString(), size: 14),
             ],
           ),
         )
       ],
     );
+  }
+
+  Widget extraDetailsLabel(String text) {
+    return Text(text,
+        style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontFamily: GoogleFonts.roboto().fontFamily));
+  }
+
+  Widget extraDetailsText(String text) {
+    return Text(text,
+        style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+            fontWeight: FontWeight.w400,
+            fontFamily: GoogleFonts.roboto().fontFamily));
   }
 
   //related vehicles list
@@ -355,9 +373,9 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
     var variants = snapshot.data!.variants[index];
     return Row(
       children: [
-        style.Roboto(text: variants.vehvarName.toString(), size: 12),
+        style.Roboto(text: variants.vehvarName.toString(), size: 14),
         const SizedBox(width: 6),
-        style.Roboto(text: variants.vehvarCc.toString(), size: 12),
+        style.Roboto(text: variants.vehvarCc.toString(), size: 14),
       ],
     );
   }
@@ -386,12 +404,14 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
                         children: [
                           style.Roboto(
                               text: "Suitable Vehicles",
-                              size: 16,
+                              size: 18,
                               fontwight: FontWeight.w400),
                           const SizedBox(height: 8),
                           style.Roboto(text: "Variants", size: 14),
                           const SizedBox(height: 6),
-                          for (var i = 0;i < snapshot.data!.variants.length;i++)
+                          for (var i = 0;
+                              i < snapshot.data!.variants.length;
+                              i++)
                             relatedVehicles(i, snapshot)
                         ],
                       );
@@ -414,7 +434,7 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
             children: [
               style.Roboto(
                   text: "Related Products",
-                  size: 16,
+                  size: 18,
                   fontwight: FontWeight.w400),
               const SizedBox(height: 8),
               relatedProductsWidget(),
@@ -436,10 +456,14 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: style.Roboto(
                   text: "Rating and Reviews",
-                  size: 16,
+                  size: 18,
                   fontwight: FontWeight.w400),
             ),
-            ProductReviews(token: widget.token.toString(), userId: box1?.get("data3"), productId: widget.productId.toString(), allReviews: false)
+            ProductReviews(
+                token: widget.token.toString(),
+                userId: box1?.get("data3"),
+                productId: widget.productId.toString(),
+                allReviews: false)
           ],
         ),
         const SizedBox(height: 10),
@@ -482,7 +506,9 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
 
     int? discount = 0;
     discount = (((products.procosMrp! - products.procosSellingPrice) /
-                products.procosMrp) * 100).round();
+                products.procosMrp) *
+            100)
+        .round();
     return InkWell(
       onTap: () {
         // Get.to(() => ProductViewDetails(
@@ -513,7 +539,8 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
                           ? SizedBox(
                               height: 100,
                               width: 100,
-                              child: Image.asset("assets/img/no_image_available.jpg"),
+                              child: Image.asset(
+                                  "assets/img/no_image_available.jpg"),
                             )
                           : Image.network(
                               products.proImagePath.toString(),
@@ -535,7 +562,7 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
                     child: Text(
                       products.proName.toString(),
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
@@ -543,16 +570,16 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star, color: Colors.yellow, size: 10),
-                      Icon(Icons.star_border_outlined, color: Colors.black, size: 10),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: const [
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                  //     Icon(Icons.star_border_outlined, color: Colors.black, size: 10),
+                  //   ],
+                  // ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Align(
@@ -564,50 +591,27 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
                               text: "₹ " + products.procosMrp.toString(),
                               fontwight: FontWeight.w400,
                               color: Colors.grey,
-                              size: 10),
+                              size: 14),
                           style.Roboto(
                               text: " ₹ " +
                                   products.procosSellingPrice.toString() +
                                   "/-",
                               fontwight: FontWeight.w300,
                               color: Colors.black,
-                              size: 12),
+                              size: 16),
                           const Spacer(),
-                          InkWell(
-                            onTap: () {
-                              var addItemApi = service.addItemToCart(
-                                  token: widget.token,
-                                  userId: box1?.get("data3"),
-                                  productId: products.productid);
-                              int? success = 0;
-                              addItemApi.then((value) {
-                                success = value!.success;
-                                // print("up $success");
-                                if (success == 1) {
-                                  Fluttertoast.showToast(msg: 'Item added to cart');
-                                  service.cartCheckoutApi(token: widget.token, userId: box1?.get("data3"))
-                                      .then((value) {
-                                    cartController.cartItemsCount.value = value!.products!.length;
-                                  });
-                                } else {
-                                  Fluttertoast.showToast(msg: 'Failed to add item to cart');
-                                }
-                              });
-                            },
-                            child: const Icon(Icons.add_shopping_cart_sharp, size: 18),
-                          ),
+                          addCart.addToCart(widget.token, box1?.get("data3"),
+                              products.productid!.toInt()),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-
-              WishlistWidget(
+              AddWishlist(
                   token: widget.token,
                   userId: box1?.get("data3"),
                   productId: products.productid.toString()),
-
               Positioned(
                 top: 4,
                 left: 4,
@@ -647,8 +651,10 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
               children: [
                 ratingCard(snapshot.data!.avgRating.avgRating.toString()),
                 style.Roboto(
-                    text: " "+snapshot.data!.totaltrating.totalrate.toString() + " reviews",
-                    size: 12,
+                    text: " " +
+                        snapshot.data!.totaltrating!.totalrate.toString() +
+                        " reviews",
+                    size: 14,
                     fontwight: FontWeight.w400,
                     color: Colors.grey),
               ],
@@ -660,6 +666,7 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
       },
     );
   }
+
   //rating card for product lists
   static ratingCard(String? rating) {
     var avgRating = double.parse(rating!);
@@ -670,7 +677,7 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
     if (avgRating >= 1 && avgRating < 2) {
       color = const Color.fromRGBO(255, 165, 0, 1);
     }
-    if (avgRating >= 2 && avgRating < 5){
+    if (avgRating >= 2 && avgRating < 5) {
       color = const Color.fromRGBO(0, 128, 0, 1);
     }
     return Card(
@@ -694,57 +701,3 @@ class _ProductViewDetailsState extends State<ProductViewDetails> {
     );
   }
 }
-
-class WishlistWidget extends StatefulWidget {
-  WishlistWidget({Key? key, this.token, this.userId, this.productId}) : super(key: key);
-
-  String? token, userId, productId;
-
-  @override
-  _WishlistWidgetState createState() => _WishlistWidgetState();
-}
-
-class _WishlistWidgetState extends State<WishlistWidget> {
-  APIService service = APIService();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Align(
-        alignment: Alignment.topRight,
-        child: InkWell(
-          onTap: () {
-            service.addToWishlistApi(
-                token: widget.token.toString(), userId: widget.userId.toString(),
-                productId: widget.productId.toString())
-                .then((value) {
-              setState(() {});
-            });
-          },
-          child: FutureBuilder<CheckWishlisted?>(
-            future: service.checkWishlist(
-                token: widget.token.toString(),
-                userId: widget.userId.toString(),
-                productId: widget.productId.toString()),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.checkout.iswishlist == 1) {
-                  return const Icon(Icons.favorite,
-                      color: Colors.red, size: 24);
-                } else {
-                  return const Icon(Icons.favorite_border,
-                      color: Colors.grey, size: 24);
-                }
-              } else {
-                return const Icon(Icons.favorite_border,
-                    color: Colors.grey, size: 24);
-              }
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
-

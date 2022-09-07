@@ -8,8 +8,16 @@ import 'package:bike_cafe/widget/config.dart';
 import 'package:bike_cafe/models/auth/signIn_model.dart';
 
 class VerifyUser extends StatefulWidget {
-  VerifyUser({Key? key, this.userId, this.phoneNumber,
-    this.userName,this.userEmail,this.userPassword, this.confirmPassword, this.smsId}) : super(key: key);
+  VerifyUser(
+      {Key? key,
+      this.userId,
+      this.phoneNumber,
+      this.userName,
+      this.userEmail,
+      this.userPassword,
+      this.confirmPassword,
+      this.smsId})
+      : super(key: key);
 
   String? userId;
   String? phoneNumber;
@@ -33,12 +41,13 @@ class _VerifyUserState extends State<VerifyUser> {
     final form = _formKey.currentState;
     if (form!.validate()) {
       form.save();
-      try{
-        var verify = apiService.verifyUserByOtpToRegisterApi(otpId: widget.smsId, userOtp: _otpController.text.toString());
-        verify.then((value){
-          if(value!.success == 1){
+      try {
+        var verify = apiService.verifyUserByOtpToRegisterApi(
+            otpId: widget.smsId, userOtp: _otpController.text.toString());
+        verify.then((value) {
+          if (value!.success == 1) {
             _register();
-          }else{
+          } else {
             Get.snackbar('Failed..', value.message.toString(),
                 snackPosition: SnackPosition.TOP,
                 duration: Duration(seconds: 5),
@@ -46,7 +55,7 @@ class _VerifyUserState extends State<VerifyUser> {
                 colorText: Colors.red);
           }
         });
-      }catch(e){
+      } catch (e) {
         print(e.toString());
       }
       return true;
@@ -66,9 +75,9 @@ class _VerifyUserState extends State<VerifyUser> {
           confrmpass: widget.confirmPassword.toString());
 
       register.then((value) {
-        if(value!.success == 1){
+        if (value!.success == 1) {
           Get.off(() => SignIn());
-        }else{
+        } else {
           Get.snackbar('Failed..', value.message.toString(),
               snackPosition: SnackPosition.TOP,
               duration: Duration(seconds: 5),
@@ -107,8 +116,9 @@ class _VerifyUserState extends State<VerifyUser> {
                       SizedBox(height: Config.Height * 0.15),
                       const Text('Enter OTP sent your mobile number'),
                       const SizedBox(height: 10),
-                      Text('+91 '+ widget.phoneNumber.toString(),
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                      Text('+91 ' + widget.phoneNumber.toString(),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 15),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -118,10 +128,11 @@ class _VerifyUserState extends State<VerifyUser> {
                           type: TextInputType.number,
                           textAlign: TextAlign.center,
                           validator: (input) {
-                            bool _isNumberValid = RegExp(r"^[0-9]{6}").hasMatch(input!);
-                            if(input == ''){
+                            bool _isNumberValid =
+                                RegExp(r"^[0-9]{6}").hasMatch(input!);
+                            if (input == '') {
                               return 'Enter OTP';
-                            }else if (!_isNumberValid) {
+                            } else if (!_isNumberValid) {
                               return 'Invalid OTP';
                             }
                             return null;

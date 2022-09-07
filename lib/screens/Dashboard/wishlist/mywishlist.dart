@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:bike_cafe/models/Products/get_wishlist_model.dart';
+import 'package:bike_cafe/screens/Dashboard/Cart/add_cart.dart';
 import 'package:bike_cafe/screens/Dashboard/Home/dashboard.dart';
 import 'package:bike_cafe/screens/Dashboard/product/locale/productviewdetails.dart';
 import 'package:bike_cafe/services/api.dart';
@@ -21,6 +22,7 @@ class _WishListState extends State<WishList> {
   Widget build(BuildContext context) {
     return GetScaffold(
       title: "My WishList",
+      index: 5,
       body: const Wishlist(),
     );
   }
@@ -51,6 +53,8 @@ class _WishlistState extends State<Wishlist> {
 
   APIService service = APIService();
 
+  AddCart addCart = AddCart();
+
   @override
   Widget build(BuildContext context) {
     return box1?.get("data4") == null
@@ -67,7 +71,7 @@ class _WishlistState extends State<Wishlist> {
                       return emptyList();
                     }
                     return StaggeredGrid.count(
-                      crossAxisCount: Config.Width ~/ 140,
+                      crossAxisCount: Config.Width ~/ 170,
                       children: [
                         for (var i = 0; i < snapshot.data!.wishlist.length; i++)
                           productsList(i, snapshot)
@@ -110,7 +114,9 @@ class _WishlistState extends State<Wishlist> {
     int? discount = 0;
 
     discount = (((products.procosMrp - products.procosSellingPrice) /
-                products.procosMrp) * 100).round();
+                products.procosMrp) *
+            100)
+        .round();
 
     return InkWell(
       onTap: () {
@@ -151,7 +157,7 @@ class _WishlistState extends State<Wishlist> {
                   child: Text(
                     products.proName.toString(),
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 1,
@@ -159,16 +165,16 @@ class _WishlistState extends State<Wishlist> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star, color: Colors.yellow, size: 10),
-                    Icon(Icons.star_border_outlined, color: Colors.black, size: 10),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: const [
+                //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                //     Icon(Icons.star, color: Colors.yellow, size: 10),
+                //     Icon(Icons.star_border_outlined, color: Colors.black, size: 10),
+                //   ],
+                // ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
@@ -180,41 +186,17 @@ class _WishlistState extends State<Wishlist> {
                             text: "₹ " + products.procosMrp.toString(),
                             fontwight: FontWeight.w400,
                             color: Colors.grey,
-                            size: 10),
+                            size: 12),
                         style.Roboto(
-                            text: " ₹ " + products.procosSellingPrice.toString() + "/-",
+                            text: " ₹ " +
+                                products.procosSellingPrice.toString() +
+                                "/-",
                             fontwight: FontWeight.w300,
                             color: Colors.black,
-                            size: 12),
+                            size: 15),
                         const Spacer(),
-                        InkWell(
-                            onTap: () {
-                              var addItemApi = service.addItemToCart(
-                                  token: box1?.get("data4"),
-                                  userId: box1?.get("data3"),
-                                  productId: products.productid);
-                              int? success = 0;
-                              addItemApi.then((value) {
-                                success = value!.success;
-                                // print("up $success");
-                                if (success == 1) {
-                                  Get.snackbar(
-                                    'Product added to cart successfully',
-                                    products.proName.toString(),
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor: const Color.fromRGBO(207, 255, 239, 1)
-                                  );
-                                } else {
-                                  Get.snackbar(
-                                    'Failed to add product to cart',
-                                    products.proName.toString(),
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor: const Color.fromRGBO(255, 245, 235, 1)
-                                  );
-                                }
-                              });
-                            },
-                            child: const Icon(Icons.add_shopping_cart_sharp, size: 18))
+                        addCart.addToCart(box1?.get("data4"),
+                            box1?.get("data3"), products.productid),
                       ],
                     ),
                   ),
@@ -227,13 +209,17 @@ class _WishlistState extends State<Wishlist> {
                 alignment: Alignment.topRight,
                 child: InkWell(
                     onTap: () {
-                      service.addToWishlistApi(token: box1?.get("data4"),
-                          userId: box1?.get("data3"), productId: products.productid.toString())
+                      service
+                          .addToWishlistApi(
+                              token: box1?.get("data4"),
+                              userId: box1?.get("data3"),
+                              productId: products.productid.toString())
                           .then((value) {
                         setState(() {});
                       });
                     },
-                    child: const Icon(Icons.favorite, color: Colors.red, size: 24)),
+                    child: const Icon(Icons.favorite,
+                        color: kPrimaryColor, size: 24)),
               ),
             ),
             Positioned(

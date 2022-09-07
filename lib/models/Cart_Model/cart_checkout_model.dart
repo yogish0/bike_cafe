@@ -1,3 +1,8 @@
+// To parse this JSON data, do
+//
+//     final cartCheckoutModel = cartCheckoutModelFromMap(jsonString);
+
+import 'package:meta/meta.dart';
 import 'dart:convert';
 
 CartCheckoutModel cartCheckoutModelFromMap(String str) => CartCheckoutModel.fromMap(json.decode(str));
@@ -92,7 +97,7 @@ class Coupon {
     couCode: json["cou_code"] == null ? null : json["cou_code"],
     couDescription: json["cou_description"] == null ? null : json["cou_description"],
     couMaxDiscount: json["cou_max_discount"] == null ? null : json["cou_max_discount"],
-    couMinOrderValue: json["cou_min_order_value"] == null ? null : json["cou_min_order_value"],
+    couMinOrderValue: json["cou_min_order_value"] == null ? 0 : json["cou_min_order_value"],
     couDiscount: json["cou_discount"] == null ? null : json["cou_discount"],
     couDiscountType: json["cou_discount_type"] == null ? null : json["cou_discount_type"],
   );
@@ -127,13 +132,13 @@ class Product {
   final int productid;
   final String productname;
   final String proImagePath;
-  final int procosSellingPrice;
-  final int procosMrp;
-  final int applyCouponId;
+  final dynamic procosSellingPrice;
+  final dynamic procosMrp;
+  final dynamic applyCouponId;
   final String catName;
   final dynamic opPrice;
-  final int proTax;
-  final int cartQuantity;
+  final dynamic proTax;
+  final dynamic cartQuantity;
 
   factory Product.fromMap(Map<String, dynamic> json) => Product(
     cartid: json["cartid"] == null ? null : json["cartid"],

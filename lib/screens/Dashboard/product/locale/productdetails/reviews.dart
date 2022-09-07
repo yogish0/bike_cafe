@@ -16,23 +16,33 @@ class RatingWidget {
   TextWidgetStyle style = TextWidgetStyle();
   //Rating and Review Container
   Widget ratingWidget(AsyncSnapshot<GetProductReviewAndRatingModel?> snapshot) {
-
     List<int?> countList = [
-      snapshot.data!.numofrating1.numofrating1,
-      snapshot.data!.numofrating2.numofrating2,
-      snapshot.data!.numofrating3.numofrating3,
-      snapshot.data!.numofrating4.numofrating4,
-      snapshot.data!.numofrating5.numofrating5
+      snapshot.data!.numofrating1?.numofrating1,
+      snapshot.data!.numofrating2?.numofrating2,
+      snapshot.data!.numofrating3?.numofrating3,
+      snapshot.data!.numofrating4?.numofrating4,
+      snapshot.data!.numofrating5?.numofrating5
     ];
-    
-    int? maxCount = countList.fold(countList.first, (max, element) => (max! < element!) ? element : max);
+
+    int? maxCount = countList.fold(
+        countList.first, (max, element) => (max! < element!) ? element : max);
 
     // stars percentages
-    double star5 = snapshot.data!.numofrating5.numofrating5 == 0 ? 0 : (snapshot.data!.numofrating5.numofrating5!/ maxCount!) ;
-    double star4 = snapshot.data!.numofrating4.numofrating4 == 0 ? 0 : (snapshot.data!.numofrating4.numofrating4!/ maxCount!) ;
-    double star3 = snapshot.data!.numofrating3.numofrating3 == 0 ? 0 : (snapshot.data!.numofrating3.numofrating3!/ maxCount!) ;
-    double star2 = snapshot.data!.numofrating2.numofrating2 == 0 ? 0 : (snapshot.data!.numofrating2.numofrating2!/ maxCount!) ;
-    double star1 = snapshot.data!.numofrating1.numofrating1 == 0 ? 0 : (snapshot.data!.numofrating1.numofrating1!/ maxCount!) ;
+    double star5 = snapshot.data!.numofrating5?.numofrating5 == 0
+        ? 0
+        : (snapshot.data!.numofrating5!.numofrating5! / maxCount!);
+    double star4 = snapshot.data!.numofrating4?.numofrating4 == 0
+        ? 0
+        : (snapshot.data!.numofrating4!.numofrating4! / maxCount!);
+    double star3 = snapshot.data!.numofrating3?.numofrating3 == 0
+        ? 0
+        : (snapshot.data!.numofrating3!.numofrating3! / maxCount!);
+    double star2 = snapshot.data!.numofrating2?.numofrating2 == 0
+        ? 0
+        : (snapshot.data!.numofrating2!.numofrating2! / maxCount!);
+    double star1 = snapshot.data!.numofrating1?.numofrating1 == 0
+        ? 0
+        : (snapshot.data!.numofrating1!.numofrating1! / maxCount!);
 
     return Container(
       color: Constants.bgwhitecolor,
@@ -55,11 +65,13 @@ class RatingWidget {
               Column(
                 children: [
                   Text(
-                    snapshot.data!.totaltrating.totalrate.toString() + " ratings and",
+                    snapshot.data!.totaltrating!.totalrate.toString() +
+                        " ratings and",
                     style: Constants.halfopacity,
                   ),
                   Text(
-                    snapshot.data!.totaltreview.totalReview.toString() + " reviews",
+                    snapshot.data!.totaltreview!.totalReview.toString() +
+                        " reviews",
                     style: Constants.halfopacity,
                   ),
                 ],
@@ -70,11 +82,11 @@ class RatingWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ratingCount(5, star5, snapshot.data!.numofrating5.numofrating5),
-              ratingCount(4, star4, snapshot.data!.numofrating4.numofrating4),
-              ratingCount(3, star3, snapshot.data!.numofrating3.numofrating3),
-              ratingCount(2, star2, snapshot.data!.numofrating2.numofrating2),
-              ratingCount(1, star1, snapshot.data!.numofrating1.numofrating1),
+              ratingCount(5, star5, snapshot.data!.numofrating5!.numofrating5),
+              ratingCount(4, star4, snapshot.data!.numofrating4!.numofrating4),
+              ratingCount(3, star3, snapshot.data!.numofrating3!.numofrating3),
+              ratingCount(2, star2, snapshot.data!.numofrating2!.numofrating2),
+              ratingCount(1, star1, snapshot.data!.numofrating1!.numofrating1),
             ],
           ),
         ],
@@ -123,7 +135,13 @@ class RatingWidget {
 }
 
 class ProductReviews extends StatefulWidget {
-  ProductReviews({Key? key, this.token, this.userId, this.productId, required this.allReviews}) : super(key: key);
+  ProductReviews(
+      {Key? key,
+      this.token,
+      this.userId,
+      this.productId,
+      required this.allReviews})
+      : super(key: key);
 
   String? token, userId, productId;
   bool allReviews;
@@ -144,20 +162,32 @@ class _ProductReviewsState extends State<ProductReviews> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data!.productreview.isEmpty) {
-            return const Center(child: Text("No reviews"));
+            return noReviewsWidget();
           } else {
             return Container(child: ratingAndReviews(snapshot));
           }
         } else {
-          return const Center();
+          return noReviewsWidget();
         }
       },
     );
   }
 
-  Widget ratingAndReviews(AsyncSnapshot<GetProductReviewAndRatingModel?> snapshot) {
+  Widget noReviewsWidget() {
+    return const SizedBox(
+      height: 100,
+      child: Center(
+        child: Text("No reviews yet", style: TextStyle(color: Colors.black38)),
+      ),
+    );
+  }
+
+  Widget ratingAndReviews(
+      AsyncSnapshot<GetProductReviewAndRatingModel?> snapshot) {
     var reviewLen = !widget.allReviews
-        ? snapshot.data!.productreview.length > 4 ? 4 : snapshot.data!.productreview.length
+        ? snapshot.data!.productreview.length > 4
+            ? 4
+            : snapshot.data!.productreview.length
         : snapshot.data!.productreview.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,18 +195,21 @@ class _ProductReviewsState extends State<ProductReviews> {
         RatingWidget().ratingWidget(snapshot),
         const SizedBox(height: 4),
         for (var i = 0; i < reviewLen; i++)
-          if(snapshot.data!.productreview[i].prorevReview != null)
-            allReviewWidget(i,snapshot, widget.token.toString()),
+          if (snapshot.data!.productreview[i].prorevReview != null)
+            allReviewWidget(i, snapshot, widget.token.toString()),
         // ProductReviews(token: widget.token.toString(), index: i, snapshot: snapshot),
         //all reviews
-        if(!widget.allReviews)
-          if(snapshot.data!.productreview.length > 4)
+        if (!widget.allReviews)
+          if (snapshot.data!.productreview.length > 4)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               height: 40,
               child: InkWell(
                 onTap: () {
-                  Get.to(() => ReviewsPage(token: widget.token.toString(), userId: widget.userId.toString(),productId: widget.productId.toString()));
+                  Get.to(() => ReviewsPage(
+                      token: widget.token.toString(),
+                      userId: widget.userId.toString(),
+                      productId: widget.productId.toString()));
                 },
                 child: Row(
                   children: const [
@@ -191,11 +224,12 @@ class _ProductReviewsState extends State<ProductReviews> {
     );
   }
 
-  Widget allReviewWidget(int index,AsyncSnapshot<GetProductReviewAndRatingModel?> snapshot, String? token) {
+  Widget allReviewWidget(int index,
+      AsyncSnapshot<GetProductReviewAndRatingModel?> snapshot, String? token) {
     var reviews = snapshot.data!.productreview[index];
     var imageList = [
       // "https://msilonline.in" + reviews.prorevProductImg.toString(),
-      "http://3.109.69.39"+reviews.prorevProductImg.toString(),
+      "https://bikecafe.co.in" + reviews.prorevProductImg.toString(),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +243,9 @@ class _ProductReviewsState extends State<ProductReviews> {
                 children: [
                   ratingCard(reviews.prorevRate),
                   Text(
-                    reviews.prorevDescription.toString() == "null" ? "" : " " +reviews.prorevDescription.toString(),
+                    reviews.prorevDescription.toString() == "null"
+                        ? ""
+                        : " " + reviews.prorevDescription.toString(),
                     style: Constants.text1,
                   ),
                 ],
@@ -237,7 +273,7 @@ class _ProductReviewsState extends State<ProductReviews> {
 
               const SizedBox(height: 4),
 
-              if(reviews.prorevProductImg != null)
+              if (reviews.prorevProductImg != null)
                 Container(
                   alignment: Alignment.topLeft,
                   child: Column(
@@ -247,10 +283,11 @@ class _ProductReviewsState extends State<ProductReviews> {
                         height: 50,
                         width: 50,
                         child: InkWell(
-                          onTap: (){
+                          onTap: () {
                             Get.to(() => GalleryWidget(urlImages: imageList));
                           },
-                          child: Image.network("http://3.109.69.39"+reviews.prorevProductImg.toString()),
+                          child: Image.network("https://bikecafe.co.in" +
+                              reviews.prorevProductImg.toString()),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -261,7 +298,8 @@ class _ProductReviewsState extends State<ProductReviews> {
                 children: [
                   Column(
                     children: [
-                      Text(reviews.username.toString(),style: Constants.halfopacity),
+                      Text(reviews.username.toString(),
+                          style: Constants.halfopacity),
                     ],
                   ),
                   const Spacer(),
@@ -271,8 +309,9 @@ class _ProductReviewsState extends State<ProductReviews> {
             ],
           ),
         ),
-
-        const SizedBox(height: 2,)
+        const SizedBox(
+          height: 2,
+        )
       ],
     );
   }
@@ -309,16 +348,15 @@ class _ProductReviewsState extends State<ProductReviews> {
     );
   }
 
-  Widget reviewsLike(Productreview reviews){
+  Widget reviewsLike(Productreview reviews) {
     return FutureBuilder<ReviewsLikesDislikesModel?>(
       future: service.getUsersReviewLikes(
-        token: widget.token.toString(),
-        userId: widget.userId.toString(),
-        productReviewId: reviews.id.toString()
-      ),
-      builder: (context, snapshot){
-        if(snapshot.hasData){
-          if(snapshot.data!.review.isNotEmpty){
+          token: widget.token.toString(),
+          userId: widget.userId.toString(),
+          productReviewId: reviews.id.toString()),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data!.review.isNotEmpty) {
             var likeData = snapshot.data!.review[0];
             return Row(
               children: [
@@ -326,13 +364,17 @@ class _ProductReviewsState extends State<ProductReviews> {
                   children: [
                     InkWell(
                       child: likeData.proLike == 1
-                          ? const Icon(Icons.thumb_up_alt,size: 15,color: kPrimaryColor)
-                          : const Icon(Icons.thumb_up_alt_outlined,size: 15,color: Colors.black54),
-                      onTap: (){},
+                          ? const Icon(Icons.thumb_up_alt,
+                              size: 15, color: kPrimaryColor)
+                          : const Icon(Icons.thumb_up_alt_outlined,
+                              size: 15, color: Colors.black54),
+                      onTap: () {},
                     ),
                     const SizedBox(width: 2),
-                    if(reviews.prorevLike != 0)
-                      Text(reviews.prorevLike.toString(),style: const TextStyle(color: Colors.black54, fontSize: 12)),
+                    if (reviews.prorevLike != 0)
+                      Text(reviews.prorevLike.toString(),
+                          style: const TextStyle(
+                              color: Colors.black54, fontSize: 12)),
                   ],
                 ),
                 const SizedBox(width: 15),
@@ -340,67 +382,95 @@ class _ProductReviewsState extends State<ProductReviews> {
                   children: [
                     InkWell(
                       child: likeData.proDislike == 1
-                          ? const Icon(Icons.thumb_down_alt,size: 15,color: kPrimaryColor)
-                          : const Icon(Icons.thumb_down_alt_outlined,size: 15,color: Colors.black54),
-                      onTap: (){},
+                          ? const Icon(Icons.thumb_down_alt,
+                              size: 15, color: kPrimaryColor)
+                          : const Icon(Icons.thumb_down_alt_outlined,
+                              size: 15, color: Colors.black54),
+                      onTap: () {},
                     ),
                     const SizedBox(width: 2),
-                    if(reviews.prorevDislike != 0)
-                      Text(reviews.prorevDislike.toString(),style: const TextStyle(color: Colors.black54, fontSize: 12)),
+                    if (reviews.prorevDislike != 0)
+                      Text(reviews.prorevDislike.toString(),
+                          style: const TextStyle(
+                              color: Colors.black54, fontSize: 12)),
                   ],
                 ),
-                const SizedBox(width: 10,),
+                const SizedBox(
+                  width: 10,
+                ),
               ],
             );
-          }else{
+          } else {
             return reviewLikeSymbols(reviews);
           }
-        }else{
+        } else {
           return reviewLikeSymbols(reviews);
         }
       },
     );
   }
 
-  Widget reviewLikeSymbols(Productreview reviews){
+  Widget reviewLikeSymbols(Productreview reviews) {
     return Row(
       children: [
         Row(
           children: [
             InkWell(
-              child: const Icon(Icons.thumb_up_alt_outlined,size: 15,color: Colors.black54,),
-              onTap: (){
-                service.likeAndDislikeUserReviewApi(
-                    token: widget.token,userId: widget.userId,
-                    reviewId: reviews.id.toString(),like: "1",dislike: "0").then((value) {
+              child: const Icon(
+                Icons.thumb_up_alt_outlined,
+                size: 15,
+                color: Colors.black54,
+              ),
+              onTap: () {
+                service
+                    .likeAndDislikeUserReviewApi(
+                        token: widget.token,
+                        userId: widget.userId,
+                        reviewId: reviews.id.toString(),
+                        like: "1",
+                        dislike: "0")
+                    .then((value) {
                   setState(() {});
                 });
               },
             ),
             const SizedBox(width: 2),
-            if(reviews.prorevLike != 0)
-              Text(reviews.prorevLike.toString(),style: const TextStyle(color: Colors.black54, fontSize: 12)),
+            if (reviews.prorevLike != 0)
+              Text(reviews.prorevLike.toString(),
+                  style: const TextStyle(color: Colors.black54, fontSize: 12)),
           ],
         ),
         const SizedBox(width: 15),
         Row(
           children: [
             InkWell(
-              child: const Icon(Icons.thumb_down_alt_outlined,size: 15,color: Colors.black54,),
-              onTap: (){
-                service.likeAndDislikeUserReviewApi(
-                    token: widget.token, userId: widget.userId,
-                    reviewId: reviews.id.toString(),like: "0",dislike: "1").then((value) {
+              child: const Icon(
+                Icons.thumb_down_alt_outlined,
+                size: 15,
+                color: Colors.black54,
+              ),
+              onTap: () {
+                service
+                    .likeAndDislikeUserReviewApi(
+                        token: widget.token,
+                        userId: widget.userId,
+                        reviewId: reviews.id.toString(),
+                        like: "0",
+                        dislike: "1")
+                    .then((value) {
                   setState(() {});
                 });
               },
             ),
             const SizedBox(width: 2),
-            if(reviews.prorevDislike != 0)
-              Text(reviews.prorevDislike.toString(),style: const TextStyle(color: Colors.black54, fontSize: 12)),
+            if (reviews.prorevDislike != 0)
+              Text(reviews.prorevDislike.toString(),
+                  style: const TextStyle(color: Colors.black54, fontSize: 12)),
           ],
         ),
-        const SizedBox(width: 10,),
+        const SizedBox(
+          width: 10,
+        ),
       ],
     );
   }

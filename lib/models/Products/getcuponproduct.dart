@@ -92,7 +92,7 @@ class Product {
         couDescription: json["cou_description"] == null ? null : json["cou_description"],
         couRedeemableCount: json["cou_redeemable_count"] == null ? null : json["cou_redeemable_count"],
         couMaxDiscount: json["cou_max_discount"] == null ? null : json["cou_max_discount"],
-        couMinOrderValue: json["cou_min_order_value"] == null ? null : json["cou_min_order_value"],
+        couMinOrderValue: json["cou_min_order_value"] == null ? 0 : json["cou_min_order_value"],
         couValidFrom: json["cou_valid_from"] == null ? null : DateTime.parse(json["cou_valid_from"]),
         couExpiresAt: json["cou_expires_at"] == null ? null : DateTime.parse(json["cou_expires_at"]),
         productid: json["Productid"] == null ? null : json["Productid"],

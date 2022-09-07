@@ -63,12 +63,11 @@ class _MenuBarState extends State<MenuBar> {
               },
             ),
             buildmenuItemWithAssets(
-              img: "assets/img/svg/Bike Cafe.svg",
-              text: "Bike Cafe",
-              ontap: (){
-                Get.to(() => const BikeCafe());
-              }
-            ),
+                img: "assets/img/svg/Bike Cafe.svg",
+                text: "Bike Cafe",
+                ontap: () {
+                  Get.to(() => const BikeCafe());
+                }),
             const Divider(color: Colors.black),
             buildmenuItemWithAssets(
                 img: "assets/img/svg/My Vehicles.svg",
@@ -80,15 +79,14 @@ class _MenuBarState extends State<MenuBar> {
                 img: "assets/img/svg/My cart.svg",
                 text: "My Cart",
                 ontap: () {
-                  Get.to(() =>const CartPage());
+                  Get.to(() => const CartPage());
                 }),
             buildmenuItemWithAssets(
-              img: "assets/img/svg/My orders.svg",
-              text: "My Orders",
+                img: "assets/img/svg/My orders.svg",
+                text: "My Orders",
                 ontap: () {
                   Get.to(() => const OrdersListPage());
-                }
-            ),
+                }),
             buildmenuItemWithAssets(
                 img: "assets/img/svg/My Addresss.svg",
                 text: "My Address",
@@ -99,25 +97,25 @@ class _MenuBarState extends State<MenuBar> {
                 img: "assets/img/svg/My Wishlist.svg",
                 text: "My Wishlist",
                 ontap: () {
-                  Get.to(() =>const WishList());
+                  Get.to(() => const WishList());
                 }),
             buildmenuItemWithAssets(
                 img: "assets/img/svg/My profile.svg",
                 text: "My Profile",
                 ontap: () {
-                  Get.to(()=> const ProfilePage());
+                  Get.to(() => const ProfilePage());
                 }),
             buildmenuItemWithAssets(
                 img: "assets/img/svg/My Notification.svg",
                 text: "My Notifications",
                 ontap: () {
-                  Get.to(() =>const NotificationPage());
+                  Get.to(() => const NotificationPage());
                 }),
             buildmenuItemWithAssets(
                 img: "assets/img/svg/offers.svg",
                 text: "My Offers",
                 ontap: () {
-                  Get.to(() =>const MyOffersPage());
+                  Get.to(() => const MyOffersPage());
                 }),
             const Divider(color: Colors.black),
             // buildmenuItemWithAssets(icon: Icons.settings, text: "Settings"),
@@ -131,8 +129,8 @@ class _MenuBarState extends State<MenuBar> {
                 img: "assets/img/svg/log out.svg",
                 text: "LogOut",
                 ontap: () {
-                  if(box1!.get("isGoogleAuth") != null){
-                    if(box1!.get("isGoogleAuth") == true){
+                  if (box1!.get("isGoogleAuth") != null) {
+                    if (box1!.get("isGoogleAuth") == true) {
                       googleAuthentication.logOut();
                       box1!.put("isGoogleAuth", false);
                     }
@@ -148,7 +146,13 @@ class _MenuBarState extends State<MenuBar> {
                   }
                 }),
             const Divider(color: Colors.black),
-            TextButton(onPressed: () {}, child: const Text("Privacy and policy")),
+            TextButton(
+                onPressed: () async {
+                  if (!await launchUrl(
+                      Uri.parse("https://bikecafe.co.in/privacyandpolicy/")))
+                    throw 'Could not launch _url';
+                },
+                child: const Text("Privacy and policy")),
             // TextButton(onPressed: () {}, child: const Text("Refer and Earn")),
             TextButton(onPressed: () {}, child: const Text("Legal")),
             const Center(
@@ -168,18 +172,20 @@ class _MenuBarState extends State<MenuBar> {
                   child: SignInButton.mini(
                       buttonType: ButtonType.facebook,
                       buttonSize: ButtonSize.small,
-                      onPressed: ()async {
-                        if (!await launchUrl(Uri.parse("https://www.facebook.com/ilovebikecafe/"))) throw 'Could not launch _url';
-
+                      onPressed: () async {
+                        if (!await launchUrl(Uri.parse(
+                            "https://www.facebook.com/ilovebikecafe/")))
+                          throw 'Could not launch _url';
                       }),
                 ),
                 SizedBox(
                   width: 50,
                   child: SignInButton.mini(
                       buttonType: ButtonType.twitter,
-                      onPressed: () async{
-                        if (!await launchUrl(Uri.parse("https://twitter.com/Gologixpvtltd"))) throw 'Could not launch _url';
-
+                      onPressed: () async {
+                        if (!await launchUrl(
+                            Uri.parse("https://twitter.com/Gologixpvtltd")))
+                          throw 'Could not launch _url';
                       },
                       buttonSize: ButtonSize.small),
                 ),
@@ -187,9 +193,10 @@ class _MenuBarState extends State<MenuBar> {
                   width: 50,
                   child: SignInButton.mini(
                       buttonType: ButtonType.instagram,
-                      onPressed: ()async {
-                        if (!await launchUrl(Uri.parse("https://instagram.com/ilovebikcafe?igshid=YmMyMTA2M2Y="))) throw 'Could not launch _url';
-
+                      onPressed: () async {
+                        if (!await launchUrl(
+                            Uri.parse("https://instagram.com/ilovebikcafe/")))
+                          throw 'Could not launch _url';
                       },
                       buttonSize: ButtonSize.small),
                 ),
@@ -197,8 +204,10 @@ class _MenuBarState extends State<MenuBar> {
                   width: 50,
                   child: SignInButton.mini(
                       buttonType: ButtonType.linkedin,
-                      onPressed: ()  async {
-                        if (!await launchUrl(Uri.parse("https://www.linkedin.com/company/gologixpvtltd/"))) throw 'Could not launch _url';
+                      onPressed: () async {
+                        if (!await launchUrl(Uri.parse(
+                            "https://www.linkedin.com/company/gologixpvtltd/")))
+                          throw 'Could not launch _url';
 
                         // Get.to("https://www.instagram.com/ilovebikcafe/");
                       },
@@ -246,8 +255,8 @@ class _MenuBarState extends State<MenuBar> {
               padding: const EdgeInsets.only(left: 35, top: 4),
               child: Text(
                 text!,
-                style:
-                    const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.w600),
               ),
             )
           ],

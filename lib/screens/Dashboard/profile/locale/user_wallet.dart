@@ -7,8 +7,12 @@ class UserWallet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: 'My Wallet',
-      body: Center(child: Text('Coming Soon...', style: TextStyle(color: Colors.red, fontSize: 30)),),
+      body: Center(
+        child: Text('Coming Soon...',
+            style: TextStyle(color: Colors.red, fontSize: 30)),
+      ),
     );
   }
 }

@@ -9,6 +9,8 @@ import 'package:bike_cafe/widget/constrants.dart';
 import 'package:hive/hive.dart';
 import 'package:get/get.dart';
 
+import '../../../../controllers/paymentstatuscontroller.dart';
+
 class CheckOutPage extends StatefulWidget {
   const CheckOutPage({Key? key}) : super(key: key);
 
@@ -33,72 +35,84 @@ class _CheckOutPageState extends State<CheckOutPage> {
     setState(() {});
   }
 
-  ProductOrderController priceController = Get.put(ProductOrderController());
   CartController cartController = Get.put(CartController());
 
   bool isLoading = true;
 
   @override
   Widget build(BuildContext context) {
-    return box1?.get("data4") == null
-        ? const Center(child: CircularProgressIndicator(color: Colors.red))
-        : Column(
-            children: [
-              FutureBuilder<GetAddressResponseModel?>(
-                future: service.addressdata(
-                    id: box1?.get("data3"), token: box1?.get("data4")),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: [
-                        for (var i = 0;i < snapshot.data!.addresses.length;i++)
-                          deliveryAddress(i, snapshot)
-                      ],
-                    );
-                  } else {
-                    return const Center();
-                  }
-                },
-              ),
-              const SizedBox(height: 4),
-              // cart checkout details details
-              // cart checkout details details
-              FutureBuilder<CartCheckoutModel?>(
-                future: service.cartCheckoutApi(
-                    token: box1?.get("data4"), userId: box1?.get("data3")),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: [
-                        for (var i = 0; i < snapshot.data!.products!.length; i++)
-                          cartLists(i, snapshot),
-                        const SizedBox(height: 4),
-                        priceDetailsWidget(snapshot,
-                              snapshot.data!.products!.length)
-                      ],
-                    );
-                  } else {
-                    return const Center();
-                  }
-                },
-              )
-            ],
-          );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        FutureBuilder<GetAddressResponseModel?>(
+          future: service.addressdata(
+              id: box1?.get("data3"), token: box1?.get("data4")),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                  child: CircularProgressIndicator(color: Colors.red));
+            }
+            if (snapshot.hasData) {
+              return Column(
+                children: [
+                  for (var i = 0; i < snapshot.data!.addresses.length; i++)
+                    deliveryAddress(i, snapshot)
+                ],
+              );
+            } else {
+              return const Center();
+            }
+          },
+        ),
+        const SizedBox(height: 4),
+        // cart checkout details details
+        // cart checkout details details
+        FutureBuilder<CartCheckoutModel?>(
+          future: service.cartCheckoutApi(
+              token: box1?.get("data4"), userId: box1?.get("data3")),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Column(
+                children: [
+                  for (var i = 0; i < snapshot.data!.products!.length; i++)
+                    cartLists(i, snapshot),
+                  const SizedBox(height: 4),
+                  priceDetailsWidget(snapshot, snapshot.data!.products!.length)
+                ],
+              );
+            } else {
+              return const Center();
+            }
+          },
+        )
+      ],
+    );
   }
 
   //Price Details widget
 
-  Widget priceDetailsWidget(AsyncSnapshot<CartCheckoutModel?> snapshot, int totalItems) {
+  Widget priceDetailsWidget(
+      AsyncSnapshot<CartCheckoutModel?> snapshot, int totalItems) {
     var checkout = snapshot.data!;
 
-    var bagTotal = checkout.grandTotal == null ? 0 : checkout.grandTotal.toStringAsFixed(2);
-    var totalMrp = checkout.totalMrp == null ? 0 : checkout.totalMrp.toStringAsFixed(2);
-    var saving = checkout.savings == null ? 0 : checkout.savings.toStringAsFixed(2);
+    var bagTotal = checkout.grandTotal == null
+        ? 0
+        : checkout.grandTotal.toStringAsFixed(2);
+    var totalMrp =
+        checkout.totalMrp == null ? 0 : checkout.totalMrp.toStringAsFixed(2);
+    var saving =
+        checkout.savings == null ? 0 : checkout.savings.toStringAsFixed(2);
     var totalTax =
         checkout.totalTax == null ? 0 : (checkout.totalTax).toStringAsFixed(2);
     var cgst = checkout.cgst == null ? 0 : (checkout.cgst).toStringAsFixed(2);
     var sgst = checkout.sgst == null ? 0 : (checkout.sgst).toStringAsFixed(2);
-    var deliveryCharge = checkout.deliverycharges == null ? 0 : (checkout.deliverycharges).toStringAsFixed(2);
+    var deliveryCharge = checkout.deliverycharges == null
+        ? 0
+        : (checkout.deliverycharges).toStringAsFixed(2);
+
+    PaymentStatusController controller = Get.put(PaymentStatusController());
+    controller.grandtotal.value = checkout.grandTotal.round();
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -162,8 +176,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
             message: 'CGST : $cgst, and SGST : $sgst',
             preferBelow: false,
             showDuration: const Duration(seconds: 5),
-            child:
-                const InkWell(child: Icon(Icons.help, size: 16, color: Colors.grey)),
+            child: const InkWell(
+                child: Icon(Icons.help, size: 16, color: Colors.grey)),
           ),
           const Spacer(),
           Text(
@@ -208,7 +222,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
   }
 
   //delivery address widget
-  Widget deliveryAddress(int index, AsyncSnapshot<GetAddressResponseModel?> snapshot) {
+  Widget deliveryAddress(
+      int index, AsyncSnapshot<GetAddressResponseModel?> snapshot) {
     var address = snapshot.data!.addresses[index];
 
     return address.addIsDefault == 0
@@ -234,8 +249,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                               // width: Config.Width * 0.3,
                               child: Text(
                                 address.name.toString(),
-                                style:
-                                    const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -243,7 +258,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             const Spacer(),
                             Text(
                               ',' + address.addPincode.toString(),
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(width: 4),
                           ],
@@ -336,8 +352,13 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                   userId: box1?.get("data3").toString(),
                                   productId: products.productid.toString());
                               remove.then((value) {
-                                service.cartCheckoutApi(token: box1?.get("data4"), userId: box1?.get("data3").toString()).then((value) {
-                                  cartController.cartItemsCount.value = value!.products!.length;
+                                service
+                                    .cartCheckoutApi(
+                                        token: box1?.get("data4"),
+                                        userId: box1?.get("data3").toString())
+                                    .then((value) {
+                                  cartController.cartItemsCount.value =
+                                      value!.products!.length;
                                 });
                                 setState(() {});
                                 Get.back();
@@ -374,7 +395,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         children: [
                           const Text('category : ',
                               style: Constants.halfopacity),
-                          Text(products.catName.toString(), style: Constants.halfopacity),
+                          Text(products.catName.toString(),
+                              style: Constants.halfopacity),
                         ],
                       ),
                       const SizedBox(height: 5),
@@ -383,7 +405,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       // Constants.RatingCard(4.3),
 
                       Row(
-                        children: const[
+                        children: const [
                           Icon(Icons.star, color: Colors.yellow, size: 14),
                           Icon(Icons.star, color: Colors.yellow, size: 14),
                           Icon(Icons.star, color: Colors.yellow, size: 14),
@@ -432,8 +454,11 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                           var decrement =
                                               service.decrementCartItemCount(
                                                   token: box1?.get("data4"),
-                                                  userId: box1?.get("data3").toString(),
-                                                  productId: products.productid.toString());
+                                                  userId: box1
+                                                      ?.get("data3")
+                                                      .toString(),
+                                                  productId: products.productid
+                                                      .toString());
                                           decrement.then((value) {
                                             setState(() {});
                                           });
@@ -481,23 +506,4 @@ class _CheckOutPageState extends State<CheckOutPage> {
       ),
     );
   }
-}
-
-
-class ProductOrderController extends GetxController {
-  var sellingPrice = 0.obs;
-  var paymentType = 0.obs;
-
-  //cart price details
-  var productCount = '0'.obs;
-  var mrpPrice = '0'.obs;
-  var savingAmount = '0'.obs;
-  var gstPrice = '0'.obs;
-  var cgstPrice = '0'.obs;
-  var sgstPrice = '0'.obs;
-  var deliveryFee = '0'.obs;
-  var totalPrice = '0'.obs;
-  var orderProcessing = false.obs;
-
-  var checkoutTotal = 0.obs;
 }

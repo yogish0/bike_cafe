@@ -6,8 +6,11 @@ import 'package:bike_cafe/screens/Dashboard/product/productpage.dart';
 import 'package:bike_cafe/screens/Dashboard/product/screens/productview.dart';
 import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/config.dart';
+import 'package:bike_cafe/widget/constrants.dart';
 import 'package:bike_cafe/widget/locale/scaffold.dart';
 import 'package:hive/hive.dart';
+
+import '../../../../widget/locale/ShimmerWidget.dart';
 
 class CategoryPage extends StatelessWidget {
   const CategoryPage({Key? key}) : super(key: key);
@@ -15,6 +18,7 @@ class CategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: "Categories",
       body: const CategoryList(),
     );
@@ -44,7 +48,8 @@ class _CategoryListState extends State<CategoryList> {
     setState(() {});
   }
 
-  CategoryProductsController categoryController = Get.put(CategoryProductsController());
+  CategoryProductsController categoryController =
+      Get.put(CategoryProductsController());
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +57,14 @@ class _CategoryListState extends State<CategoryList> {
         ? const Center(child: CircularProgressIndicator())
         : ListView(
             children: [
-              Container(
-                height: 200,
-                width: Config.Width,
-                decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/img/sm-post.png"),
-                        fit: BoxFit.fill)),
-              ),
+              // Container(
+              //   height: 200,
+              //   width: Config.Width,
+              //   decoration: const BoxDecoration(
+              //       image: DecorationImage(
+              //           image: AssetImage("assets/img/sm-post.png"),
+              //           fit: BoxFit.fill)),
+              // ),
               TabbarPage(
                 children: [category(), serviceWidget()],
               ),
@@ -69,7 +74,7 @@ class _CategoryListState extends State<CategoryList> {
 
   Widget category() {
     return SizedBox(
-      height: 300,
+      // height: 300,
       width: Config.Width,
       child: FutureBuilder<GetCategories?>(
         future: service.getCategoriesApi(token: box1!.get("data4")),
@@ -84,7 +89,7 @@ class _CategoryListState extends State<CategoryList> {
                   return getCategory(categories);
                 });
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return Constants.circularWidget();
           }
         },
       ),
@@ -99,10 +104,20 @@ class _CategoryListState extends State<CategoryList> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            getCategory2("assets/bike_cafe/bikewash.jpg", "Automatic bike wash in 2 minutes"),
+            const SizedBox(
+              height: 100,
+              child: Center(
+                child: Text(
+                  "Coming soon...",
+                  style: TextStyle(color: kPrimaryColor, fontSize: 22),
+                ),
+              ),
+            ),
+            getCategory2("assets/bike_cafe/bikewash.jpg",
+                "Automatic bike wash in 2 minutes"),
             getCategory2("assets/bike_cafe/carwash.jpg", "Automatic car wash"),
             getCategory2("assets/img/msc.png", "General Services"),
-            const SizedBox(height: 25)
+            SizedBox(height: Config.screenHeight! * 0.2)
           ],
         ),
       ),
@@ -114,18 +129,27 @@ class _CategoryListState extends State<CategoryList> {
       margin: const EdgeInsets.all(2),
       child: Card(
         elevation: 6,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15))),
         child: InkWell(
           onTap: () {
             categoryController.selectedCatId.value = categories.id;
-            Get.to(() => ProductPage(token: box1?.get("data4").toString(),
+            Get.to(() => ProductPage(
+                token: box1?.get("data4").toString(),
                 userId: box1?.get("data3")));
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.network(categories.catImagepath.toString(), height: 40, width: 40),
+              Image.network(
+                categories.catImagepath.toString(),
+                height: 40,
+                width: 40,
+                errorBuilder: (context, img, image) {
+                  return const ShimmerWidget.circular(width: 50, height: 50);
+                },
+              ),
               const SizedBox(height: 10),
               Text(
                 categories.catName.toString(),
@@ -144,7 +168,8 @@ class _CategoryListState extends State<CategoryList> {
     return Container(
       margin: const EdgeInsets.all(2),
       child: Card(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15))),
         child: InkWell(
           onTap: () {
             // Get.to(() => ProductPage());
@@ -161,7 +186,8 @@ class _CategoryListState extends State<CategoryList> {
                 imageCaption,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
             ],

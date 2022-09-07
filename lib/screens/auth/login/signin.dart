@@ -10,6 +10,8 @@ import 'package:bike_cafe/services/api.dart';
 import 'package:bike_cafe/widget/auth/clipPath.dart';
 import 'package:bike_cafe/widget/auth/txt_formfield.dart';
 import 'package:bike_cafe/widget/config.dart';
+import 'package:bike_cafe/widget/constrants.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -40,7 +42,7 @@ class _SignInState extends State<SignIn> {
   TextWidgetStyle style = TextWidgetStyle();
   final GeoController _controller = GeoController();
 
-  bool? isApiCallProcess = false;
+  bool? isApiCallProcess = true;
   List? data1;
 
   Box? box1;
@@ -62,6 +64,9 @@ class _SignInState extends State<SignIn> {
       });
       debugPrint("android id : " + androidId);
     });
+    if (FirebaseAuth.instance.currentUser != null) {
+      googleAuthentication.logOut();
+    }
   }
 
   void createBox() async {
@@ -94,8 +99,8 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      body: androidId == ''
-          ? const CircularProgressIndicator(color: kPrimaryColor)
+      body: isApiCallProcess == false
+          ? Center(child: const CircularProgressIndicator(color: kPrimaryColor))
           : ListView(
               children: [
                 SizedBox(
@@ -191,19 +196,24 @@ class _SignInState extends State<SignIn> {
                                           box1!.put('password',
                                               _passwordController.text);
 
-                                          setState(() {
-                                            isApiCallProcess = true;
-                                            const CircularProgressIndicator();
-                                          });
+                                          // setState(() {
+                                          //   isApiCallProcess = true;
+                                          //   Center(child: const CircularProgressIndicator());
+                                          // });
 
                                           // requestModel!.loginType = "email";
-                                          requestModel!.email=_emailController.text.toString();
-                                          requestModel!.password=_passwordController.text.toString();
+                                          requestModel!.email =
+                                              _emailController.text.toString();
+                                          requestModel!.password =
+                                              _passwordController.text
+                                                  .toString();
 
                                           requestModel!.andriod_id =
                                               androidId.toString();
-                                              requestModel!.deviceToken=box1!.get('device_token').toString();
-                                              requestModel!.web_id=''.toString();
+                                          requestModel!.deviceToken = box1!
+                                              .get('device_token')
+                                              .toString();
+                                          requestModel!.web_id = ''.toString();
                                           try {
                                             var loginRequest;
                                             // if (_emailController.text.isNum) {
@@ -220,8 +230,9 @@ class _SignInState extends State<SignIn> {
                                             //   );
                                             // }
                                             //  else {
-                                              loginRequest = apiService.login(
-                                                  requestModel!, "loginbyemailorphone");
+                                            loginRequest = apiService.login(
+                                                requestModel!,
+                                                "loginbyemailorphone");
                                             // }
 
                                             loginRequest.then((input) async {
@@ -231,9 +242,9 @@ class _SignInState extends State<SignIn> {
                                                 });
                                                 if (input
                                                     .apiToken!.isNotEmpty) {
-                                                  setState(() {
-                                                    isApiCallProcess = true;
-                                                  });
+                                                  // setState(() {
+                                                  //   isApiCallProcess = true;
+                                                  // });
                                                   // Get.off(() => BottomNavBarPage());
 
                                                   List data = [
@@ -276,6 +287,8 @@ class _SignInState extends State<SignIn> {
                                                           : Get.off(() =>
                                                               Dashboard());
                                                     });
+                                                  } else {
+                                                    Get.offAll(() => SignIn());
                                                   }
                                                   box1!.put('data0', name);
                                                   box1!.put(
@@ -329,141 +342,161 @@ class _SignInState extends State<SignIn> {
                                 padding:
                                     const EdgeInsets.only(left: 8.0, right: 25),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    SignInButton.mini(
-                                      buttonType: ButtonType.google,
-                                      onPressed: () {
-                                        try {
-                                          googleAuthentication
-                                              .googleSignIn()
-                                              .then((value) {
-                                            final googleUserData = FirebaseAuth
-                                                .instance.currentUser;
-                                            print(googleUserData?.email!
-                                                .toString());
-                                            apiService
-                                                .checkSocialAuthUserApi(
-                                                    email: googleUserData
-                                                        ?.email!
-                                                        .toString())
-                                                .then((value) {
-                                              if (value!.isavailable == "1") {
-                                                apiService
-                                                    .socialAuthUserApi(
-                                                        email: googleUserData
-                                                            ?.email!,
-                                                        userName: googleUserData
-                                                            ?.displayName!,
-                                                        deviceToken: androidId,
-                                                        mailIdToken:
-                                                            googleUserData?.uid,
-                                                        authType: "email",
-                                                        phoneNumber: null)
-                                                    .then((value) {
-                                                  if (value!.apiToken !=
-                                                      "null") {
-                                                    box1!.put(
-                                                        'data0',
-                                                        value.user!.name
-                                                            .toString());
-                                                    box1!.put(
-                                                        'data1',
-                                                        value.user!.phonenumber
-                                                            .toString());
-                                                    box1!.put(
-                                                        'data2',
-                                                        value.user!.email
-                                                            .toString());
-                                                    box1!.put(
-                                                        'data3',
-                                                        value.user!.id
-                                                            .toString());
-                                                    box1!.put(
-                                                        'data4',
-                                                        value.apiToken
-                                                            .toString());
-                                                    box1!.put('isLogged', true);
-                                                    box1!.put(
-                                                        "welcomeNotification",
-                                                        false);
-                                                    box1!.put(
-                                                        "isGoogleAuth", true);
-                                                    var checkVehicleList = apiService
-                                                        .getvechiledetailsbyuserid(
-                                                            token: value
-                                                                .apiToken
-                                                                .toString(),
-                                                            id: value.user!.id
-                                                                .toString());
-                                                    checkVehicleList
-                                                        ?.then((value) {
-                                                      value!.body.isEmpty
-                                                          ? Get.off(() =>
-                                                              const RegisterVehicle())
-                                                          : Get.off(() =>
-                                                              Dashboard());
-                                                    });
-                                                  } else {
-                                                    Fluttertoast.showToast(
-                                                        msg: "Sign in failed"
-                                                            "");
-                                                  }
-                                                });
-                                              } else {
-                                                Get.to(() =>
-                                                    SocialAuthMobileVerification(
-                                                        email: googleUserData
-                                                            ?.email!,
-                                                        userName: googleUserData
-                                                            ?.displayName!,
-                                                        deviceToken: androidId,
-                                                        mailIdToken:
-                                                            googleUserData?.uid,
-                                                        authType: "email"));
-                                              }
-                                            });
-                                          });
-                                        } catch (e) {
-                                          debugPrint(e.toString());
-                                        }
-                                      },
-                                    ),
-                                    SignInButton.mini(
-                                      buttonType: ButtonType.facebook,
-                                      onPressed: () {},
-                                    ),
-                                    const Spacer(),
-                                    TextButton(
-                                      child: style.Roboto(
-                                          text: "Sign up",
-                                          fontwight: FontWeight.w400,
-                                          size: 18,
-                                          color: Colors.black),
-                                      onPressed: () =>
-                                          Get.toNamed(Routes.signUp),
+                                    const SizedBox(width: 12),
+                                    // Row(
+                                    //   children: [
+                                    //     const SizedBox(width: 8),
+                                    //     Text(
+                                    //       "Sign with",
+                                    //       style: TextStyle(
+                                    //           color: Colors.black,
+                                    //           fontWeight: FontWeight.w400,
+                                    //           fontSize: 18,
+                                    //           fontFamily: GoogleFonts.roboto().fontFamily
+                                    //       ),
+                                    //     ),
+                                    //     SignInButton.mini(
+                                    //       buttonType: ButtonType.google,
+                                    //       onPressed: () async{
+                                    //         try {
+                                    //             setState(() {
+                                    //                   isApiCallProcess=true;
+                                    //                 });
+                                    //          await googleAuthentication
+                                    //               .googleSignIn()
+                                    //               .then((value) async{
+                                    //             final googleUserData = FirebaseAuth
+                                    //                 .instance.currentUser;
+                                    //             print(googleUserData?.email!
+                                    //                 .toString());
+                                    //                 setState(() {
+                                    //                   isApiCallProcess=true;
+                                    //                 });
+                                    //           await  apiService
+                                    //                 .checkSocialAuthUserApi(
+                                    //                     email: googleUserData
+                                    //                         ?.email!
+                                    //                         .toString())
+                                    //                 .then((value) async{
+                                    //               if (value!.isavailable == "1") {
+                                    //                await apiService
+                                    //                     .socialAuthUserApi(
+                                    //                         email: googleUserData
+                                    //                             ?.email!,
+                                    //                         userName: googleUserData
+                                    //                             ?.displayName!,
+                                    //                         deviceToken: androidId,
+                                    //                         mailIdToken:
+                                    //                             googleUserData?.uid,
+                                    //                         authType: "email",
+                                    //                         phoneNumber: null)
+                                    //                     .then((value) {
+                                    //                   if (value!.apiToken !=
+                                    //                       "null") {
+                                    //                     box1!.put(
+                                    //                         'data0',
+                                    //                         value.user!.name
+                                    //                             .toString());
+                                    //                     box1!.put(
+                                    //                         'data1',
+                                    //                         value.user!.phonenumber
+                                    //                             .toString());
+                                    //                     box1!.put(
+                                    //                         'data2',
+                                    //                         value.user!.email
+                                    //                             .toString());
+                                    //                     box1!.put(
+                                    //                         'data3',
+                                    //                         value.user!.id
+                                    //                             .toString());
+                                    //                     box1!.put(
+                                    //                         'data4',
+                                    //                         value.apiToken
+                                    //                             .toString());
+                                    //                     box1!.put('isLogged', true);
+                                    //                     box1!.put(
+                                    //                         "welcomeNotification",
+                                    //                         false);
+                                    //                     box1!.put(
+                                    //                         "isGoogleAuth", true);
+                                    //                     var checkVehicleList = apiService
+                                    //                         .getvechiledetailsbyuserid(
+                                    //                             token: value
+                                    //                                 .apiToken
+                                    //                                 .toString(),
+                                    //                             id: value.user!.id
+                                    //                                 .toString());
+                                    //                                   setState(() {
+                                    //                   isApiCallProcess=false;
+                                    //                 });
+                                    //                     checkVehicleList
+                                    //                         ?.then((value) {
+                                    //                       value!.body.isEmpty
+                                    //                           ? Get.off(() =>
+                                    //                               const RegisterVehicle())
+                                    //                           : Get.off(() =>
+                                    //                               Dashboard());
+                                    //                     });
+                                    //                   } else {
+                                    //                     Fluttertoast.showToast(
+                                    //                         msg: "Sign in failed"
+                                    //                             "");
+                                    //                     googleAuthentication.logOut();
+                                    //                   }
+                                    //                 });
+                                    //               } else {
+                                    //                 Get.to(() =>
+                                    //                     SocialAuthMobileVerification(
+                                    //                         email: googleUserData
+                                    //                             ?.email!,
+                                    //                         userName: googleUserData
+                                    //                             ?.displayName!,
+                                    //                         deviceToken: androidId,
+                                    //                         mailIdToken:
+                                    //                             googleUserData?.uid,
+                                    //                         authType: "email"));
+                                    //               }
+                                    //             });
+                                    //           });
+                                    //         } catch (e) {
+                                    //           debugPrint(e.toString());
+                                    //         }
+                                    //       },
+                                    //     ),
+                                    //   ],
+                                    // ),
+                                    // SignInButton.mini(
+                                    //   buttonType: ButtonType.facebook,
+                                    //   onPressed: () {},
+                                    // ),
+                                    // const Spacer(),
+                                    Row(
+                                      children: [
+                                        style.Roboto(
+                                            text: "Don't have account? ",
+                                            fontwight: FontWeight.w400,
+                                            color: Colors.black),
+                                        TextButton(
+                                          child: Constants.linkText("Sign Up"),
+                                          onPressed: () =>
+                                              Get.toNamed(Routes.signUp),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   TextButton(
-                                    child: style.Roboto(
-                                        text: "Forgot Password ?",
-                                        fontwight: FontWeight.w400,
-                                        size: 18,
-                                        color: Colors.black),
+                                    child:
+                                        Constants.linkText("Forgot Password ?"),
                                     onPressed: () =>
                                         Get.toNamed(Routes.forgotpwd),
-                                    style: ButtonStyle(
-                                      overlayColor:
-                                          MaterialStateColor.resolveWith(
-                                              (states) => Colors.transparent),
-                                    ),
                                   ),
                                 ],
                               )
@@ -482,6 +515,7 @@ class _SignInState extends State<SignIn> {
 
 class DeviceInfoApi {
   static final _deviceInfoPlugin = DeviceInfoPlugin();
+
   static Future<String> getDeviceAndroidId() async {
     String data = '';
     if (Platform.isAndroid) {

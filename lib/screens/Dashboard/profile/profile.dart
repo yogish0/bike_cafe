@@ -1,3 +1,4 @@
+import 'package:bike_cafe/screens/CloudParking/CP_Dashboard/CloudParkingDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../auth/sign_up/google_authentication.dart';
+import '../../auth/sign_up/sign_up.dart';
 import 'locale/editProfile.dart';
 import 'dart:io';
 import 'locale/gallery_widget.dart';
@@ -32,7 +34,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return GetScaffold(title: "My Profile", body: const Profile());
+    return GetScaffold(
+      title: "My Profile",
+      body: const Profile(),
+      index: 4,
+    );
   }
 }
 
@@ -64,11 +70,13 @@ class _ProfileState extends State<Profile> {
 
   //pick image from gallery/camera
   Future pickImage(ImageSource imgSource, String token, String userId) async {
-    final pickedFile = await picker.pickImage(source: imgSource, imageQuality: 50);
+    final pickedFile =
+        await picker.pickImage(source: imgSource, imageQuality: 50);
     if (pickedFile != null) {
       image = File(pickedFile.path);
       if (image != null) {
-        service.uploadProfilePhotoApi(token: token, userId: userId, img: image!)
+        service
+            .uploadProfilePhotoApi(token: token, userId: userId, img: image!)
             .then((value) {
           setState(() {});
         });
@@ -78,6 +86,7 @@ class _ProfileState extends State<Profile> {
       debugPrint('no image selected');
     }
   }
+
   GoogleAuthentication googleAuthentication = GoogleAuthentication();
 
   @override
@@ -113,7 +122,7 @@ class _ProfileState extends State<Profile> {
     var user = snapshot.data!.user[index];
     var imageList = [
       // "https://msilonline.in" + user.profilePhotoPath.toString(),
-      "http://3.109.69.39" + user.profilePhotoPath.toString(),
+      "https://" + user.profilePhotoPath.toString(),
     ];
     return Stack(
       children: [
@@ -139,12 +148,16 @@ class _ProfileState extends State<Profile> {
                                       GalleryWidget(urlImages: imageList));
                                 },
                                 child: Image.network(
-                                    // "https://msilonline.in" + user.profilePhotoPath.toString(),
-                                    "http://3.109.69.39" +
-                                        user.profilePhotoPath.toString(),
-                                    fit: BoxFit.cover,
-                                    width: 120,
-                                    height: 120),
+                                  // "https://msilonline.in" + user.profilePhotoPath.toString(),
+                                  "https://" + user.profilePhotoPath.toString(),
+                                  fit: BoxFit.cover,
+                                  width: 120,
+                                  height: 120,
+                                  errorBuilder: (context, img, image) {
+                                    return Image.asset(
+                                        "assets/img/no_image_available.jpg");
+                                  },
+                                ),
                               ),
                       ),
                     ),
@@ -271,6 +284,23 @@ class _ProfileState extends State<Profile> {
             svgname: 'offers.svg', text: 'My Offers', routename: '/myoffers'),
         // profileOptionWalletTile(
         //     icon: Icons.account_balance_wallet, text: 'My Wallet'),
+        Card(
+          margin: const EdgeInsets.all(3),
+          child: InkWell(
+            onTap: () {
+              Get.to(()=> CloudParkingDashboard());
+            },
+            child: ListTile(
+              leading: SvgPicture.asset('assets/img/svg/offers.svg',
+                  height: 20, width: 20),
+              title: const Text(
+                "Cloud Parking",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+            ),
+          ),
+        ),
         logoutOptionTile(svgname: 'log out.svg', text: 'Logout'),
       ],
     );
@@ -337,8 +367,8 @@ class _ProfileState extends State<Profile> {
       margin: const EdgeInsets.all(3),
       child: InkWell(
         onTap: () {
-          if(box1!.get("isGoogleAuth") != null){
-            if(box1!.get("isGoogleAuth") == true){
+          if (box1!.get("isGoogleAuth") != null) {
+            if (box1!.get("isGoogleAuth") == true) {
               googleAuthentication.logOut();
               box1!.put("isGoogleAuth", false);
             }

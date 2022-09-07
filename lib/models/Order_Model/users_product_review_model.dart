@@ -31,6 +31,7 @@ class Review {
     required this.prorevUserId,
     required this.prorevProductId,
     required this.prorevProductImg,
+    required this.productreviewimages
   });
 
   int? reviewid;
@@ -42,6 +43,7 @@ class Review {
   int? prorevUserId;
   int? prorevProductId;
   String? prorevProductImg;
+  List<Productreviewimage> productreviewimages;
 
   factory Review.fromMap(Map<String, dynamic> json) => Review(
     reviewid: json["Reviewid"],
@@ -53,5 +55,24 @@ class Review {
     prorevUserId: json["prorev_user_id"],
     prorevProductId: json["prorev_product_id"],
     prorevProductImg: json["prorev_product_img"],
+    productreviewimages: List<Productreviewimage>.from(json["productreviewimages"].map((x) => Productreviewimage.fromMap(x))),
+  );
+}
+
+class Productreviewimage {
+  Productreviewimage({
+    required this.id,
+    required this.proReviewId,
+    required this.proReviewImage
+  });
+
+  int? id;
+  int? proReviewId;
+  String? proReviewImage;
+
+  factory Productreviewimage.fromMap(Map<String, dynamic> json) => Productreviewimage(
+    id: json["id"],
+    proReviewId: json["pro_review_id"],
+    proReviewImage: json["pro_review_image"]
   );
 }

@@ -16,6 +16,8 @@ import 'package:get/get.dart';
 import 'package:bike_cafe/widget/locale/scaffold.dart';
 import 'package:hive/hive.dart';
 
+import '../../../widget/locale/ShimmerWidget.dart';
+
 class CartPage extends StatefulWidget {
   const CartPage({Key? key}) : super(key: key);
 
@@ -25,12 +27,17 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   Box? box1;
+  APIService service = APIService();
+  TextWidgetStyle style = TextWidgetStyle();
 
   @override
   void initState() {
     super.initState();
-    createBox().then((value){
-      service.cartCheckoutApi(token: box1!.get("data4"), userId: box1!.get("data3")).then((value) {
+    createBox().then((value) {
+      service
+          .cartCheckoutApi(
+              token: box1!.get("data4"), userId: box1!.get("data3"))
+          .then((value) {
         if (value?.success == "1") {
           cartController.cartItemsCount.value = value!.products!.length;
         }
@@ -50,73 +57,63 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    APIService service = APIService();
-
     return GetScaffold(
       title: "My cart",
+      index: 1,
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          box1?.get("data4") == null
-              ? const Center(
-                  child: CircularProgressIndicator(color: Colors.red))
-              : Expanded(
-                  // height: height * 0.73,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 5),
-
-                        //Deliver address
-                        FutureBuilder<GetAddressResponseModel?>(
-                          future: service.addressdata(
-                              id: box1?.get("data3"),
-                              token: box1?.get("data4")),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              if (snapshot.data!.addresses.length == 0) {
-                                return noAddressWidget();
-                              } else {
-                                return Column(
-                                  children: [
-                                    for (var i = 0; i < snapshot.data!.addresses.length;i++)
-                                      deliveryAddress(i, snapshot)
-                                  ],
-                                );
-                              }
-                            } else {
-                              return const Center();
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 10),
-
-                        // cart checkout details details
-                        CartDesign(token: box1?.get("data4"),
-                            userId: box1?.get("data3"))
-                      ],
-                    ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  FutureBuilder<GetAddressResponseModel?>(
+                    future: service.addressdata(
+                        id: box1?.get("data3"), token: box1?.get("data4")),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child:
+                              CircularProgressIndicator(color: kPrimaryColor),
+                        );
+                      } else if (snapshot.hasData) {
+                        if (snapshot.data!.addresses.isEmpty) {
+                          return Center(child: noAddressWidget());
+                        } else {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 5),
+                              Column(
+                                children: [
+                                  for (var i = 0;
+                                      i < snapshot.data!.addresses.length;
+                                      i++)
+                                    deliveryAddress(i, snapshot)
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          );
+                        }
+                      }
+                      return Container();
+                    },
                   ),
-                ),
+                  CartDesign(
+                    token: box1?.get("data4"),
+                    userId: box1?.get("data3"),
+                  ),
+                ],
+              ),
+            ),
+          ),
           SizedBox(
             height: 55,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Container(
-                //   padding: EdgeInsets.all(8),
-                //   height: 65,
-                //   width: Config.Width * 0.40,
-                //   child: Column(
-                //     //crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Text('Subtotal'),
-                //       SizedBox(height: 5),
-                //       Text(cartController.totalCartPrice.value.toString(), style: Constants.price_1),
-                //     ],
-                //   ),
-                // ),
-
                 SizedBox(
                   width: Config.Width * 0.9,
                   height: 45,
@@ -138,8 +135,8 @@ class _CartPageState extends State<CartPage> {
                               Get.to(() => const MainPage());
                               // Get.to(() => const CheckoutPage());
                             } else {
-                              Get.snackbar('No items found in cart',
-                                  'Add items to cart',
+                              Get.snackbar(
+                                  'No items found in cart', 'Add items to cart',
                                   duration: const Duration(seconds: 3),
                                   backgroundColor:
                                       const Color.fromRGBO(0, 0, 0, 0.8),
@@ -147,8 +144,8 @@ class _CartPageState extends State<CartPage> {
                             }
                           });
                         } else {
-                          Get.snackbar('No address Found',
-                              'Add address to place order',
+                          Get.snackbar(
+                              'No address Found', 'Add address to place order',
                               backgroundColor:
                                   const Color.fromRGBO(0, 0, 0, 0.8),
                               colorText: Colors.white);
@@ -161,8 +158,7 @@ class _CartPageState extends State<CartPage> {
                         size: 14,
                         fontwight: FontWeight.w700),
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(kPrimaryColor),
+                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
                     ),
                   ),
                 ),
@@ -173,9 +169,6 @@ class _CartPageState extends State<CartPage> {
       ),
     );
   }
-
-  APIService service = APIService();
-  TextWidgetStyle style = TextWidgetStyle();
 
   //delivery address widget
   Widget deliveryAddress(
@@ -289,14 +282,19 @@ class CartDesign extends StatefulWidget {
 class _CartDesignState extends State<CartDesign> {
   APIService service = APIService();
   TextWidgetStyle style = TextWidgetStyle();
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CartCheckoutModel?>(
       future: service.cartCheckoutApi(
-          token: widget.token.toString(),
-          userId: widget.userId.toString(),
+        token: widget.token.toString(),
+        userId: widget.userId.toString(),
       ),
       builder: (context, snapshot) {
+        // if (snapshot.connectionState == ConnectionState.waiting) {
+        //   return const Center(
+        //       child: CircularProgressIndicator(color: kPrimaryColor));
+        // } else
         if (snapshot.hasData) {
           var totalCartItems = snapshot.data!.products!.length;
           if (totalCartItems == 0) {
@@ -304,10 +302,10 @@ class _CartDesignState extends State<CartDesign> {
           } else {
             return Column(
               children: [
-                for (var i = 0; i < snapshot.data!.products!.length;i++)
+                for (var i = 0; i < snapshot.data!.products!.length; i++)
                   cartLists(i, snapshot),
                 const SizedBox(height: 10),
-                priceDetailsWidget(snapshot,snapshot.data!.products!.length)
+                priceDetailsWidget(snapshot, snapshot.data!.products!.length)
               ],
             );
           }
@@ -333,7 +331,10 @@ class _CartDesignState extends State<CartDesign> {
                   onPressed: () {
                     Get.to(() => Dashboard());
                   },
-                  child: const Text('Continue Shopping')),
+                  child: const Text(
+                    'Continue Shopping',
+                    style: TextStyle(color: kPrimaryColor),
+                  )),
               const Text('to Add Products to Cart')
             ],
           )
@@ -362,13 +363,13 @@ class _CartDesignState extends State<CartDesign> {
                     width: 80,
                     child: Image.network(
                       products.proImagePath.toString(),
+                      errorBuilder: (context, img, image) {
+                        return Image.asset("assets/img/no_image_available.jpg");
+                      },
                     ),
                   ),
                   const SizedBox(height: 5),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-                    ),
+                  InkWell(
                     child: FutureBuilder<CheckWishlisted?>(
                       future: service.checkWishlist(
                           token: widget.token.toString(),
@@ -377,42 +378,57 @@ class _CartDesignState extends State<CartDesign> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           if (snapshot.data!.checkout.iswishlist == 1) {
-                            return Constants.IconText(
-                                text: 'wishlist',
-                                icontext: Icons.favorite_sharp,
-                                isWishlist: 1);
+                            return Card(
+                                color: kPrimaryColor,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Constants.IconText(
+                                      text: 'wishlist',
+                                      icontext: Icons.favorite_sharp),
+                                ));
                           } else {
-                            return Constants.IconText(
-                                text: 'wishlist',
-                                icontext: Icons.favorite_outline);
+                            return Card(
+                                color: kPrimaryColor,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Constants.IconText(
+                                      text: 'wishlist',
+                                      icontext: Icons.favorite_outline),
+                                ));
                           }
                         } else {
-                          return Constants.IconText(
-                              text: 'wishlist',
-                              icontext: Icons.favorite_outline);
+                          return Card(
+                              color: kPrimaryColor,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Constants.IconText(
+                                    text: 'wishlist',
+                                    icontext: Icons.favorite_outline),
+                              ));
                         }
                       },
                     ),
-                    onPressed: () {
+                    onTap: () {
                       service
                           .addToWishlistApi(
-                          token: widget.token.toString(),
-                          userId: widget.userId.toString(),
-                          productId: products.productname.toString())
+                              token: widget.token.toString(),
+                              userId: widget.userId.toString(),
+                              productId: products.productid.toString())
                           .then((value) {
                         setState(() {});
                       });
                     },
                   ),
-                  const SizedBox(height: 5),
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                  InkWell(
+                    child: Card(
+                      color: kPrimaryColor,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Constants.IconText(
+                            text: 'Remove', icontext: Icons.close),
+                      ),
                     ),
-
-                    child: Constants.IconText(
-                        text: 'Remove', icontext: Icons.close),
-                    onPressed: () {
+                    onTap: () {
                       debugPrint('Removed');
                       Get.defaultDialog(
                         content: Text('Do yoy want to remove ' +
@@ -429,11 +445,13 @@ class _CartDesignState extends State<CartDesign> {
                             service
                                 .cartCheckoutApi(
                               token: widget.token.toString(),
-                              userId: widget.userId.toString(),)
+                              userId: widget.userId.toString(),
+                            )
                                 .then((value) {
                               cartController.cartItemsCount.value =
                                   value!.products!.length;
-                              debugPrint('length is data'+value.products!.length.toString());
+                              debugPrint('length is data' +
+                                  value.products!.length.toString());
                             });
                             setState(() {});
                             Get.back();
@@ -450,12 +468,11 @@ class _CartDesignState extends State<CartDesign> {
               ),
             ),
 
-            //details
             Container(
               width: Config.Width * 0.55,
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Column(
-                //mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InkWell(
@@ -472,36 +489,26 @@ class _CartDesignState extends State<CartDesign> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-
-                  //category text
                   Row(
                     children: [
                       const Text('Category : ', style: Constants.halfopacity),
                       Text(products.catName.toString(),
                           style: Constants.halfopacity),
-                      //products.catName.toString()
                     ],
                   ),
                   const SizedBox(height: 5),
-
-                  //rating
-                  // Constants.RatingCard(4.3),
-
-                  Row(
-                    children: const [
-                      Icon(Icons.star, color: Colors.yellow, size: 14),
-                      Icon(Icons.star, color: Colors.yellow, size: 14),
-                      Icon(Icons.star, color: Colors.yellow, size: 14),
-                      Icon(Icons.star, color: Colors.yellow, size: 14),
-                      Icon(Icons.star_border_outlined,
-                          color: Colors.black, size: 14),
-                    ],
-                  ),
-
+                  // Row(
+                  //   children: const [
+                  //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                  //     Icon(Icons.star, color: Colors.yellow, size: 14),
+                  //     Icon(Icons.star_border_outlined,
+                  //         color: Colors.black, size: 14),
+                  //   ],
+                  // ),
                   const SizedBox(height: 10),
-
                   Row(
-                    //mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Row(
                         children: [
@@ -526,7 +533,7 @@ class _CartDesignState extends State<CartDesign> {
                             children: [
                               Padding(
                                 padding:
-                                const EdgeInsets.symmetric(horizontal: 8),
+                                    const EdgeInsets.symmetric(horizontal: 8),
                                 child: InkWell(
                                   child: const Icon(
                                     Icons.remove,
@@ -535,10 +542,11 @@ class _CartDesignState extends State<CartDesign> {
                                   onTap: () {
                                     if (products.cartQuantity > 1) {
                                       var decrement =
-                                      service.decrementCartItemCount(
-                                          token: widget.token.toString(),
-                                          userId: widget.userId.toString(),
-                                          productId: products.productid.toString());
+                                          service.decrementCartItemCount(
+                                              token: widget.token.toString(),
+                                              userId: widget.userId.toString(),
+                                              productId: products.productid
+                                                  .toString());
                                       decrement.then((value) {
                                         setState(() {});
                                       });
@@ -547,11 +555,12 @@ class _CartDesignState extends State<CartDesign> {
                                 ),
                               ),
                               Text(
-                                ' ' + products.cartQuantity.toString() + ' ',style: TextStyle(fontSize: 18),),
-                              //in 1 place, we need to pass total count
+                                ' ' + products.cartQuantity.toString() + ' ',
+                                style: const TextStyle(fontSize: 18),
+                              ),
                               Padding(
                                 padding:
-                                const EdgeInsets.symmetric(horizontal: 8),
+                                    const EdgeInsets.symmetric(horizontal: 8),
                                 child: InkWell(
                                   child: const Icon(
                                     Icons.add,
@@ -592,20 +601,17 @@ class _CartDesignState extends State<CartDesign> {
     var bagTotal = checkout.grandTotal == null
         ? 0
         : checkout.grandTotal.toStringAsFixed(2);
-    var totalMrp = checkout.grandTotal == null
+    var totalMrp =
+        checkout.grandTotal == null ? 0 : checkout.totalMrp.toStringAsFixed(2);
+    var saving =
+        checkout.savings == null ? 0 : checkout.savings.toStringAsFixed(2);
+    var totalTax =
+        checkout.totalTax == null ? 0 : (checkout.totalTax).toStringAsFixed(2);
+    var cgst = checkout.cgst == null ? 0 : (checkout.cgst).toStringAsFixed(2);
+    var sgst = checkout.sgst == null ? 0 : (checkout.sgst).toStringAsFixed(2);
+    var deliveryCharge = checkout.deliverycharges == null
         ? 0
-        : checkout.totalMrp.toStringAsFixed(2);
-    var saving = checkout.savings == null
-        ? 0
-        : checkout.savings.toStringAsFixed(2);
-    var totalTax = checkout.totalTax == null
-        ? 0
-        : (checkout.totalTax).toStringAsFixed(2);
-    var cgst =
-    checkout.cgst == null ? 0 : (checkout.cgst).toStringAsFixed(2);
-    var sgst =
-    checkout.sgst == null ? 0 : (checkout.sgst).toStringAsFixed(2);
-    var deliveryCharge = checkout.deliverycharges == null ? 0 : (checkout.deliverycharges).toStringAsFixed(2);
+        : (checkout.deliverycharges).toStringAsFixed(2);
 
     // cartController.totalCartPrice.value = bagTotal!;
 
@@ -716,8 +722,6 @@ class _CartDesignState extends State<CartDesign> {
     );
   }
 }
-
-
 
 class CartController extends GetxController {
   var cartItemsCount = 0.obs;

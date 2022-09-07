@@ -41,20 +41,23 @@ class _AddressPageListState extends State<AddressPageList> {
     return box1?.get("data4") == null
         ? const Center()
         : GetScaffold(
-          title: 'My Address',
-          body: Scaffold(
+            index: 6,
+            title: 'My Address',
+            body: Scaffold(
               bottomNavigationBar: BottomAppBar(
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 8),
                       width: Config.Width,
                       height: 75,
                       child: Column(
                         children: [
                           const Text(
                             'Product will delivered to selected address',
-                            style: TextStyle(color: Colors.black54, fontSize: 12),
+                            style:
+                                TextStyle(color: Colors.black54, fontSize: 12),
                           ),
                           const SizedBox(height: 5),
                           Row(
@@ -64,19 +67,21 @@ class _AddressPageListState extends State<AddressPageList> {
                                 width: Config.Width * 0.45,
                                 height: 40,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    if(widget.routeName == null){
-                                      Get.back();
-                                    }
-                                    else{
-                                      Get.offNamed(widget.routeName.toString());
-                                    }
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all(kPrimaryColor),
-                                  ),
-                                  child: const Text("Continue", style: TextStyle(color: Colors.white))),
+                                    onPressed: () {
+                                      if (widget.routeName == null) {
+                                        Get.back();
+                                      } else {
+                                        Get.offNamed(
+                                            widget.routeName.toString());
+                                      }
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              kPrimaryColor),
+                                    ),
+                                    child: const Text("Continue",
+                                        style: TextStyle(color: Colors.white))),
                               ),
                             ],
                           ),
@@ -100,7 +105,10 @@ class _AddressPageListState extends State<AddressPageList> {
                             height: 40,
                             child: ElevatedButton(
                               onPressed: () {
-                                Get.to(() => EditAdressPage(routeName: widget.routeName == null ? '/myprofile' : widget.routeName.toString()));
+                                Get.to(() => EditAdressPage(
+                                    routeName: widget.routeName == null
+                                        ? '/myprofile'
+                                        : widget.routeName.toString()));
                               },
                               style: ButtonStyle(
                                 backgroundColor:
@@ -132,7 +140,9 @@ class _AddressPageListState extends State<AddressPageList> {
                           if (snapshot.hasData) {
                             return Column(
                               children: [
-                                for (var i = 0;i < snapshot.data!.addresses.length;i++)
+                                for (var i = 0;
+                                    i < snapshot.data!.addresses.length;
+                                    i++)
                                   listedAddress(i, snapshot)
                               ],
                             );
@@ -147,7 +157,7 @@ class _AddressPageListState extends State<AddressPageList> {
                 ),
               ),
             ),
-        );
+          );
   }
 
   // int? _groupValue = 0;
@@ -217,10 +227,13 @@ class _AddressPageListState extends State<AddressPageList> {
                       right: 0,
                       child: TextButton(
                         onPressed: () {
-                          Get.to(()=> AddressEditPage(token: box1?.get("data4"),
+                          Get.to(() => AddressEditPage(
+                              token: box1?.get("data4"),
                               userId: box1?.get("data3"),
                               addressId: address.addressId.toString(),
-                              routeName: widget.routeName == null ? '/myprofile' : widget.routeName.toString()));
+                              routeName: widget.routeName == null
+                                  ? '/myprofile'
+                                  : widget.routeName.toString()));
                         }, //Edit Option
                         child: const Text('Edit'),
                       ),

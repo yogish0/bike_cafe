@@ -12,6 +12,7 @@ class _BuyAndSellVehiclesState extends State<BuyAndSellVehicles> {
   @override
   Widget build(BuildContext context) {
     return GetScaffold(
+      index: 6,
       title: 'Services',
       body: Container(
         child: Center(

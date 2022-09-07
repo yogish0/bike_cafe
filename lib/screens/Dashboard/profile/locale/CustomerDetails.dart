@@ -50,7 +50,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                         //profile photo
                         ClipOval(
                           child: Container(
-                              child: Image.asset('assets/img/go-logo4.png', width: 120, height: 120)),
+                              child: Image.asset('assets/img/go-logo4.png',
+                                  width: 120, height: 120)),
                         ),
 
                         SizedBox(height: 5),
@@ -81,9 +82,11 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                   bottom: 5,
                   right: 5,
                   child: Container(
-                    child: IconButton(onPressed: () {
-                      Get.to(EditProfile());
-                    }, icon: Icon(Icons.edit)),
+                    child: IconButton(
+                        onPressed: () {
+                          Get.to(EditProfile());
+                        },
+                        icon: Icon(Icons.edit)),
                   ),
                 ),
 
@@ -105,7 +108,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                         Card(
                           child: Text(
                             ' ' + '100' + ' GC ',
-                            style: TextStyle(color: Colors.green,fontSize: 12),
+                            style: TextStyle(color: Colors.green, fontSize: 12),
                           ),
                         ),
                       ],
@@ -115,9 +118,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               ],
             ),
           ),
-
           SizedBox(height: 8),
-
           ProfilebBio(
               icon: Icons.shopping_cart, title: "My Cart", onpressed: () {}),
           SizedBox(
@@ -142,7 +143,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
           SizedBox(
             height: 8,
           ),
-          ProfilebBio(icon: Icons.person, title: "My Profile", onpressed: () {}),
+          ProfilebBio(
+              icon: Icons.person, title: "My Profile", onpressed: () {}),
           SizedBox(
             height: 8,
           ),
@@ -158,7 +160,9 @@ class _CustomerDetailsState extends State<CustomerDetails> {
             height: 8,
           ),
           ProfilebBio(
-              icon: Icons.wallet_giftcard, title: "My Offers", onpressed: () {}),
+              icon: Icons.wallet_giftcard,
+              title: "My Offers",
+              onpressed: () {}),
           SizedBox(
             height: 8,
           ),
@@ -192,7 +196,6 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w300),
                             ),
-
                           ],
                         ),
                       ],

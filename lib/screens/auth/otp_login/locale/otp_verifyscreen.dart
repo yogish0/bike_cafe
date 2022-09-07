@@ -1,12 +1,12 @@
 // import 'package:flutter/material.dart';
 // import 'package:get/get.dart';
-// import 'package:getx_loginpage/controllers/phonenumberController.dart';
-// import 'package:getx_loginpage/screens/Dashboard/dashboard.dart';
+// import 'package:bike_cafe/controllers/phonenumberController.dart';
+// import 'package:bike_cafe/screens/Dashboard/dashboard.dart';
 
-// import 'package:getx_loginpage/widget/auth/button.dart';
-// import 'package:getx_loginpage/widget/auth/hero_title.dart';
-// import 'package:getx_loginpage/widget/auth/txt_bttn.dart';
-// import 'package:getx_loginpage/widget/config.dart';
+// import 'package:bike_cafe/widget/auth/button.dart';
+// import 'package:bike_cafe/widget/auth/hero_title.dart';
+// import 'package:bike_cafe/widget/auth/txt_bttn.dart';
+// import 'package:bike_cafe/widget/config.dart';
 
 // import 'package:pinput/pin_put/pin_put.dart';
 

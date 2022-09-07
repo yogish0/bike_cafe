@@ -16,7 +16,6 @@ class BikeCafe extends StatefulWidget {
 }
 
 class _BikeCafeState extends State<BikeCafe> {
-
   bool seeMoreMenu = false;
 
   @override
@@ -34,19 +33,33 @@ class _BikeCafeState extends State<BikeCafe> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Stack(
                   children: [
-                    Text(
-                      "Bike  Cafe",
-                      style: GoogleFonts.mrDafoe(
-                          fontSize: 40, fontWeight: FontWeight.bold, color: kPrimaryColor),
-                    ),
-                    Row(
-                      children: const [
-                        Icon(Icons.location_on, color: kPrimaryColor),
-                        Text("2nd stage, Nagarabhavi, Bengaluru"),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Bike  Cafe",
+                          style: GoogleFonts.mrDafoe(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: kPrimaryColor),
+                        ),
+                        Row(
+                          children: const [
+                            Icon(Icons.location_on, color: kPrimaryColor),
+                            Text("2nd stage, Nagarabhavi, Bengaluru"),
+                          ],
+                        )
                       ],
+                    ),
+                    const Positioned(
+                      top: 20,
+                      right: 0,
+                      child: Text(
+                        "Coming soon...",
+                        style: TextStyle(fontSize: 20, color: Colors.black38),
+                      ),
                     )
                   ],
                 ),
@@ -75,22 +88,70 @@ class _BikeCafeState extends State<BikeCafe> {
                   children: [
                     const Text(
                       "Today's menu",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
-                    menuListWidget("assets/bike_cafe/cappuccino.jpg", "Cappuccino", "4.3", "1k+ ratings", "Hot beverage", "99"),
-                    menuListWidget("assets/bike_cafe/image3.jpg", "Bike cafe special chicken burger", "4.3", "1k+ ratings", "Snacks", "99"),
-
+                    menuListWidget(
+                        "assets/bike_cafe/cappuccino.jpg",
+                        "Cappuccino",
+                        "4.3",
+                        "1k+ ratings",
+                        "Hot beverage",
+                        "99"),
+                    menuListWidget(
+                        "assets/bike_cafe/image3.jpg",
+                        "Bike cafe special chicken burger",
+                        "4.3",
+                        "1k+ ratings",
+                        "Snacks",
+                        "99"),
                     Visibility(
                       visible: seeMoreMenu,
                       child: Column(
                         children: [
-                          menuListWidget("assets/bike_cafe/pizza.jpg", "Mexican pizza", "4.2", "200+ ratings", "Snacks", "149"),
-                          menuListWidget("assets/bike_cafe/pizza2.jpg", "Cheese corn pizza", "4.3", "100+ ratings", "Snacks", "179"),
-                          menuListWidget("assets/bike_cafe/image2.jpg", "Chicken butter garlic", "4.1", "100+ ratings", "Snacks", "149"),
-                          menuListWidget("assets/bike_cafe/cacke.jpg", "Banana cake", "4.1", "200+ ratings", "Snacks", "99"),
-                          menuListWidget("assets/bike_cafe/bbq.jpg", "DBC(Death by chocolate)", "3.7", "100+ ratings", "snacks", "149"),
-                          menuListWidget("assets/bike_cafe/image3.jpg", "Chicken crispy burger", "4.0", "500+ ratings", "Snacks", "139"),
+                          menuListWidget(
+                              "assets/bike_cafe/pizza.jpg",
+                              "Mexican pizza",
+                              "4.2",
+                              "200+ ratings",
+                              "Snacks",
+                              "149"),
+                          menuListWidget(
+                              "assets/bike_cafe/pizza2.jpg",
+                              "Cheese corn pizza",
+                              "4.3",
+                              "100+ ratings",
+                              "Snacks",
+                              "179"),
+                          menuListWidget(
+                              "assets/bike_cafe/image2.jpg",
+                              "Chicken butter garlic",
+                              "4.1",
+                              "100+ ratings",
+                              "Snacks",
+                              "149"),
+                          menuListWidget(
+                              "assets/bike_cafe/cacke.jpg",
+                              "Banana cake",
+                              "4.1",
+                              "200+ ratings",
+                              "Snacks",
+                              "99"),
+                          menuListWidget(
+                              "assets/bike_cafe/bbq.jpg",
+                              "DBC(Death by chocolate)",
+                              "3.7",
+                              "100+ ratings",
+                              "snacks",
+                              "149"),
+                          menuListWidget(
+                              "assets/bike_cafe/image3.jpg",
+                              "Chicken crispy burger",
+                              "4.0",
+                              "500+ ratings",
+                              "Snacks",
+                              "139"),
                         ],
                       ),
                     ),
@@ -98,7 +159,7 @@ class _BikeCafeState extends State<BikeCafe> {
                       visible: !seeMoreMenu,
                       child: Center(
                         child: InkWell(
-                          onTap: (){
+                          onTap: () {
                             setState(() {
                               seeMoreMenu = true;
                             });
@@ -121,71 +182,89 @@ class _BikeCafeState extends State<BikeCafe> {
                   children: [
                     const Text(
                       "Hot Beverages",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
                     horizontalListView([
-                      categoryListWidget("assets/bike_cafe/image4.jpg","Special coffee"),
-                      categoryListWidget("assets/bike_cafe/masala_tea.jpg","Special tea"),
-                      categoryListWidget("assets/bike_cafe/tea.jpg","Tea without milk"),
+                      categoryListWidget(
+                          "assets/bike_cafe/image4.jpg", "Special coffee"),
+                      categoryListWidget(
+                          "assets/bike_cafe/masala_tea.jpg", "Special tea"),
+                      categoryListWidget(
+                          "assets/bike_cafe/tea.jpg", "Tea without milk"),
                     ]),
                   ],
                 ),
-
                 const SizedBox(height: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       "Cold Beverages",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
                     horizontalListView([
-                      categoryListWidget("assets/bike_cafe/milkshake.jpg","Milk shakes"),
-                      categoryListWidget("assets/bike_cafe/iced_tea.jpg","Iced tea"),
-                      categoryListWidget("assets/bike_cafe/mojito.jpg","Mojito's"),
+                      categoryListWidget(
+                          "assets/bike_cafe/milkshake.jpg", "Milk shakes"),
+                      categoryListWidget(
+                          "assets/bike_cafe/iced_tea.jpg", "Iced tea"),
+                      categoryListWidget(
+                          "assets/bike_cafe/mojito.jpg", "Mojito's"),
                     ]),
                   ],
                 ),
-
                 const SizedBox(height: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       "Snacks",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
                     horizontalListView([
-                      categoryListWidget("assets/bike_cafe/pizza.jpg","Pizza"),
-                      categoryListWidget("assets/bike_cafe/pizza2.jpg","Starters"),
-                      categoryListWidget("assets/bike_cafe/burger.jpg","Burger"),
-                      categoryListWidget("assets/bike_cafe/pasta.jpg","Pasta"),
-                      categoryListWidget("assets/bike_cafe/sandwich.jpg","Sandwich"),
-                      categoryListWidget("assets/bike_cafe/nachoes.jpg","Nachos"),
-                      categoryListWidget("assets/bike_cafe/Casserole.jpg","Sweet tooth"),
-                      categoryListWidget("assets/bike_cafe/image2.jpg","Cookies"),
-                      categoryListWidget("assets/bike_cafe/salad2.jpg","Salad"),
-                      categoryListWidget("assets/bike_cafe/salad.jpg","Quick bites"),
-                      categoryListWidget("assets/bike_cafe/dip.jpg","Potato twisters"),
+                      categoryListWidget("assets/bike_cafe/pizza.jpg", "Pizza"),
+                      categoryListWidget(
+                          "assets/bike_cafe/pizza2.jpg", "Starters"),
+                      categoryListWidget(
+                          "assets/bike_cafe/burger.jpg", "Burger"),
+                      categoryListWidget("assets/bike_cafe/pasta.jpg", "Pasta"),
+                      categoryListWidget(
+                          "assets/bike_cafe/sandwich.jpg", "Sandwich"),
+                      categoryListWidget(
+                          "assets/bike_cafe/nachoes.jpg", "Nachos"),
+                      categoryListWidget(
+                          "assets/bike_cafe/Casserole.jpg", "Sweet tooth"),
+                      categoryListWidget(
+                          "assets/bike_cafe/image2.jpg", "Cookies"),
+                      categoryListWidget(
+                          "assets/bike_cafe/salad2.jpg", "Salad"),
+                      categoryListWidget(
+                          "assets/bike_cafe/salad.jpg", "Quick bites"),
+                      categoryListWidget(
+                          "assets/bike_cafe/dip.jpg", "Potato twisters"),
                     ]),
                   ],
                 ),
-
                 const SizedBox(height: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       "Desert",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     horizontalListView([
-                      categoryListWidget("assets/bike_cafe/iced_tea.jpg","Ice sundae"),
-                      categoryListWidget("assets/bike_cafe/chicken.jpg","Biscuit ice cream cup")
+                      categoryListWidget(
+                          "assets/bike_cafe/iced_tea.jpg", "Ice sundae"),
+                      categoryListWidget("assets/bike_cafe/chicken.jpg",
+                          "Biscuit ice cream cup")
                     ]),
                   ],
                 ),
@@ -197,11 +276,13 @@ class _BikeCafeState extends State<BikeCafe> {
     );
   }
 
-  Widget menuListWidget(String menuImgPath, name, rating, ratingCount, category, price) {
+  Widget menuListWidget(
+      String menuImgPath, name, rating, ratingCount, category, price) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         Get.bottomSheet(
-          bottomSheetWidget(menuImgPath, name, rating, ratingCount, category, price),
+          bottomSheetWidget(
+              menuImgPath, name, rating, ratingCount, category, price),
           backgroundColor: Colors.white,
         );
       },
@@ -223,9 +304,12 @@ class _BikeCafeState extends State<BikeCafe> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      maxLines: 2,overflow: TextOverflow.ellipsis,
+                    Text(
+                      name,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
                     Row(
@@ -236,7 +320,8 @@ class _BikeCafeState extends State<BikeCafe> {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(category,
+                    Text(
+                      category,
                       style: const TextStyle(color: Colors.black54),
                     )
                   ],
@@ -249,10 +334,10 @@ class _BikeCafeState extends State<BikeCafe> {
     );
   }
 
-  Widget categoryListWidget(String imgPath, subCategoryName){
+  Widget categoryListWidget(String imgPath, subCategoryName) {
     return InkWell(
-      onTap: (){
-        Get.to(()=> SubCategoryMenuLists(subCategoryName: subCategoryName));
+      onTap: () {
+        Get.to(() => SubCategoryMenuLists(subCategoryName: subCategoryName));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -267,7 +352,8 @@ class _BikeCafeState extends State<BikeCafe> {
               ),
             ),
             const SizedBox(height: 4),
-            Text(subCategoryName,
+            Text(
+              subCategoryName,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
@@ -277,21 +363,21 @@ class _BikeCafeState extends State<BikeCafe> {
     );
   }
 
-  Widget horizontalListView(List<Widget> subCategories){
+  Widget horizontalListView(List<Widget> subCategories) {
     return SizedBox(
       height: 200,
       width: Get.width * 0.95,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          for(var i=0; i< subCategories.length; i++)
-            subCategories[i]
+          for (var i = 0; i < subCategories.length; i++) subCategories[i]
         ],
       ),
     );
   }
 
-  Widget bottomSheetWidget(String menuImgPath, name, rating, ratingCount, category, price){
+  Widget bottomSheetWidget(
+      String menuImgPath, name, rating, ratingCount, category, price) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -306,9 +392,9 @@ class _BikeCafeState extends State<BikeCafe> {
                 right: 4,
                 top: 4,
                 child: InkWell(
-                    onTap: (){
-                      Get.back();
-                    },
+                  onTap: () {
+                    Get.back();
+                  },
                   child: const Icon(Icons.close, size: 30, color: Colors.white),
                 ),
               ),
@@ -320,9 +406,12 @@ class _BikeCafeState extends State<BikeCafe> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  maxLines: 2,overflow: TextOverflow.ellipsis,
+                Text(
+                  name,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -333,43 +422,44 @@ class _BikeCafeState extends State<BikeCafe> {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(category,
+                Text(
+                  category,
                   style: const TextStyle(color: Colors.black54),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.favorite_border_sharp,color: kPrimaryColor, size: 30),
+                    Icon(Icons.favorite_border_sharp,
+                        color: kPrimaryColor, size: 30),
                     const SizedBox(width: 20),
-                    Icon(Icons.share,color: kPrimaryColor, size: 30),
+                    Icon(Icons.share, color: kPrimaryColor, size: 30),
                     const SizedBox(width: 20),
                     Container(
                       height: 45,
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        border: Border.all(color: kPrimaryColor),
-                        borderRadius: BorderRadius.circular(5)
-                      ),
+                          border: Border.all(color: kPrimaryColor),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Row(
                         children: [
                           Icon(Icons.remove, color: kPrimaryColor),
                           const SizedBox(width: 8),
-                          Text("1" ,style: TextStyle(color: kPrimaryColor)),
+                          Text("1", style: TextStyle(color: kPrimaryColor)),
                           const SizedBox(width: 8),
                           Icon(Icons.add, color: kPrimaryColor),
                         ],
                       ),
                     ),
-
                     const SizedBox(width: 20),
                     SizedBox(
                       height: 45,
                       width: Get.width * 0.45,
                       child: ElevatedButton(
-                        onPressed: (){},
+                        onPressed: () {},
                         child: Text("Add item  ₹ " + price),
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                          backgroundColor:
+                              MaterialStateProperty.all(kPrimaryColor),
                         ),
                       ),
                     ),

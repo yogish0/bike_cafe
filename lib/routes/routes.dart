@@ -49,20 +49,19 @@ abstract class AppPages {
 
     // GetPage(name: Routes.APRESENTACAO, page:()=> ApresentacaoPage()),
 
-
-    GetPage(name: '/categories', page: ()=> CategoryPage()),
+    GetPage(name: '/categories', page: () => CategoryPage()),
     // GetPage(name: '/bikecafe', page: ()=> BikeCafePage()),
-    GetPage(name: '/myvehicles', page: ()=> ListedVehicle()),
-    GetPage(name: '/mycart', page: ()=> CartPage()),
-    GetPage(name: '/myorders', page: ()=> OrdersListPage()),
-    GetPage(name: '/myaddress', page: ()=> AddressPageList()),
-    GetPage(name: '/mywishlist', page: ()=> WishList()),
-    GetPage(name: '/myprofile', page: ()=> ProfilePage()),
-    GetPage(name: '/mynotification', page: ()=> NotificationPage()),
-    GetPage(name: '/mychats', page: ()=> ChatBotPage()),
-    GetPage(name: '/myoffers', page: ()=> MyOffersPage()),
-    GetPage(name: '/mydashboard', page: ()=> Dashboard()),
+    GetPage(name: '/myvehicles', page: () => ListedVehicle()),
+    GetPage(name: '/mycart', page: () => CartPage()),
+    GetPage(name: '/myorders', page: () => OrdersListPage()),
+    GetPage(name: '/myaddress', page: () => AddressPageList()),
+    GetPage(name: '/mywishlist', page: () => WishList()),
+    GetPage(name: '/myprofile', page: () => ProfilePage()),
+    GetPage(name: '/mynotification', page: () => NotificationPage()),
+    GetPage(name: '/mychats', page: () => ChatBotPage()),
+    GetPage(name: '/myoffers', page: () => MyOffersPage()),
+    GetPage(name: '/mydashboard', page: () => Dashboard()),
     //route for checkoutpage
-    GetPage(name: '/checkoutpage', page: ()=> MainPage()),
+    GetPage(name: '/checkoutpage', page: () => MainPage()),
   ];
 }
